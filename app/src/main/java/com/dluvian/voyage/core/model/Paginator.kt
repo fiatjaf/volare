@@ -144,7 +144,6 @@ class Paginator(
         ).map { list -> list.map { FeedCtx(mainEvent = it) } }
         val mutedWords = muteProvider.getMutedWords()
 
-        page.value = flow.stateIn(scope, SharingStarted.WhileSubscribed(), staticFeed)
         filteredPage.value = flow
             // No duplicate cross-posts
             .map { postCtx -> postCtx.distinctBy { it.mainEvent.getRelevantId() } }
@@ -170,12 +169,13 @@ class Paginator(
                 }
             }
             .stateIn(scope, SharingStarted.WhileSubscribed(), staticFeed)
+        page.value = flow.stateIn(scope, SharingStarted.WhileSubscribed(), staticFeed)
     }
 
     private suspend fun getStaticFeed(until: Long): List<MainEventCtx> {
         return feedProvider.getStaticFeed(
             until = until,
-            size = FEED_PAGE_SIZE.div(2),
+            size = FEED_PAGE_SIZE.div(6),
             setting = feedSetting
         ).map { FeedCtx(mainEvent = it) }
     }
