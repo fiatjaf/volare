@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -47,8 +48,7 @@ class Paginator(
     override val hasMoreRecentItems = mutableStateOf(false)
     override val hasPage: MutableState<StateFlow<Boolean>> =
         mutableStateOf(MutableStateFlow(true))
-    override val page: MutableState<StateFlow<List<MainEventCtx>>> =
-        mutableStateOf(MutableStateFlow(emptyList()))
+    override val pageTimestamps: MutableState<List<Long>> = mutableStateOf(emptyList())
     override val filteredPage: MutableState<StateFlow<List<MainEventCtx>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
 
@@ -62,7 +62,7 @@ class Paginator(
 
     fun reinit(setting: FeedSetting, showRefreshIndicator: Boolean = false) {
         isInitialized.value = true
-        val isSame = page.value.value.isNotEmpty() && feedSetting == setting
+        val isSame = pageTimestamps.value.isNotEmpty() && feedSetting == setting
         if (isSame) {
             Log.i(TAG, "Skip init. Settings are the same")
             return
@@ -112,15 +112,15 @@ class Paginator(
 
 
     fun append() {
-        if (isAppending.value || isRefreshing.value || page.value.value.isEmpty()) return
+        if (isAppending.value || isRefreshing.value || pageTimestamps.value.isEmpty()) return
 
         subCreator.unsubAll()
         isAppending.value = true
         hasMoreRecentItems.value = true
 
         scope.launchIO {
-            val newUntil = page.value.value.takeLast(FEED_OFFSET).first().mainEvent.createdAt
-            val subUntil = page.value.value.last().mainEvent.createdAt - 1
+            val newUntil = pageTimestamps.value.takeLast(FEED_OFFSET).first()
+            val subUntil = pageTimestamps.value.last() - 1
             setPage(until = newUntil, subUntil = subUntil)
             delay(DELAY_1SEC)
         }.invokeOnCompletion {
@@ -134,17 +134,19 @@ class Paginator(
         feedSetting: FeedSetting = this.feedSetting,
         forceSubscription: Boolean = false
     ) {
-        val staticFeed = getStaticFeed(until = until)
+        val mutedWords = muteProvider.getMutedWords()
+
         val flow = feedProvider.getFeedFlow(
             until = until,
             subUntil = subUntil,
             size = FEED_PAGE_SIZE,
             setting = feedSetting,
             forceSubscription = forceSubscription,
-        ).map { list -> list.map { FeedCtx(mainEvent = it) } }
-        val mutedWords = muteProvider.getMutedWords()
+        )
 
         filteredPage.value = flow
+            .onEach { pageTimestamps.value = it.map { post -> post.createdAt } }
+            .map { list -> list.map { FeedCtx(mainEvent = it) } }
             // No duplicate cross-posts
             .map { postCtx -> postCtx.distinctBy { it.mainEvent.getRelevantId() } }
             // Reported bug that LazyCol id has duplicates
@@ -168,8 +170,7 @@ class Paginator(
                     BookmarksFeedSetting, is ReplyFeedSetting, is ProfileFeedSetting -> postCtxs
                 }
             }
-            .stateIn(scope, SharingStarted.WhileSubscribed(), staticFeed)
-        page.value = flow.stateIn(scope, SharingStarted.WhileSubscribed(), staticFeed)
+            .stateIn(scope, SharingStarted.WhileSubscribed(), getStaticFeed(until = until))
     }
 
     private suspend fun getStaticFeed(until: Long): List<MainEventCtx> {
