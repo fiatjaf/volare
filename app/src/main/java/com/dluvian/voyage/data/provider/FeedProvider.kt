@@ -92,8 +92,16 @@ class FeedProvider(
         }
             .firstThenDistinctDebounce(SHORT_DEBOUNCE)
             .onEach { posts ->
-                oldestUsedEvent.updateOldestCreatedAt(posts.minOfOrNull { it.createdAt })
-                nostrSubscriber.subVotesAndReplies(
+                val filtered = posts.filter {
+                    !it.content.any {
+                        when (it) {
+                            is TextItem.AString -> it.value.text.containsAnyIgnoreCase(strs = mutedWords)
+                            else -> false
+                        }
+                    }
+                }
+                oldestUsedEvent.updateOldestCreatedAt(filtered.minOfOrNull { it.createdAt })
+                nostrSubscriber.subVotes(
                     parentIds = posts.filter { it.replyCount == 0 && it.upvoteCount == 0 }
                         .filter {
                             !it.content.any {
@@ -105,12 +113,16 @@ class FeedProvider(
                         }
                         .map { it.getRelevantId() }
                 )
-                nostrSubscriber.subPollResponses(polls = posts.filterIsInstance<Poll>())
+                nostrSubscriber.subReplies(
+                    parentIds = filtered.filter { it.replyCount == 0 }.map { it.getRelevantId() }
+                )
+
+                nostrSubscriber.subPollResponses(polls = filtered.filterIsInstance<Poll>())
                 if (showAuthorName.value) {
-                    val pubkeys = posts.filter { it.authorName.isNullOrEmpty() }
+                    val pubkeys = filtered.filter { it.authorName.isNullOrEmpty() }
                         .map { it.pubkey }
                         .toMutableSet()
-                    val crossPostedPubkeys = posts.mapNotNull {
+                    val crossPostedPubkeys = filtered.mapNotNull {
                         if (it is CrossPost && it.crossPostedAuthorName.isNullOrEmpty())
                             it.crossPostedPubkey
                         else null
