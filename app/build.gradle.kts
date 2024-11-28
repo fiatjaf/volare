@@ -98,7 +98,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
 
-    implementation("org.rust-nostr:nostr-sdk:0.36.0")
+    implementation("org.rust-nostr:nostr-sdk:0.37.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.anggrayudi:storage:2.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")

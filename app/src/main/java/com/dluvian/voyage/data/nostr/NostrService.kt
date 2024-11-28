@@ -24,7 +24,6 @@ import rust.nostr.sdk.Coordinate
 import rust.nostr.sdk.Event
 import rust.nostr.sdk.EventId
 import rust.nostr.sdk.Filter
-import rust.nostr.sdk.Kind
 import rust.nostr.sdk.Metadata
 import rust.nostr.sdk.PublicKey
 
@@ -170,20 +169,18 @@ class NostrService(
 
     suspend fun publishLegacyReply(
         content: String,
-        parentId: EventIdHex,
+        parent: Event,
         mentions: List<PubkeyHex>,
         quotes: List<String>,
-        relayHint: RelayUrl,
-        pubkeyHint: PubkeyHex,
+        relayHint: RelayUrl?,
         relayUrls: Collection<RelayUrl>,
         isAnon: Boolean,
     ): Result<Event> {
         return eventMaker.buildReply(
-            parentId = EventId.fromHex(parentId),
+            parent = parent,
             mentions = mentions,
             quotes = quotes,
             relayHint = relayHint,
-            pubkeyHint = pubkeyHint,
             content = content,
             isAnon = isAnon,
         )
@@ -192,24 +189,20 @@ class NostrService(
 
     suspend fun publishComment(
         content: String,
-        parentId: EventIdHex,
-        parentKind: Kind,
+        parent: Event,
         mentions: List<PubkeyHex>,
         quotes: List<String>,
         topics: List<Topic>,
-        relayHint: RelayUrl,
-        pubkeyHint: PubkeyHex,
+        relayHint: RelayUrl?,
         relayUrls: Collection<RelayUrl>,
         isAnon: Boolean,
     ): Result<Event> {
         return eventMaker.buildComment(
-            parentId = EventId.fromHex(parentId),
-            parentKind = parentKind,
+            parent = parent,
             mentions = mentions,
             quotes = quotes,
             topics = topics,
             relayHint = relayHint,
-            pubkeyHint = pubkeyHint,
             content = content,
             isAnon = isAnon,
         )

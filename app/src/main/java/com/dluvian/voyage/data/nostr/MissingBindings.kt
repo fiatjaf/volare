@@ -28,11 +28,6 @@ fun createTitleTag(title: String): Tag {
     return Tag.fromStandardized(TagStandard.Title(title = title))
 }
 
-fun createKindTag(kind: Kind): Tag {
-    // fromStandardized sucks hard
-    return Tag.parse(listOf("k", kind.asU16().toString()))
-}
-
 fun createDescriptionTag(description: String): Tag {
     return Tag.fromStandardized(TagStandard.Description(desc = description))
 }
