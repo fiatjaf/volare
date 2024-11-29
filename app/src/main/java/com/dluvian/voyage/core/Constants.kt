@@ -46,7 +46,7 @@ const val MAX_KEYS = 750 // Filter requests might get too long for most relays. 
 const val MAX_KEYS_SQL = 999 // Exception when query gets too long
 const val MAX_EVENTS_TO_SUB = 200uL
 
-const val FEED_PAGE_SIZE = 30
+const val FEED_PAGE_SIZE = 25
 const val FEED_OFFSET = 3
 
 const val MIN_RETAIN_ROOT = 500f
