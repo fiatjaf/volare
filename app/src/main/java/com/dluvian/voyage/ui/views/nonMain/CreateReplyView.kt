@@ -35,6 +35,7 @@ import com.dluvian.voyage.ui.components.bottomSheet.FullPostBottomSheet
 import com.dluvian.voyage.ui.components.scaffold.ContentCreationScaffold
 import com.dluvian.voyage.ui.components.text.InputWithSuggestions
 import com.dluvian.voyage.ui.components.text.TextInput
+import com.dluvian.voyage.ui.components.text.AnnotatedText
 import com.dluvian.voyage.ui.theme.ExpandIcon
 import com.dluvian.voyage.ui.theme.spacing
 
@@ -133,11 +134,10 @@ private fun Parent(parent: MainEvent) {
             .padding(start = spacing.bigScreenEdge),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
+        AnnotatedText(
+            items = parent.content,
             modifier = Modifier.weight(weight = 1f, fill = true),
-            text = parent.content,
             maxLines = 3,
-            overflow = TextOverflow.Ellipsis
         )
         IconButton(
             onClick = { showFullParent.value = true }) {

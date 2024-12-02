@@ -10,15 +10,15 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import com.dluvian.voyage.R
 import com.dluvian.voyage.core.Fn
 import com.dluvian.voyage.ui.components.text.AnnotatedText
 import com.dluvian.voyage.ui.theme.spacing
+import com.dluvian.voyage.data.provider.TextItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FullPostBottomSheet(content: AnnotatedString, onDismiss: Fn) {
+fun FullPostBottomSheet(content: List<TextItem>, onDismiss: Fn) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         BottomSheetColumn(header = stringResource(id = R.string.original_post)) {
             Column(
@@ -27,7 +27,7 @@ fun FullPostBottomSheet(content: AnnotatedString, onDismiss: Fn) {
                     .verticalScroll(state = rememberScrollState())
                     .padding(bottom = spacing.xxl)
             ) {
-                AnnotatedText(text = content)
+                AnnotatedText(items = content)
             }
         }
     }

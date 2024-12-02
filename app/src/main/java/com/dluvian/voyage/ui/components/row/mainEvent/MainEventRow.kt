@@ -150,7 +150,7 @@ private fun MainEventMainRow(
                 exit = slideOutVertically(animationSpec = tween(durationMillis = 0))
             ) {
                 AnnotatedText(
-                    text = ctx.mainEvent.content,
+                    items = ctx.mainEvent.content,
                     maxLines = when (ctx) {
                         is ThreadReplyCtx, is ThreadRootCtx -> Int.MAX_VALUE
                         is FeedCtx -> MAX_CONTENT_LINES

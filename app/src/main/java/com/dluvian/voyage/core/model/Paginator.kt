@@ -7,7 +7,7 @@ import com.dluvian.voyage.core.DELAY_1SEC
 import com.dluvian.voyage.core.FEED_OFFSET
 import com.dluvian.voyage.core.FEED_PAGE_SIZE
 import com.dluvian.voyage.core.Fn
-import com.dluvian.voyage.core.utils.containsNoneIgnoreCase
+import com.dluvian.voyage.core.utils.containsAnyIgnoreCase
 import com.dluvian.voyage.core.utils.launchIO
 import com.dluvian.voyage.data.model.BookmarksFeedSetting
 import com.dluvian.voyage.data.model.FeedSetting
@@ -21,6 +21,7 @@ import com.dluvian.voyage.data.nostr.SubscriptionCreator
 import com.dluvian.voyage.data.nostr.getCurrentSecs
 import com.dluvian.voyage.data.provider.FeedProvider
 import com.dluvian.voyage.data.provider.MuteProvider
+import com.dluvian.voyage.data.provider.TextItem
 import com.dluvian.voyage.ui.components.row.mainEvent.FeedCtx
 import com.dluvian.voyage.ui.components.row.mainEvent.MainEventCtx
 import kotlinx.coroutines.CoroutineScope
@@ -154,7 +155,12 @@ class Paginator(
                     is InboxFeedSetting, is ListFeedSetting -> {
                         postCtxs.filter { postCtx ->
                             postCtx.mainEvent.trustType == Oneself ||
-                            postCtx.mainEvent.content.text.containsNoneIgnoreCase(strs = mutedWords)
+                            !postCtx.mainEvent.content.any {
+                                when (it) {
+                                    is TextItem.AString -> it.value.text.containsAnyIgnoreCase(strs = mutedWords)
+                                    else -> false
+                                }
+                            }
                         }
                     }
                     // Muted words allowed

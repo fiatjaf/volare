@@ -9,6 +9,7 @@ import com.dluvian.voyage.data.event.COMMENT_U16
 import com.dluvian.voyage.data.event.POLL_U16
 import com.dluvian.voyage.data.nostr.RelayUrl
 import com.dluvian.voyage.data.provider.AnnotatedStringProvider
+import com.dluvian.voyage.data.provider.TextItem
 import com.dluvian.voyage.data.room.view.CommentView
 import com.dluvian.voyage.data.room.view.CrossPostView
 import com.dluvian.voyage.data.room.view.LegacyReplyView
@@ -21,7 +22,7 @@ import rust.nostr.sdk.KindEnum
 sealed class MainEvent(
     open val id: EventIdHex,
     open val pubkey: PubkeyHex,
-    open val content: AnnotatedString,
+    open val content: List<TextItem>,
     open val authorName: String?,
     open val trustType: TrustType,
     open val relayUrl: RelayUrl,
@@ -60,7 +61,7 @@ sealed class MainEvent(
 sealed class ThreadableMainEvent(
     override val id: EventIdHex,
     override val pubkey: PubkeyHex,
-    override val content: AnnotatedString,
+    override val content: List<TextItem>,
     override val authorName: String?,
     override val trustType: TrustType,
     override val relayUrl: RelayUrl,
@@ -87,7 +88,7 @@ sealed class ThreadableMainEvent(
 data class RootPost(
     override val id: EventIdHex,
     override val pubkey: PubkeyHex,
-    override val content: AnnotatedString,
+    override val content: List<TextItem>,
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
@@ -125,7 +126,7 @@ data class RootPost(
                 myTopic = rootPostView.myTopic,
                 createdAt = rootPostView.createdAt,
                 subject = annotatedStringProvider.annotate(rootPostView.subject),
-                content = annotatedStringProvider.annotate(rootPostView.content),
+                content = annotatedStringProvider.annotateWithMedia(rootPostView.content),
                 upvoteCount = rootPostView.upvoteCount,
                 relayUrl = rootPostView.relayUrl,
                 isUpvoted = rootPostView.isUpvoted,
@@ -141,7 +142,7 @@ data class RootPost(
 data class Poll(
     override val id: EventIdHex,
     override val pubkey: PubkeyHex,
-    override val content: AnnotatedString,
+    override val content: List<TextItem>,
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
@@ -180,7 +181,7 @@ data class Poll(
                 trustType = TrustType.from(pollView = pollView),
                 myTopic = pollView.myTopic,
                 createdAt = pollView.createdAt,
-                content = annotatedStringProvider.annotate(pollView.content),
+                content = annotatedStringProvider.annotateWithMedia(pollView.content),
                 upvoteCount = pollView.upvoteCount,
                 relayUrl = pollView.relayUrl,
                 isUpvoted = pollView.isUpvoted,
@@ -200,7 +201,7 @@ sealed class SomeReply(
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
-    override val content: AnnotatedString,
+    override val content: List<TextItem>,
     override val upvoteCount: Int,
     override val replyCount: Int,
     override val relayUrl: RelayUrl,
@@ -227,7 +228,7 @@ data class LegacyReply(
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
-    override val content: AnnotatedString,
+    override val content: List<TextItem>,
     override val upvoteCount: Int,
     override val relayUrl: RelayUrl,
     override val isUpvoted: Boolean,
@@ -260,7 +261,7 @@ data class LegacyReply(
                 authorName = legacyReplyView.authorName,
                 trustType = TrustType.from(legacyReplyView = legacyReplyView),
                 createdAt = legacyReplyView.createdAt,
-                content = annotatedStringProvider.annotate(legacyReplyView.content),
+                content = annotatedStringProvider.annotateWithMedia(legacyReplyView.content),
                 isUpvoted = legacyReplyView.isUpvoted,
                 upvoteCount = legacyReplyView.upvoteCount,
                 relayUrl = legacyReplyView.relayUrl,
@@ -279,7 +280,7 @@ data class Comment(
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
-    override val content: AnnotatedString,
+    override val content: List<TextItem>,
     override val upvoteCount: Int,
     override val replyCount: Int,
     override val relayUrl: RelayUrl,
@@ -317,7 +318,7 @@ data class Comment(
                 authorName = commentView.authorName,
                 trustType = TrustType.from(commentView = commentView),
                 createdAt = commentView.createdAt,
-                content = annotatedStringProvider.annotate(commentView.content),
+                content = annotatedStringProvider.annotateWithMedia(commentView.content),
                 isUpvoted = commentView.isUpvoted,
                 upvoteCount = commentView.upvoteCount,
                 replyCount = commentView.replyCount,
@@ -345,7 +346,7 @@ data class CrossPost(
     val crossPostedRelayUrl: RelayUrl,
     val crossPostedIsUpvoted: Boolean,
     val crossPostedIsBookmarked: Boolean,
-    val crossPostedContent: AnnotatedString,
+    val crossPostedContent: List<TextItem>,
     val crossPostedSubject: AnnotatedString,
     val crossPostedTrustType: TrustType,
 ) : MainEvent(
@@ -374,7 +375,7 @@ data class CrossPost(
                 myTopic = crossPostView.myTopic,
                 createdAt = crossPostView.createdAt,
                 crossPostedSubject = annotatedStringProvider.annotate(crossPostView.crossPostedSubject.orEmpty()),
-                crossPostedContent = annotatedStringProvider.annotate(crossPostView.crossPostedContent),
+                crossPostedContent = annotatedStringProvider.annotateWithMedia(crossPostView.crossPostedContent),
                 crossPostedIsUpvoted = crossPostView.crossPostedIsUpvoted,
                 crossPostedUpvoteCount = crossPostView.crossPostedUpvoteCount,
                 crossPostedLegacyReplyCount = crossPostView.crossPostedLegacyReplyCount,

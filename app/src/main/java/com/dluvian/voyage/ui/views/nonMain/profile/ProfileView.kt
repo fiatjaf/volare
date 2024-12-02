@@ -269,11 +269,11 @@ private fun AboutPage(
             }
             if (!about.isNullOrEmpty()) item {
                 AnnotatedTextWithHeader(
+                    text = about,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = spacing.medium),
                     header = stringResource(id = R.string.about),
-                    text = about
                 )
             }
         }

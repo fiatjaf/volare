@@ -8,7 +8,7 @@ import com.dluvian.voyage.core.model.CrossPost
 import com.dluvian.voyage.core.model.MainEvent
 import com.dluvian.voyage.core.model.Poll
 import com.dluvian.voyage.core.model.SomeReply
-import com.dluvian.voyage.core.utils.containsNoneIgnoreCase
+import com.dluvian.voyage.core.utils.containsAnyIgnoreCase
 import com.dluvian.voyage.core.utils.firstThenDistinctDebounce
 import com.dluvian.voyage.core.utils.mergeToMainEventUIList
 import com.dluvian.voyage.core.utils.mergeToSomeReplyUIList
@@ -95,7 +95,14 @@ class FeedProvider(
                 oldestUsedEvent.updateOldestCreatedAt(posts.minOfOrNull { it.createdAt })
                 nostrSubscriber.subVotesAndReplies(
                     parentIds = posts.filter { it.replyCount == 0 && it.upvoteCount == 0 }
-                        .filter { it.content.text.containsNoneIgnoreCase(strs = mutedWords) }
+                        .filter {
+                            !it.content.any {
+                                when (it) {
+                                    is TextItem.AString -> it.value.text.containsAnyIgnoreCase(strs = mutedWords)
+                                    else -> false
+                                }
+                            }
+                        }
                         .map { it.getRelevantId() }
                 )
                 nostrSubscriber.subPollResponses(polls = posts.filterIsInstance<Poll>())

@@ -142,11 +142,11 @@ private fun AboutSection(
         }
         if (description.isNotEmpty()) item {
             AnnotatedTextWithHeader(
+                text = description,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = spacing.medium),
                 header = stringResource(id = R.string.description),
-                text = description
             )
         }
     }

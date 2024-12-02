@@ -493,6 +493,10 @@ fun String.containsNoneIgnoreCase(strs: Collection<String>): Boolean {
     return strs.none { this.contains(other = it, ignoreCase = true) }
 }
 
+fun String.containsAnyIgnoreCase(strs: Collection<String>): Boolean {
+    return strs.any { this.contains(other = it, ignoreCase = true) }
+}
+
 fun String.toTextFieldValue() = TextFieldValue(text = this, selection = TextRange(this.length))
 
 fun createVoyageClientTag() = Tag.parse(listOf("client", VOYAGE))

@@ -28,6 +28,12 @@ import java.util.Collections
 
 private const val TAG = "AnnotatedStringProvider"
 
+sealed class TextItem {
+  data class AString (val value: AnnotatedString): TextItem()
+  data class ImageURL (val value: String): TextItem()
+  data class VideoURL (val value: String): TextItem()
+}
+
 class AnnotatedStringProvider(private val nameProvider: NameProvider) {
     companion object {
         const val NEVENT_TAG = "NEVENT"
@@ -49,11 +55,23 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
         this.onUpdate = onUpdate
     }
 
-    private val cache: MutableMap<String, AnnotatedString> =
+    private val cache: MutableMap<String, List<TextItem>> =
         Collections.synchronizedMap(mutableMapOf())
 
     fun annotate(str: String): AnnotatedString {
-        if (str.isEmpty()) return AnnotatedString("")
+        val first = annotateInternal(str, false).first()
+        when (first) {
+          is TextItem.AString -> return first.value
+          else -> throw Exception("unexpected first item on annotate()")
+        }
+    }
+
+    fun annotateWithMedia(str: String): List<TextItem> {
+        return annotateInternal(str, true)
+    }
+
+    private fun annotateInternal(str: String, withMedia: Boolean): List<TextItem> {
+        if (str.isEmpty()) return mutableListOf(TextItem.AString(AnnotatedString("")))
         val cached = cache[str]
         if (cached != null) return cached
 
@@ -65,78 +83,116 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
         }
         tokens.addAll(hashtags)
 
-        if (tokens.isEmpty()) return AnnotatedString(text = str)
+        if (tokens.isEmpty()) return mutableListOf(TextItem.AString(AnnotatedString(str)))
         tokens.sortBy { it.range.first }
 
         val editedContent = StringBuilder(str)
         var isCacheable = true
-        val result = buildAnnotatedString {
-            for (token in tokens) {
-                val firstIndex = editedContent.indexOf(token.value)
-                if (firstIndex > 0) {
-                    append(editedContent.subSequence(0, firstIndex))
-                    editedContent.delete(0, firstIndex)
-                }
-                if (urls.contains(token)) {
-                    pushStyledUrlAnnotation(url = token.value)
-                } else if (hashtags.contains(token)) {
-                    pushAnnotatedString(
-                        tag = HASHTAG,
-                        rawString = token.value,
-                        style = HashtagStyle,
-                        displayString = token.value
-                    )
-                } else {
-                    when (val nostrMention = NostrMention.from(token.value)) {
-                        is NpubMention, is NprofileMention -> {
-                            val nprofile = if (nostrMention is NprofileMention) {
-                                nostrMention.nprofile
-                            } else {
-                                createNprofile(hex = nostrMention.hex)
+
+        val result = mutableListOf<TextItem>()
+        var currToken = -1
+
+        while (currToken < tokens.size - 1) {
+            var media: TextItem? = null
+            val annotatedString = buildAnnotatedString {
+                var firstIteration = true;
+
+                while (currToken < tokens.size - 1) {
+                    currToken = currToken + 1
+                    val token = tokens[currToken]
+
+                    val firstIndex = editedContent.indexOf(token.value)
+                    if (firstIndex > 0) {
+                        var text = editedContent.subSequence(0, firstIndex)
+                        if (firstIteration) {
+                            text = text.trimStart()
+                        }
+
+                        append(text)
+                        editedContent.delete(0, firstIndex)
+                    }
+                    editedContent.delete(0, token.value.length)
+                    firstIteration = false
+
+                    if (urls.contains(token)) {
+                        // always display a link even if we are going to display the image afterwards
+                        pushStyledUrlAnnotation(url = token.value)
+
+                        val base = token.value.split("?")[0]
+                        if (withMedia &&
+                            base.endsWith(".gif", true) ||
+                            base.endsWith(".png", true) ||
+                            base.endsWith(".jpeg", true) ||
+                            base.endsWith(".jpg", true) ||
+                            base.endsWith(".webp", true)
+                        ) {
+                            media = TextItem.ImageURL(token.value)
+                            break
+                        } else if (withMedia && base.endsWith(".mp4", true) || base.endsWith(".webm", true)) {
+                            media = TextItem.VideoURL(token.value)
+                            break
+                        }
+                    } else if (hashtags.contains(token)) {
+                        pushAnnotatedString(
+                            tag = HASHTAG,
+                            rawString = token.value,
+                            style = HashtagStyle,
+                            displayString = token.value
+                        )
+                    } else {
+                        when (val nostrMention = NostrMention.from(token.value)) {
+                            is NpubMention, is NprofileMention -> {
+                                val nprofile = if (nostrMention is NprofileMention) {
+                                    nostrMention.nprofile
+                                } else {
+                                    createNprofile(hex = nostrMention.hex)
+                                }
+                                val mentionedName = nameProvider.getName(nprofile = nprofile)
+                                if (mentionedName == null) isCacheable = false
+                                val name = "@${
+                                    mentionedName.orEmpty()
+                                        .ifEmpty { nostrMention.bech32.shortenBech32() }
+                                }"
+                                pushAnnotatedString(
+                                    tag = if (nostrMention is NpubMention) NPUB_TAG else NPROFILE_TAG,
+                                    rawString = nostrMention.bech32,
+                                    style = MentionStyle,
+                                    displayString = name
+                                )
                             }
-                            val mentionedName = nameProvider.getName(nprofile = nprofile)
-                            if (mentionedName == null) isCacheable = false
-                            val name = "@${
-                                mentionedName.orEmpty()
-                                    .ifEmpty { nostrMention.bech32.shortenBech32() }
-                            }"
-                            pushAnnotatedString(
-                                tag = if (nostrMention is NpubMention) NPUB_TAG else NPROFILE_TAG,
-                                rawString = nostrMention.bech32,
-                                style = MentionStyle,
-                                displayString = name
-                            )
-                        }
 
-                        is NoteMention, is NeventMention -> {
-                            pushAnnotatedString(
-                                tag = if (nostrMention is NoteMention) NOTE1_TAG else NEVENT_TAG,
-                                rawString = nostrMention.bech32,
-                                style = MentionStyle,
-                                displayString = nostrMention.bech32.shortenBech32()
-                            )
-                        }
+                            is NoteMention, is NeventMention -> {
+                                pushAnnotatedString(
+                                    tag = if (nostrMention is NoteMention) NOTE1_TAG else NEVENT_TAG,
+                                    rawString = nostrMention.bech32,
+                                    style = MentionStyle,
+                                    displayString = nostrMention.bech32.shortenBech32()
+                                )
+                            }
 
-                        is CoordinateMention -> {
-                            pushAnnotatedString(
-                                tag = COORDINATE,
-                                rawString = nostrMention.bech32,
-                                style = MentionStyle,
-                                displayString = nostrMention.identifier.ifEmpty { nostrMention.bech32.shortenBech32() }
-                            )
-                        }
+                            is CoordinateMention -> {
+                                pushAnnotatedString(
+                                    tag = COORDINATE,
+                                    rawString = nostrMention.bech32,
+                                    style = MentionStyle,
+                                    displayString = nostrMention.identifier.ifEmpty { nostrMention.bech32.shortenBech32() }
+                                )
+                            }
 
-                        null -> {
-                            Log.w(TAG, "Failed to identify ${token.value}")
-                            append(token.value)
-                        }
+                            null -> {
+                                Log.w(TAG, "Failed to identify ${token.value}")
+                                append(token.value)
+                            }
 
+                        }
                     }
                 }
-                editedContent.delete(0, token.value.length)
             }
-            append(editedContent)
+
+            result.add(TextItem.AString(annotatedString))
+            if (media != null) result.add(media!!)
         }
+
         if (isCacheable) cache[str] = result
 
         return result

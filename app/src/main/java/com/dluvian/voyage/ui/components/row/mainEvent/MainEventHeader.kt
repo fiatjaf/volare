@@ -66,8 +66,8 @@ fun MainEventHeader(
         ) {
             MainEventHeaderIconsAndName(ctx = ctx, showAuthor = showAuthorName, onUpdate = onUpdate)
             if (ctx.isCollapsedReply()) AnnotatedText(
+                items = ctx.mainEvent.content,
                 modifier = Modifier.padding(start = spacing.large),
-                text = ctx.mainEvent.content,
                 maxLines = 1
             )
         }

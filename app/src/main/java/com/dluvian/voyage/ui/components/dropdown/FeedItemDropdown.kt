@@ -37,6 +37,7 @@ import com.dluvian.voyage.core.utils.createProcessTextIntent
 import com.dluvian.voyage.core.utils.getTranslators
 import com.dluvian.voyage.data.nostr.createNevent
 import com.dluvian.voyage.data.nostr.createNeventUri
+import com.dluvian.voyage.data.provider.TextItem
 
 @Composable
 fun FeedItemDropdown(
@@ -95,7 +96,7 @@ fun FeedItemDropdown(
             text = stringResource(id = R.string.copy_content),
             onClick = {
                 copyAndToast(
-                    text = mainEvent.content,
+                    text = mainEvent.content.map { when (it) { is TextItem.AString -> it.value.text; else -> "" } }.joinToString(""),
                     toast = contentCopiedToast,
                     context = context,
                     clip = clip
@@ -141,7 +142,7 @@ fun FeedItemDropdown(
                     onClick = {
                         launcher.launch(
                             createProcessTextIntent(
-                                text = mainEvent.content.text,
+                                text = mainEvent.content.map { when (it) { is TextItem.AString -> it.value.text; else -> "" } }.joinToString(""),
                                 info = translator
                             )
                         )

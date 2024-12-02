@@ -99,6 +99,11 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("cash.z.ecc.android:kotlin-bip39:1.0.8")
     implementation("com.anggrayudi:storage:2.0.0")
+    implementation("io.coil-kt.coil3:coil-compose:3.0.3")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.3")
+    implementation("io.coil-kt.coil3:coil-gif:3.0.3")
+    implementation("io.coil-kt.coil3:coil-svg:3.0.3")
+    implementation("io.coil-kt.coil3:coil-video:3.0.3")
 
     // R8 error: Missing class com.google.errorprone.annotations...
     implementation("com.google.errorprone:error_prone_annotations:2.35.1")
