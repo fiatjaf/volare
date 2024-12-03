@@ -30,8 +30,8 @@ private const val TAG = "AnnotatedStringProvider"
 
 sealed class TextItem {
   data class AString (val value: AnnotatedString): TextItem()
-  data class ImageURL (val value: String): TextItem()
-  data class VideoURL (val value: String): TextItem()
+  data class ImageURL (val value: AnnotatedString, val short: String): TextItem()
+  data class VideoURL (val value: AnnotatedString, val short: String): TextItem()
 }
 
 class AnnotatedStringProvider(private val nameProvider: NameProvider) {
@@ -115,22 +115,33 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
                     firstIteration = false
 
                     if (urls.contains(token)) {
-                        // always display a link even if we are going to display the image afterwards
-                        pushStyledUrlAnnotation(url = token.value)
-
                         val base = token.value.split("?")[0]
                         if (withMedia &&
                             base.endsWith(".gif", true) ||
                             base.endsWith(".png", true) ||
                             base.endsWith(".jpeg", true) ||
                             base.endsWith(".jpg", true) ||
+                            base.endsWith(".svg", true) ||
                             base.endsWith(".webp", true)
                         ) {
-                            media = TextItem.ImageURL(token.value)
+                            // it's an image -- stop building the annotated string here and push the url
+                            // (we will resume building a new annotated string afterwards)
+                            media = TextItem.ImageURL(buildAnnotatedString { pushRawUrlAnnotation(token.value) }, shortenUrl(token.value))
                             break
-                        } else if (withMedia && base.endsWith(".mp4", true) || base.endsWith(".webm", true)) {
-                            media = TextItem.VideoURL(token.value)
+                        } else if (withMedia &&
+                                   base.endsWith(".mp4", true) ||
+                                   base.endsWith(".avi", true) ||
+                                   base.endsWith(".mpeg", true) ||
+                                   base.endsWith(".mpg", true) ||
+                                   base.endsWith(".wmv", true) ||
+                                   base.endsWith(".webm", true)
+                        ) {
+                            // it's a video -- idem
+                            media = TextItem.VideoURL(buildAnnotatedString { pushRawUrlAnnotation(token.value) }, shortenUrl(token.value))
                             break
+                        } else {
+                            // otherwise push a URL
+                            pushStyledUrlAnnotation(token.value)
                         }
                     } else if (hashtags.contains(token)) {
                         pushAnnotatedString(
@@ -223,7 +234,13 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
 
     private fun AnnotatedString.Builder.pushStyledUrlAnnotation(url: String) {
         pushLink(LinkAnnotation.Url(url = url, styles = TextLinkStyles(style = UrlStyle)))
-        append(shortenUrl(url = url))
+        append(shortenUrl(url))
+        pop()
+    }
+
+    private fun AnnotatedString.Builder.pushRawUrlAnnotation(url: String) {
+        pushLink(LinkAnnotation.Url(url = url, styles = TextLinkStyles(style = UrlStyle)))
+        append(url)
         pop()
     }
 }

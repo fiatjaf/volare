@@ -1,5 +1,6 @@
 package com.dluvian.voyage.core.utils
 
+import android.net.Uri
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -155,44 +156,40 @@ private val nostrMentionRegex =
 
 fun extractNostrMentions(extractFrom: String) = nostrMentionRegex.findAll(extractFrom).toList()
 
-private val MEDIA_SUFFIXES = listOf(
-    ".jpeg",
-    ".jpg",
-    ".gif",
-    ".png",
-    ".webp",
-    ".mp4",
-    ".mov",
-    ".mp3",
-    ".webm",
-    ".wav",
-    ".bmp",
-    ".svg",
-    ".avi",
-    ".mpg",
-    ".mpeg",
-    ".wmv"
-)
-
 fun shortenUrl(url: String): String {
-    val noPrefix = url.removePrefix("https://").removePrefix("http://")
-    if (!noPrefix.contains('/') || MEDIA_SUFFIXES.none { noPrefix.endsWith(it) }) {
-        return noPrefix
+    val u = Uri.parse(url)
+
+    var rem = 36
+    val res = StringBuilder()
+    if (u.scheme!! != "https") {
+        res.append(u.scheme!!)
+        res.append("://")
+        rem -= (u.scheme!!.length + 3)
     }
 
-    val firstSlash = noPrefix.indexOfFirst { it == '/' }
-    val lastDot = noPrefix.indexOfLast { it == '.' }
+    val host = if (u.authority!!.startsWith("www.")) u.authority!!.drop(4) else u.authority!!
+    if (host.length < 16 || (u.path!!.length + host.length < rem)) {
+        res.append(host)
+        rem -= host.length
+    } else {
+        res.append(host.take(16))
+        rem -= 16
+    }
 
-    if (lastDot - firstSlash <= 12) return noPrefix
+    if (u.path!!.length > 0) {
+        if (u.path!!.length < rem) {
+            res.append(u.path!!)
+        } else {
+            val spl = u.path!!.split("/")
+            if (spl.size >= 3) {
+                res.append("/…/${spl[spl.size-1].takeLast(rem - 3)}")
+            } else {
+                res.append("/${spl[spl.size-1].takeLast(rem - 1)}")
+            }
+        }
+    }
 
-    val firstN = firstSlash + 1
-    val lastN = noPrefix.length - lastDot
-
-    return noPrefix.take(firstN) +
-            noPrefix.drop(firstN).take(3) +
-            "…" +
-            noPrefix.dropLast(lastN).take(3) +
-            noPrefix.takeLast(lastN)
+    return res.toString()
 }
 
 fun createReplyAndVoteFilters(
