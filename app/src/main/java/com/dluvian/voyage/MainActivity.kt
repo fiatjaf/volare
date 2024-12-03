@@ -143,7 +143,7 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
                 appPreferences = appContainer.appPreferences,
                 databaseInteractor = appContainer.databaseInteractor,
                 externalSignerHandler = appContainer.externalSignerHandler,
-                mnemonicSigner = appContainer.mnemonicSigner,
+                plainKeySigner = appContainer.plainKeySigner,
                 accountLocker = appContainer.accountLocker
             )
         },

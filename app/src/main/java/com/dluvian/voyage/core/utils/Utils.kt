@@ -68,7 +68,7 @@ fun PublicKey.toShortenedNpub(): String {
     return this.toBech32().shortenBech32()
 }
 
-fun Bech32.shortenBech32() = "${this.take(10)}:${this.takeLast(5)}"
+fun Bech32.shortenBech32() = "${this.take(10)}…${this.takeLast(5)}"
 
 fun PubkeyHex.toShortenedBech32(): String {
     if (this.isEmpty()) return ""

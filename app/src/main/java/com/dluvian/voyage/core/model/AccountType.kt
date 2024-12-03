@@ -6,7 +6,7 @@ import rust.nostr.sdk.PublicKey
 sealed class AccountType(open val publicKey: PublicKey)
 
 @Immutable
-data class DefaultAccount(override val publicKey: PublicKey) : AccountType(publicKey = publicKey)
+data class PlainKeyAccount(override val publicKey: PublicKey) : AccountType(publicKey = publicKey)
 
 @Immutable
 data class ExternalAccount(override val publicKey: PublicKey) : AccountType(publicKey = publicKey)

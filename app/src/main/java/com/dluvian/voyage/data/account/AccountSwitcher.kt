@@ -8,7 +8,7 @@ import androidx.compose.runtime.State
 import com.dluvian.voyage.core.DELAY_1SEC
 import com.dluvian.voyage.core.FEED_PAGE_SIZE
 import com.dluvian.voyage.core.model.AccountType
-import com.dluvian.voyage.core.model.DefaultAccount
+import com.dluvian.voyage.core.model.PlainKeyAccount
 import com.dluvian.voyage.core.model.ExternalAccount
 import com.dluvian.voyage.data.event.IdCacheClearer
 import com.dluvian.voyage.data.nostr.LazyNostrSubscriber
@@ -20,6 +20,7 @@ import com.dluvian.voyage.data.room.dao.MainEventDao
 import com.dluvian.voyage.data.room.entity.AccountEntity
 import kotlinx.coroutines.delay
 import rust.nostr.sdk.PublicKey
+import rust.nostr.sdk.Keys
 
 private const val TAG = "AccountSwitcher"
 
@@ -44,15 +45,14 @@ class AccountSwitcher(
         return !result.getOrNull().isNullOrEmpty()
     }
 
-    suspend fun useDefaultAccount() {
-        if (accountManager.accountType.value is DefaultAccount) return
-        Log.i(TAG, "Use default account")
+    suspend fun usePlainKeyAccount(key: String) {
+        Log.i(TAG, "Use plain key account $key")
 
-        // Set accountType first, bc it's needed for subbing events
-        val defaultPubkey = accountManager.mnemonicSigner.getPublicKey()
-        accountManager.accountType.value = DefaultAccount(publicKey = defaultPubkey)
+        accountManager.plainKeySigner.setKey(key)
+        val pubkey = accountManager.plainKeySigner.getPublicKey()
+        accountManager.accountType.value = PlainKeyAccount(publicKey = pubkey)
 
-        updateAndReset(account = AccountEntity(pubkey = defaultPubkey.toHex()))
+        updateAndReset(account = AccountEntity(pubkey = pubkey.toHex()))
     }
 
     suspend fun useExternalAccount(publicKey: PublicKey, packageName: String) {

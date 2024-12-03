@@ -16,8 +16,8 @@ import com.dluvian.voyage.core.DEBOUNCE
 import com.dluvian.voyage.core.DELAY_1SEC
 import com.dluvian.voyage.core.DeleteAllPosts
 import com.dluvian.voyage.core.ExportDatabase
+import com.dluvian.voyage.core.LoadSecretKeyForDisplay
 import com.dluvian.voyage.core.ExternalSignerHandler
-import com.dluvian.voyage.core.LoadSeed
 import com.dluvian.voyage.core.LockAccount
 import com.dluvian.voyage.core.ProcessExternalAccount
 import com.dluvian.voyage.core.REBROADCAST_DELAY
@@ -31,16 +31,16 @@ import com.dluvian.voyage.core.ShowUsernames
 import com.dluvian.voyage.core.UpdateAutopilotRelays
 import com.dluvian.voyage.core.UpdateLocalRelayPort
 import com.dluvian.voyage.core.UpdateRootPostThreshold
-import com.dluvian.voyage.core.UseDefaultAccount
+import com.dluvian.voyage.core.UsePlainKeyAccount
 import com.dluvian.voyage.core.UseV2Replies
 import com.dluvian.voyage.core.model.AccountType
-import com.dluvian.voyage.core.model.DefaultAccount
+import com.dluvian.voyage.core.model.PlainKeyAccount
 import com.dluvian.voyage.core.model.ExternalAccount
 import com.dluvian.voyage.core.utils.launchIO
 import com.dluvian.voyage.core.utils.showToast
 import com.dluvian.voyage.data.account.AccountLocker
 import com.dluvian.voyage.data.account.AccountSwitcher
-import com.dluvian.voyage.data.account.MnemonicSigner
+import com.dluvian.voyage.data.account.PlainKeySigner
 import com.dluvian.voyage.data.preferences.AppPreferences
 import com.dluvian.voyage.data.preferences.DatabasePreferences
 import com.dluvian.voyage.data.preferences.EventPreferences
@@ -64,14 +64,14 @@ class SettingsViewModel(
     private val appPreferences: AppPreferences,
     private val databaseInteractor: DatabaseInteractor,
     private val externalSignerHandler: ExternalSignerHandler,
-    private val mnemonicSigner: MnemonicSigner,
+    private val plainKeySigner: PlainKeySigner,
     private val accountLocker: AccountLocker,
 ) : ViewModel() {
     val accountType: State<AccountType> = accountSwitcher.accountType
     val rootPostThreshold = mutableIntStateOf(databasePreferences.getSweepThreshold())
     val currentRootPostCount = databaseInteractor.getRootPostCountFlow()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
-    val seed = mutableStateOf(emptyList<String>())
+    val nsec = mutableStateOf("")
     val sendAuth = mutableStateOf(relayPreferences.getSendAuth())
     val sendBookmarkedToLocalRelay =
         mutableStateOf(relayPreferences.getSendBookmarkedToLocalRelay())
@@ -93,10 +93,9 @@ class SettingsViewModel(
 
     fun handle(action: SettingsViewAction) {
         when (action) {
-            is UseDefaultAccount -> useDefaultAccount()
+            is UsePlainKeyAccount -> usePlainKeyAccount(action.key)
 
             is RequestExternalAccount -> requestExternalAccountData(action = action)
-
             is ProcessExternalAccount -> processExternalAccountData(
                 result = action.activityResult,
                 context = action.context
@@ -113,7 +112,9 @@ class SettingsViewModel(
                 relayPreferences.setAutopilotRelays(newNumber = action.numberOfRelays)
             }
 
-            is LoadSeed -> seed.value = mnemonicSigner.getSeed()
+            is LoadSecretKeyForDisplay -> {
+                nsec.value = plainKeySigner.getKey()!!.secretKey().toBech32()
+            }
 
             is SendAuth -> {
                 relayPreferences.setSendAuth(sendAuth = action.sendAuth)
@@ -162,12 +163,11 @@ class SettingsViewModel(
         }
     }
 
-    private fun useDefaultAccount() {
-        if (accountType.value is DefaultAccount || isLoadingAccount.value) return
+    private fun usePlainKeyAccount(key: String) {
         isLoadingAccount.value = true
 
         viewModelScope.launchIO {
-            accountSwitcher.useDefaultAccount()
+            accountSwitcher.usePlainKeyAccount(key)
         }.invokeOnCompletion {
             isLoadingAccount.value = false
         }

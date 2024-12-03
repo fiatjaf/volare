@@ -39,11 +39,11 @@ const val MAX_RELAYS_PER_PUBKEY = 2
 const val MAX_POPULAR_RELAYS = 50
 
 const val MIN_AUTOPILOT_RELAYS = MAX_RELAYS
-const val DEFAULT_AUTOPILOT_RELAYS = 12
-const val MAX_AUTOPILOT_RELAYS = 25
+const val DEFAULT_AUTOPILOT_RELAYS = 25
+const val MAX_AUTOPILOT_RELAYS = 50
 
 const val MAX_KEYS = 750 // Filter requests might get too long for most relays. Limit to 750
-const val MAX_KEYS_SQL = 4 * MAX_KEYS // Exception when query gets too long
+const val MAX_KEYS_SQL = 999 // Exception when query gets too long
 const val MAX_EVENTS_TO_SUB = 200uL
 
 const val FEED_PAGE_SIZE = 30
@@ -51,4 +51,4 @@ const val FEED_OFFSET = 6
 
 const val MIN_RETAIN_ROOT = 500f
 const val MAX_RETAIN_ROOT = 5_000f
-const val DEFAULT_RETAIN_ROOT = 1500
+const val DEFAULT_RETAIN_ROOT = 2500

@@ -18,7 +18,7 @@
     <string name="account">账户</string>
     <string name="app">应用</string>
     <string name="external_signer">外部签名器</string>
-    <string name="default_account">默认账户</string>
+    <string name="plain_key_account">默认账户</string>
     <string name="logout">登出</string>
     <string name="login_with_external_signer">使用外部签名器登录</string>
     <string name="no_external_signer_installed">您未安装外部签名器</string>

@@ -32,7 +32,8 @@ fun InputWithSuggestions(
     searchSuggestions: List<AdvancedProfileView>,
     isAnon: MutableState<Boolean>,
     onUpdate: OnUpdate,
-    input: ComposableContent
+    allowAnon: Boolean = false,
+    input: ComposableContent,
 ) {
     val showSuggestions = remember { mutableStateOf(false) }
     remember(body.value) {
@@ -61,7 +62,7 @@ fun InputWithSuggestions(
                     onUpdate(ClickProfileSuggestion(pubkey = profile.pubkey))
                 }
             )
-        } else {
+        } else if (allowAnon) {
             NamedCheckbox(
                 isChecked = isAnon.value,
                 name = stringResource(id = R.string.create_anonymously),

@@ -108,7 +108,8 @@ private fun CreateGitIssueContent(
         body = body,
         searchSuggestions = searchSuggestions,
         isAnon = isAnon,
-        onUpdate = onUpdate
+        onUpdate = onUpdate,
+        allowAnon = true
     ) {
         IssueTypeSelection(type = type)
         TextInput(

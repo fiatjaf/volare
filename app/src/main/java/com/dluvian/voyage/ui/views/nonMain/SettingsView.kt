@@ -1,5 +1,6 @@
 package com.dluvian.voyage.ui.views.nonMain
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +37,7 @@ import com.dluvian.voyage.core.ClickCreateGitIssue
 import com.dluvian.voyage.core.ComposableContent
 import com.dluvian.voyage.core.DeleteAllPosts
 import com.dluvian.voyage.core.ExportDatabase
-import com.dluvian.voyage.core.LoadSeed
+import com.dluvian.voyage.core.LoadSecretKeyForDisplay
 import com.dluvian.voyage.core.LockAccount
 import com.dluvian.voyage.core.MAX_AUTOPILOT_RELAYS
 import com.dluvian.voyage.core.MAX_RETAIN_ROOT
@@ -53,10 +54,10 @@ import com.dluvian.voyage.core.ShowUsernames
 import com.dluvian.voyage.core.UpdateAutopilotRelays
 import com.dluvian.voyage.core.UpdateLocalRelayPort
 import com.dluvian.voyage.core.UpdateRootPostThreshold
-import com.dluvian.voyage.core.UseDefaultAccount
 import com.dluvian.voyage.core.UseV2Replies
+import com.dluvian.voyage.core.UsePlainKeyAccount
 import com.dluvian.voyage.core.model.AccountType
-import com.dluvian.voyage.core.model.DefaultAccount
+import com.dluvian.voyage.core.model.PlainKeyAccount
 import com.dluvian.voyage.core.model.ExternalAccount
 import com.dluvian.voyage.core.model.Locked
 import com.dluvian.voyage.core.utils.toShortenedNpub
@@ -64,8 +65,9 @@ import com.dluvian.voyage.core.utils.toTextFieldValue
 import com.dluvian.voyage.core.viewModel.SettingsViewModel
 import com.dluvian.voyage.data.nostr.LOCAL_WEBSOCKET
 import com.dluvian.voyage.data.nostr.createNprofile
-import com.dluvian.voyage.ui.components.bottomSheet.SeedBottomSheet
+import com.dluvian.voyage.ui.components.bottomSheet.NsecBottomSheet
 import com.dluvian.voyage.ui.components.dialog.BaseActionDialog
+import com.dluvian.voyage.ui.components.dialog.SetKeyOrBunkerDialog
 import com.dluvian.voyage.ui.components.indicator.FullLinearProgressIndicator
 import com.dluvian.voyage.ui.components.indicator.SmallCircleProgressIndicator
 import com.dluvian.voyage.ui.components.row.ClickableRow
@@ -91,16 +93,17 @@ fun SettingsView(vm: SettingsViewModel, snackbar: SnackbarHostState, onUpdate: O
 @Composable
 private fun SettingsViewContent(vm: SettingsViewModel, onUpdate: OnUpdate) {
     val scope = rememberCoroutineScope()
-    val isLocked = vm.isLocked.collectAsState()
+
+    // val isLocked = vm.isLocked.collectAsState()
     LazyColumn {
         if (vm.isLoadingAccount.value) item { FullLinearProgressIndicator() }
         item {
             AccountSection(
                 accountType = vm.accountType.value,
-                seed = vm.seed.value,
-                isLocking = vm.isLocking.value,
-                isLocked = vm.isLockedForced.value || isLocked.value,
-                scope = scope,
+                nsec = vm.nsec.value,
+                // isLocking = vm.isLocking.value,
+                // isLocked = vm.isLockedForced.value || isLocked.value,
+                // scope = scope,
                 onUpdate = onUpdate
             )
         }
@@ -119,10 +122,10 @@ private fun SettingsViewContent(vm: SettingsViewModel, onUpdate: OnUpdate) {
 @Composable
 private fun AccountSection(
     accountType: AccountType,
-    seed: List<String>,
-    isLocking: Boolean,
-    isLocked: Boolean,
-    scope: CoroutineScope,
+    nsec: String,
+    // isLocking: Boolean,
+    // isLocked: Boolean,
+    // scope: CoroutineScope,
     onUpdate: OnUpdate
 ) {
     SettingsSection(header = stringResource(id = R.string.account)) {
@@ -130,7 +133,7 @@ private fun AccountSection(
         ClickableRow(
             header = when (accountType) {
                 is ExternalAccount -> stringResource(id = R.string.external_signer)
-                is DefaultAccount -> stringResource(id = R.string.default_account)
+                is PlainKeyAccount -> stringResource(id = R.string.plain_key_account)
             },
             text = shortenedNpub,
             leadingIcon = AccountIcon,
@@ -140,40 +143,42 @@ private fun AccountSection(
         ) {
             AccountRowButton(accountType = accountType, onUpdate = onUpdate)
         }
-        if (accountType is DefaultAccount) {
-            val showSeed = remember { mutableStateOf(false) }
+
+        if (accountType is PlainKeyAccount) {
+            val showNsec = remember { mutableStateOf(false) }
             ClickableRow(
                 header = stringResource(id = R.string.recovery_phrase),
                 text = stringResource(id = R.string.click_to_show_recovery_phrase),
-                onClick = { showSeed.value = true }
+                onClick = { showNsec.value = true }
             )
-            if (showSeed.value) SeedBottomSheet(
-                seed = seed,
-                onLoadSeed = { onUpdate(LoadSeed) },
-                onDismiss = { showSeed.value = false })
+            if (showNsec.value) NsecBottomSheet(
+                nsec = nsec,
+                onLoadNsec = { onUpdate(LoadSecretKeyForDisplay) },
+                onDismiss = { showNsec.value = false })
         }
 
-        val showLockDialog = remember { mutableStateOf(false) }
-        if (showLockDialog.value) BaseActionDialog(
-            title = stringResource(id = R.string.lock_your_account),
-            icon = WarningIcon,
-            iconTint = getTrustColor(trustType = Locked),
-            text = stringResource(id = R.string.lock_your_account_warning),
-            confirmText = stringResource(id = R.string.lock_my_account),
-            onConfirm = {
-                onUpdate(LockAccount(uiScope = scope))
-                showLockDialog.value = false
-            },
-            onDismiss = { showLockDialog.value = false })
-        if (!isLocked) ClickableRow(
-            header = stringResource(id = R.string.lock_your_account),
-            text = stringResource(id = R.string.lock_your_account_in_case_your_keys_are_compromised),
-            trailingContent = { if (isLocking) SmallCircleProgressIndicator() },
-            onClick = { showLockDialog.value = true })
-        else ClickableRow(
-            header = stringResource(id = R.string.rebroadcast_your_lock_event),
-            text = stringResource(id = R.string.your_account_is_locked_click_to_rebroadcast),
-            onClick = { onUpdate(RebroadcastMyLockEvent(uiScope = scope)) })
+        // TODO: revive this later when we have a standard way to fix compromised keys?
+        // val showLockDialog = remember { mutableStateOf(false) }
+        // if (showLockDialog.value) BaseActionDialog(
+        //     title = stringResource(id = R.string.lock_your_account),
+        //     icon = WarningIcon,
+        //     iconTint = getTrustColor(trustType = Locked),
+        //     text = stringResource(id = R.string.lock_your_account_warning),
+        //     confirmText = stringResource(id = R.string.lock_my_account),
+        //     onConfirm = {
+        //         onUpdate(LockAccount(uiScope = scope))
+        //         showLockDialog.value = false
+        //     },
+        //     onDismiss = { showLockDialog.value = false })
+        // if (!isLocked) ClickableRow(
+        //     header = stringResource(id = R.string.lock_your_account),
+        //     text = stringResource(id = R.string.lock_your_account_in_case_your_keys_are_compromised),
+        //     trailingContent = { if (isLocking) SmallCircleProgressIndicator() },
+        //     onClick = { showLockDialog.value = true })
+        // else ClickableRow(
+        //     header = stringResource(id = R.string.rebroadcast_your_lock_event),
+        //     text = stringResource(id = R.string.your_account_is_locked_click_to_rebroadcast),
+        //     onClick = { onUpdate(RebroadcastMyLockEvent(uiScope = scope)) })
     }
 }
 
@@ -397,16 +402,32 @@ private fun AccountRowButton(
     onUpdate: OnUpdate
 ) {
     val context = LocalContext.current
+
+    val showKeyDialog = remember { mutableStateOf(false) }
+
+    if (showKeyDialog.value) {
+        SetKeyOrBunkerDialog(
+            onSet = { key ->
+                onUpdate(UsePlainKeyAccount(key))
+            },
+            onDismiss = { showKeyDialog.value = false },
+        )
+    }
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         when (accountType) {
-            is ExternalAccount -> TextButton(onClick = { onUpdate(UseDefaultAccount) }) {
-                Text(text = stringResource(id = R.string.logout))
+            is ExternalAccount -> Row {
+                TextButton(onClick = { showKeyDialog.value = true }) {
+                    Text(text = stringResource(id = R.string.use_another_account))
+                }
             }
-
-            is DefaultAccount -> TextButton(onClick = {
-                onUpdate(RequestExternalAccount(context = context))
-            }) {
-                Text(text = stringResource(id = R.string.login_with_external_signer))
+            is PlainKeyAccount -> Row {
+                TextButton(onClick = { showKeyDialog.value = true }) {
+                    Text(text = stringResource(id = R.string.use_another_account))
+                }
+                TextButton(onClick = { onUpdate(RequestExternalAccount(context = context)) }) {
+                    Text(text = stringResource(id = R.string.login_with_external_signer))
+                }
             }
         }
     }

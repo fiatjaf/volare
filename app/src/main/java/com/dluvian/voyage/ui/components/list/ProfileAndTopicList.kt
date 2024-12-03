@@ -20,9 +20,9 @@ import com.dluvian.voyage.core.OnUpdate
 import com.dluvian.voyage.core.UnmuteWord
 import com.dluvian.voyage.core.model.Muted
 import com.dluvian.voyage.ui.components.SimpleTabPager
-import com.dluvian.voyage.ui.components.dialog.AddMuteWordDialog
 import com.dluvian.voyage.ui.components.indicator.ComingSoon
 import com.dluvian.voyage.ui.components.row.AddRow
+import com.dluvian.voyage.ui.components.dialog.AddMuteWordDialog
 import com.dluvian.voyage.ui.model.FollowableOrMutableItem
 import com.dluvian.voyage.ui.theme.WordIcon
 import com.dluvian.voyage.ui.theme.getTrustColor

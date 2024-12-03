@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.dluvian.voyage.core.model.AccountType
-import com.dluvian.voyage.core.model.DefaultAccount
+import com.dluvian.voyage.core.model.PlainKeyAccount
 import com.dluvian.voyage.core.model.ExternalAccount
 import com.dluvian.voyage.data.room.dao.AccountDao
 import com.dluvian.voyage.data.room.entity.AccountEntity
@@ -20,7 +20,7 @@ import rust.nostr.sdk.UnsignedEvent
 private const val TAG = "AccountManager"
 
 class AccountManager(
-    val mnemonicSigner: MnemonicSigner,
+    val plainKeySigner: PlainKeySigner,
     private val externalSigner: ExternalSigner,
     private val accountDao: AccountDao,
 ) : IMyPubkeyProvider {
@@ -31,10 +31,10 @@ class AccountManager(
     init {
         val dbAccount = runBlocking { accountDao.getAccount() }
         if (dbAccount == null) {
-            Log.i(TAG, "No acc pubkey found in database. Initialize new.")
-            val pubkey = mnemonicSigner.getPublicKey()
+            Log.i(TAG, "No account pubkey found in database. Initialize new.")
+            val pubkey = plainKeySigner.getPublicKey()
             val hex = pubkey.toHex()
-            accountType = mutableStateOf(DefaultAccount(pubkey))
+            accountType = mutableStateOf(PlainKeyAccount(pubkey))
             val account = AccountEntity(pubkey = hex)
             scope.launch {
                 accountDao.updateAccount(account = account)
@@ -44,7 +44,7 @@ class AccountManager(
             }
         } else {
             val publicKey = PublicKey.fromHex(dbAccount.pubkey)
-            val account = if (dbAccount.packageName == null) DefaultAccount(publicKey = publicKey)
+            val account = if (dbAccount.packageName == null) PlainKeyAccount(publicKey = publicKey)
             else ExternalAccount(publicKey = publicKey)
             accountType = mutableStateOf(account)
         }
@@ -56,8 +56,8 @@ class AccountManager(
 
     suspend fun sign(unsignedEvent: UnsignedEvent): Result<Event> {
         return when (accountType.value) {
-            is DefaultAccount -> {
-                mnemonicSigner.sign(unsignedEvent = unsignedEvent)
+            is PlainKeyAccount -> {
+                plainKeySigner.sign(unsignedEvent = unsignedEvent)
             }
 
             is ExternalAccount -> {

@@ -311,7 +311,7 @@ data class SaveProfile(
 
 
 sealed class SettingsViewAction : UIEvent()
-data object UseDefaultAccount : SettingsViewAction()
+data class UsePlainKeyAccount(val key: String): SettingsViewAction()
 data class RequestExternalAccount(val context: Context) : SettingsViewAction()
 data class ProcessExternalAccount(
     val activityResult: ActivityResult,
@@ -320,7 +320,7 @@ data class ProcessExternalAccount(
 
 data class UpdateRootPostThreshold(val threshold: Float) : SettingsViewAction()
 data class UpdateAutopilotRelays(val numberOfRelays: Int) : SettingsViewAction()
-data object LoadSeed : SettingsViewAction()
+data object LoadSecretKeyForDisplay : SettingsViewAction()
 data class SendAuth(val sendAuth: Boolean) : SettingsViewAction()
 data class SendUpvotedToLocalRelay(val sendToLocalRelay: Boolean) : SettingsViewAction()
 data class SendBookmarkedToLocalRelay(val sendToLocalRelay: Boolean) : SettingsViewAction()

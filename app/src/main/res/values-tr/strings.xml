@@ -17,7 +17,7 @@
     <string name="account">Hesap</string>
     <string name="app">Uygulama</string>
     <string name="external_signer">Harici imzalayıcı</string>
-    <string name="default_account">Varsayılan hesap</string>
+    <string name="plain_key_account">Varsayılan hesap</string>
     <string name="logout">Çıkış Yap</string>
     <string name="login_with_external_signer">Harici imzalayıcı ile giriş yap</string>
     <string name="no_external_signer_installed">Harici imzalayıcı yüklü değil</string>
