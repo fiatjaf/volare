@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Brush
 import coil3.compose.AsyncImage
+import com.dluvian.voyage.ui.components.video.VideoPlayer
 import com.dluvian.voyage.data.provider.TextItem
 
 @Composable
@@ -81,7 +82,39 @@ fun AnnotatedText(
                         }
                     }
                 is TextItem.VideoURL ->
-                    AsyncImage(model = item.value.text, contentDescription = null)
+                    if (bigImage != index) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier
+                                .clickable {
+                                    setBigImage(index)
+                                }
+                                .fillMaxWidth()
+                                .height(21.dp)
+                                .background(gradientBrush)
+                        ) {
+                            AsyncImage(model = item.value.text, contentDescription = null)
+                            Text(text = item.short, style = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp))
+                        }
+                    } else {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier
+                                // .clickable {
+                                //     setBigImage(-1)
+                                // }
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                                .background(gradientBrush)
+                        ) {
+                            VideoPlayer(
+                                url = item.value.text,
+                                modifier = Modifier
+                            )
+                            Text(text = item.value, style = TextStyle(fontSize = 16.sp))
+                        }
+                    }
             }
         }
     }
