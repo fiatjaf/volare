@@ -64,9 +64,6 @@ class Bookmarker(
 
     private fun handleAction(postId: EventIdHex, isBookmarked: Boolean) {
         updateForcedStates(postId = postId, isBookmarked = isBookmarked)
-        if (relayPreferences.getSendBookmarkedToLocalRelay()) {
-            scope.launchIO { rebroadcaster.rebroadcastLocally(postId = postId) }
-        }
         handleBookmark()
     }
 

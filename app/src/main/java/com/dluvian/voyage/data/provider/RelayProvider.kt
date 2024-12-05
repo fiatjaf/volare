@@ -11,8 +11,6 @@ import com.dluvian.voyage.core.PubkeyHex
 import com.dluvian.voyage.core.model.ConnectionStatus
 import com.dluvian.voyage.core.model.Disconnected
 import com.dluvian.voyage.core.model.Spam
-import com.dluvian.voyage.core.utils.addLocalRelay
-import com.dluvian.voyage.core.utils.createLocalRelayUrl
 import com.dluvian.voyage.core.utils.putOrAdd
 import com.dluvian.voyage.core.utils.takeRandom
 import com.dluvian.voyage.data.model.CustomPubkeys
@@ -23,7 +21,6 @@ import com.dluvian.voyage.data.model.NoPubkeys
 import com.dluvian.voyage.data.model.PubkeySelection
 import com.dluvian.voyage.data.model.SingularPubkey
 import com.dluvian.voyage.data.model.WebOfTrustPubkeys
-import com.dluvian.voyage.data.nostr.LOCAL_WEBSOCKET
 import com.dluvian.voyage.data.nostr.Nip65Relay
 import com.dluvian.voyage.data.nostr.NostrClient
 import com.dluvian.voyage.data.nostr.RelayUrl
@@ -57,7 +54,6 @@ class RelayProvider(
     fun getReadRelays(
         limit: Int = MAX_RELAYS,
         includeConnected: Boolean = false,
-        includeLocalRelay: Boolean = true
     ): List<RelayUrl> {
         return myNip65.value
             .filter { it.nip65Relay.isRead }
@@ -66,9 +62,6 @@ class RelayProvider(
             .preferConnected(limit = limit)
             .let {
                 if (includeConnected) (it + nostrClient.getAllConnectedUrls()).distinct() else it
-            }
-            .let {
-                if (includeLocalRelay) it.addLocalRelay(relayPreferences.getLocalRelayPort()) else it
             }
             .distinct()
     }
@@ -79,7 +72,6 @@ class RelayProvider(
             .map { it.nip65Relay.url }
             .ifEmpty { defaultRelays }
             .preferConnected(limit)
-            .addLocalRelay(relayPreferences.getLocalRelayPort())
             .distinct()
     }
 
@@ -201,7 +193,6 @@ class RelayProvider(
         }
 
         val eventRelays = eventRelaysView.map { it.relayUrl }
-            .filterNot { it.startsWith(LOCAL_WEBSOCKET) }
             .toSet()
 
         val writeRelays = when (selection) {
@@ -282,7 +273,6 @@ class RelayProvider(
             .toMutableSet()
         if (singleSelectedPubkeys.isNotEmpty()) {
             getReadRelays()
-                .filterNot { it.startsWith(LOCAL_WEBSOCKET) }
                 .shuffled()
                 .forEach { relay ->
                     val selectedPubkeys = result[relay].orEmpty()
@@ -294,11 +284,6 @@ class RelayProvider(
                     result.putOrAdd(relay, addable)
                     singleSelectedPubkeys.removeAll(addable)
                 }
-        }
-
-        val localRelay = createLocalRelayUrl(port = relayPreferences.getLocalRelayPort())
-        if (localRelay != null) {
-            result.putOrAdd(localRelay, result.values.flatten().toSet())
         }
 
         Log.i(TAG, "Selected ${result.size} autopilot relays ${result.keys}")
@@ -324,11 +309,6 @@ class RelayProvider(
     }
 
     suspend fun getPopularRelays() = nip65Dao.getPopularRelays(limit = MAX_POPULAR_RELAYS)
-
-    fun getConnectedLocalRelay(): RelayUrl? {
-        return nostrClient.getAllConnectedUrls()
-            .find { it.startsWith(LOCAL_WEBSOCKET) }
-    }
 
     private fun List<RelayUrl>.preferConnected(limit: Int): List<RelayUrl> {
         if (this.size <= limit) return this

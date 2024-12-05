@@ -48,11 +48,8 @@ import com.dluvian.voyage.core.OpenProfile
 import com.dluvian.voyage.core.RebroadcastMyLockEvent
 import com.dluvian.voyage.core.RequestExternalAccount
 import com.dluvian.voyage.core.SendAuth
-import com.dluvian.voyage.core.SendBookmarkedToLocalRelay
-import com.dluvian.voyage.core.SendUpvotedToLocalRelay
 import com.dluvian.voyage.core.ShowUsernames
 import com.dluvian.voyage.core.UpdateAutopilotRelays
-import com.dluvian.voyage.core.UpdateLocalRelayPort
 import com.dluvian.voyage.core.UpdateRootPostThreshold
 import com.dluvian.voyage.core.UseV2Replies
 import com.dluvian.voyage.core.UsePlainKeyAccount
@@ -63,7 +60,6 @@ import com.dluvian.voyage.core.model.Locked
 import com.dluvian.voyage.core.utils.toShortenedNpub
 import com.dluvian.voyage.core.utils.toTextFieldValue
 import com.dluvian.voyage.core.viewModel.SettingsViewModel
-import com.dluvian.voyage.data.nostr.LOCAL_WEBSOCKET
 import com.dluvian.voyage.data.nostr.createNprofile
 import com.dluvian.voyage.ui.components.bottomSheet.NsecBottomSheet
 import com.dluvian.voyage.ui.components.dialog.BaseActionDialog
@@ -210,65 +206,11 @@ private fun RelaySection(vm: SettingsViewModel, onUpdate: OnUpdate) {
             text = stringResource(id = R.string.max_num_of_relays_autopilot_is_allowed_to_select),
             onClick = { showAutopilotDialog.value = true })
 
-        val showPortDialog = remember { mutableStateOf(false) }
-        if (showPortDialog.value) {
-            val newPort = remember {
-                mutableStateOf(vm.localRelayPort.value?.toString().orEmpty().toTextFieldValue())
-            }
-            val parsedNewPort = remember(newPort.value) {
-                runCatching { newPort.value.text.toUShort() }.getOrNull()
-            }
-            BaseActionDialog(title = stringResource(id = R.string.local_relay_port),
-                main = {
-                    LaunchedEffect(key1 = Unit) { focusRequester.requestFocus() }
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(focusRequester = focusRequester),
-                        value = newPort.value,
-                        prefix = { Text(text = LOCAL_WEBSOCKET) },
-                        onValueChange = { newStr ->
-                            if (newStr.text.length <= 5 &&
-                                newStr.text.all { it.isDigit() } &&
-                                !newStr.text.startsWith("0")
-                            ) {
-                                newPort.value = newStr
-                            }
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
-                        ),
-                    )
-                },
-                confirmIsEnabled = newPort.value.text.isEmpty() || parsedNewPort != null,
-                onConfirm = { onUpdate(UpdateLocalRelayPort(port = parsedNewPort)) },
-                onDismiss = { showPortDialog.value = false })
-        }
-        val headerSuffix = remember(vm.localRelayPort.value) {
-            vm.localRelayPort.value.let { if (it != null) ": $it" else "" }
-        }
-        ClickableRow(header = stringResource(id = R.string.local_relay_port) + headerSuffix,
-            text = stringResource(id = R.string.port_number_of_your_local_relay),
-            onClick = { showPortDialog.value = true })
-
         ClickableRowCheckbox(
             header = stringResource(id = R.string.authenticate_via_auth),
             text = stringResource(id = R.string.enable_to_authenticate_yourself_to_relays),
             checked = vm.sendAuth.value,
             onClickChange = { onUpdate(SendAuth(sendAuth = it)) })
-
-        ClickableRowCheckbox(
-            header = stringResource(id = R.string.send_bookmarked_post_to_local_relay),
-            text = stringResource(id = R.string.send_post_to_local_relay_after_bookmarking_it),
-            checked = vm.sendBookmarkedToLocalRelay.value,
-            onClickChange = { onUpdate(SendBookmarkedToLocalRelay(sendToLocalRelay = it)) })
-
-        ClickableRowCheckbox(
-            header = stringResource(id = R.string.send_upvoted_post_to_local_relay),
-            text = stringResource(id = R.string.send_post_to_local_relay_after_upvoting_it),
-            checked = vm.sendUpvotedToLocalRelay.value,
-            onClickChange = { onUpdate(SendUpvotedToLocalRelay(it)) })
     }
 }
 

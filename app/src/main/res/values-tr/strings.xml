@@ -202,8 +202,6 @@
     <string name="list_is_empty">Liste boş</string>
     <string name="in_list">"Listede "</string>
     <string name="next">Sonraki</string>
-    <string name="local_relay_port">Yerel röle bağlantı noktası</string>
-    <string name="port_number_of_your_local_relay">Yerel aktarıcınızın bağlantı noktası numarası</string>
     <string name="export_database">Veritabanını dışa aktar</string>
     <string name="export_your_posts_and_bookmarks">Gönderilerinizi ve yer işaretlerinizi dışa aktarın</string>
     <string name="exported_n_posts">%d gönderi dışa aktarıldı</string>
@@ -220,10 +218,6 @@
     <string name="words">Kelimeler</string>
     <string name="failed_to_sign_mute_list">Sessiz listeyi imzalama başarısız oldu</string>
     <string name="add_word">Kelime ekle</string>
-    <string name="send_bookmarked_post_to_local_relay">Yer imlerine eklenen gönderiyi yerel röleye gönder</string>
-    <string name="send_post_to_local_relay_after_bookmarking_it">Yer imlerine ekledikten sonra gönderiyi yerel röleye gönder</string>
-    <string name="send_upvoted_post_to_local_relay">Oylanan gönderiyi yerel röleye gönder</string>
-    <string name="send_post_to_local_relay_after_upvoting_it">Oy verdikten sonra gönderiyi yerel röleye gönder</string>
     <string name="upvote_event_content">Upvote-Etkinlik içeriği</string>
     <string name="this_affects_how_other_clients_render_your_upvotes">Bu, diğer istemcilerin sizin oylarınızı nasıl işlediğini etkiler</string>
     <string name="confirm">Onaylamak</string>

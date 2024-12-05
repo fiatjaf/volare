@@ -24,12 +24,9 @@ import com.dluvian.voyage.core.REBROADCAST_DELAY
 import com.dluvian.voyage.core.RebroadcastMyLockEvent
 import com.dluvian.voyage.core.RequestExternalAccount
 import com.dluvian.voyage.core.SendAuth
-import com.dluvian.voyage.core.SendBookmarkedToLocalRelay
-import com.dluvian.voyage.core.SendUpvotedToLocalRelay
 import com.dluvian.voyage.core.SettingsViewAction
 import com.dluvian.voyage.core.ShowUsernames
 import com.dluvian.voyage.core.UpdateAutopilotRelays
-import com.dluvian.voyage.core.UpdateLocalRelayPort
 import com.dluvian.voyage.core.UpdateRootPostThreshold
 import com.dluvian.voyage.core.UsePlainKeyAccount
 import com.dluvian.voyage.core.UseV2Replies
@@ -73,11 +70,7 @@ class SettingsViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
     val nsec = mutableStateOf("")
     val sendAuth = mutableStateOf(relayPreferences.getSendAuth())
-    val sendBookmarkedToLocalRelay =
-        mutableStateOf(relayPreferences.getSendBookmarkedToLocalRelay())
-    val sendUpvotedToLocalRelay = mutableStateOf(relayPreferences.getSendUpvotedToLocalRelay())
     val autopilotRelays = mutableIntStateOf(relayPreferences.getAutopilotRelays())
-    val localRelayPort = mutableStateOf(relayPreferences.getLocalRelayPort())
     val isDeleting = mutableStateOf(false)
     val isExporting = mutableStateOf(false)
     val exportCount = mutableIntStateOf(0)
@@ -134,21 +127,6 @@ class SettingsViewModel(
             is UseV2Replies -> {
                 eventPreferences.setIsUsingV2Replies(useV2Replies = action.useV2Replies)
                 this.useV2Replies.value = action.useV2Replies
-            }
-
-            is SendBookmarkedToLocalRelay -> {
-                relayPreferences.setSendBookmarkedToLocalRelay(sendToLocalRelay = action.sendToLocalRelay)
-                this.sendBookmarkedToLocalRelay.value = action.sendToLocalRelay
-            }
-
-            is SendUpvotedToLocalRelay -> {
-                relayPreferences.setSendUpvotedToLocalRelay(sendToLocalRelay = action.sendToLocalRelay)
-                this.sendUpvotedToLocalRelay.value = action.sendToLocalRelay
-            }
-
-            is UpdateLocalRelayPort -> {
-                relayPreferences.setLocalRelayPort(port = action.port?.toInt())
-                this.localRelayPort.value = action.port?.toInt()
             }
 
             is ShowUsernames -> appPreferences.setShowAuthorName(showAuthorName = action.showUsernames)

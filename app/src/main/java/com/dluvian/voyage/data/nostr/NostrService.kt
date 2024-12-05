@@ -13,7 +13,6 @@ import com.dluvian.voyage.core.model.Connected
 import com.dluvian.voyage.core.model.ConnectionStatus
 import com.dluvian.voyage.core.model.Spam
 import com.dluvian.voyage.core.model.Waiting
-import com.dluvian.voyage.core.utils.addLocalRelay
 import com.dluvian.voyage.core.utils.launchIO
 import com.dluvian.voyage.data.event.EventCounter
 import com.dluvian.voyage.data.event.EventMaker
@@ -109,7 +108,6 @@ class NostrService(
     fun initialize(initRelayUrls: Collection<RelayUrl>) {
         nostrClient.setListener(listener)
         Log.i(TAG, "Add ${initRelayUrls.size} relays: $initRelayUrls")
-        nostrClient.addRelays(initRelayUrls.addLocalRelay(relayPreferences.getLocalRelayPort()))
 
         initRelayUrls.forEach {
             addConnectionStatus(relayUrl = it, status = Waiting)

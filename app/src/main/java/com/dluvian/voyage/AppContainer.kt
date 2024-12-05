@@ -301,7 +301,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         voteDao = roomDb.voteDao(),
         eventDeletor = eventDeletor,
         rebroadcaster = eventRebroadcaster,
-        relayPreferences = relayPreferences,
         eventPreferences = eventPreferences,
     )
 

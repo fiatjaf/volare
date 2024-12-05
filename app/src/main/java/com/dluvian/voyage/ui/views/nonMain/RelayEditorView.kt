@@ -48,7 +48,6 @@ import com.dluvian.voyage.core.model.Connected
 import com.dluvian.voyage.core.model.ConnectionStatus
 import com.dluvian.voyage.core.model.Waiting
 import com.dluvian.voyage.core.viewModel.RelayEditorViewModel
-import com.dluvian.voyage.data.nostr.LOCAL_WEBSOCKET
 import com.dluvian.voyage.data.nostr.Nip65Relay
 import com.dluvian.voyage.data.nostr.RelayUrl
 import com.dluvian.voyage.ui.components.ConnectionDot
@@ -181,9 +180,7 @@ private fun LazyListScope.addSection(
         itemsIndexed(items = relays) { index, relayUrl ->
             NormalRelayRow(
                 relayUrl = relayUrl,
-                isAddable = addIsEnabled &&
-                        myRelays.none { it.url == relayUrl } &&
-                        !relayUrl.startsWith(LOCAL_WEBSOCKET),
+                isAddable = addIsEnabled && myRelays.none { it.url == relayUrl },
                 connectionStatus = connectionStatuses[relayUrl],
                 scope = scope,
                 onUpdate = onUpdate,

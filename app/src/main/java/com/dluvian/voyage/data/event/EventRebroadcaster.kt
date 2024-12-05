@@ -51,17 +51,4 @@ class EventRebroadcaster(
                 )
             }
     }
-
-    suspend fun rebroadcastLocally(postId: EventIdHex) {
-        val localRelay = relayProvider.getConnectedLocalRelay()
-        if (localRelay.isNullOrEmpty()) {
-            Log.i(TAG, "No open local relay connection to rebroadcast bookmarked post")
-            return
-        }
-
-        val json = mainEventDao.getJson(id = postId)
-        if (json.isNullOrEmpty()) return
-
-        nostrService.publishJson(eventJson = json, relayUrls = listOf(localRelay))
-    }
 }

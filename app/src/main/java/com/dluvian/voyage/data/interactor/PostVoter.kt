@@ -43,7 +43,6 @@ class PostVoter(
     private val voteDao: VoteDao,
     private val eventDeletor: EventDeletor,
     private val rebroadcaster: EventRebroadcaster,
-    private val relayPreferences: RelayPreferences,
     private val eventPreferences: EventPreferences,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -58,9 +57,6 @@ class PostVoter(
             is ClickNeutralizeVote -> false
         }
         updateForcedVote(action.postId, newVote)
-        if (relayPreferences.getSendUpvotedToLocalRelay()) {
-            scope.launchIO { rebroadcaster.rebroadcastLocally(postId = action.postId) }
-        }
         vote(
             postId = action.postId,
             mention = action.mention,

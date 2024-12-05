@@ -25,7 +25,6 @@ import com.dluvian.voyage.data.event.COMMENT_U16
 import com.dluvian.voyage.data.event.POLL_U16
 import com.dluvian.voyage.data.model.ForcedData
 import com.dluvian.voyage.data.model.RelevantMetadata
-import com.dluvian.voyage.data.nostr.LOCAL_WEBSOCKET
 import com.dluvian.voyage.data.nostr.RelayUrl
 import com.dluvian.voyage.data.nostr.getSubject
 import com.dluvian.voyage.data.provider.AnnotatedStringProvider
@@ -471,19 +470,6 @@ fun createAdvancedProfile(
         isInList = dbProfile?.isInList ?: itemSetProvider.isInAnySet(pubkey = pubkey),
         isLocked = dbProfile?.isLocked ?: lockProvider.isLocked(pubkey = pubkey)
     )
-}
-
-fun createLocalRelayUrl(port: Int?): String? {
-    return if (port != null) "$LOCAL_WEBSOCKET$port" else null
-}
-
-fun Collection<RelayUrl>.addLocalRelay(port: Int?): List<RelayUrl> {
-    val local = createLocalRelayUrl(port = port)
-    return if (local != null) {
-        mutableListOf(local).apply { addAll(this@addLocalRelay) }
-    } else {
-        this.toList()
-    }
 }
 
 fun String.containsNoneIgnoreCase(strs: Collection<String>): Boolean {
