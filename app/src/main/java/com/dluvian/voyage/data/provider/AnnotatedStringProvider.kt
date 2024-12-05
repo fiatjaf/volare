@@ -1,5 +1,6 @@
 package com.dluvian.voyage.data.provider
 
+import java.util.Collections
 import android.util.Log
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.AnnotatedString
@@ -24,13 +25,12 @@ import com.dluvian.voyage.data.nostr.createNprofile
 import com.dluvian.voyage.ui.theme.HashtagStyle
 import com.dluvian.voyage.ui.theme.MentionStyle
 import com.dluvian.voyage.ui.theme.UrlStyle
-import java.util.Collections
 
 private const val TAG = "AnnotatedStringProvider"
 
 sealed class TextItem {
   data class AString (val value: AnnotatedString): TextItem()
-  data class ImageURL (val value: AnnotatedString, val short: String): TextItem()
+  data class ImageURL (val value: AnnotatedString, val short: String, val blurhash: String): TextItem()
   data class VideoURL (val value: AnnotatedString, val short: String): TextItem()
 }
 
@@ -59,18 +59,18 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
         Collections.synchronizedMap(mutableMapOf())
 
     fun annotate(str: String): AnnotatedString {
-        val first = annotateInternal(str, false).first()
+        val first = annotateInternal(str, false, mapOf()).first()
         when (first) {
           is TextItem.AString -> return first.value
           else -> throw Exception("unexpected first item on annotate()")
         }
     }
 
-    fun annotateWithMedia(str: String): List<TextItem> {
-        return annotateInternal(str, true)
+    fun annotateWithMedia(str: String, blurhashes: Map<String, String>?): List<TextItem> {
+        return annotateInternal(str, true, blurhashes)
     }
 
-    private fun annotateInternal(str: String, withMedia: Boolean): List<TextItem> {
+    private fun annotateInternal(str: String, withMedia: Boolean, blurhashes: Map<String, String>?): List<TextItem> {
         if (str.isEmpty()) return mutableListOf(TextItem.AString(AnnotatedString("")))
         val cached = cache[str]
         if (cached != null) return cached
@@ -126,7 +126,11 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
                         ) {
                             // it's an image -- stop building the annotated string here and push the url
                             // (we will resume building a new annotated string afterwards)
-                            media = TextItem.ImageURL(buildAnnotatedString { pushRawUrlAnnotation(token.value) }, shortenUrl(token.value))
+                            media = TextItem.ImageURL(
+                                value = buildAnnotatedString { pushRawUrlAnnotation(token.value) },
+                                short = shortenUrl(token.value),
+                                blurhash = blurhashes?.get(token.value) ?: "LkIOOl9aM|oJ.ARjRlxYt8WBR*of"
+                            )
                             break
                         } else if (withMedia &&
                                    base.endsWith(".mp4", true) ||

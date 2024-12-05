@@ -28,6 +28,7 @@ data class MainEventEntity(
     val content: String,
     val relayUrl: RelayUrl,
     val isMentioningMe: Boolean,
+    val blurhashes: Map<String, String>?,
     val json: String?,
 ) {
     companion object {
@@ -50,6 +51,13 @@ data class MainEventEntity(
                     is ValidatedComment -> mainEvent.isMentioningMe
                     is ValidatedPoll -> mainEvent.isMentioningMe
                     is ValidatedCrossPost -> false
+                },
+                blurhashes = when (mainEvent) {
+                    is ValidatedRootPost -> mainEvent.blurhashes
+                    is ValidatedLegacyReply -> mainEvent.blurhashes
+                    is ValidatedComment -> mainEvent.blurhashes
+                    is ValidatedPoll -> mainEvent.blurhashes
+                    is ValidatedCrossPost -> null
                 },
                 json = when (mainEvent) {
                     is ValidatedRootPost -> mainEvent.json

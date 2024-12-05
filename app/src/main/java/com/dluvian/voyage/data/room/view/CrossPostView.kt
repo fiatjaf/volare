@@ -11,15 +11,16 @@ import com.dluvian.voyage.data.provider.AnnotatedStringProvider
 
 @DatabaseView(
     """
-        SELECT 
-            mainEvent.id, 
-            mainEvent.pubkey, 
-            crossPost.crossPostedId, 
-            mainEvent.createdAt, 
-            rootPost.subject AS crossPostedSubject, 
-            crossPostedEvent.content AS crossPostedContent, 
-            crossPostedEvent.relayUrl AS crossPostedRelayUrl, 
-            crossPostedEvent.pubkey AS crossPostedPubkey, 
+        SELECT
+            mainEvent.id,
+            mainEvent.pubkey,
+            crossPost.crossPostedId,
+            mainEvent.createdAt,
+            mainEvent.blurhashes,
+            rootPost.subject AS crossPostedSubject,
+            crossPostedEvent.content AS crossPostedContent,
+            crossPostedEvent.relayUrl AS crossPostedRelayUrl,
+            crossPostedEvent.pubkey AS crossPostedPubkey,
             profile.name AS authorName,
             cross_posted_profile.name AS crossPostedAuthorName,
             ht.min_hashtag AS myTopic,
@@ -39,7 +40,7 @@ import com.dluvian.voyage.data.provider.AnnotatedStringProvider
             CASE WHEN cross_posted_mute.mutedItem IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsMuted,
             CASE WHEN cross_posted_profile_set_item.pubkey IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsInList,
             CASE WHEN cross_posted_lock.pubkey IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsLocked,
-            (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = crossPost.crossPostedId)) AS crossPostedIsBookmarked 
+            (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = crossPost.crossPostedId)) AS crossPostedIsBookmarked
         FROM crossPost
         JOIN mainEvent ON crossPost.eventId = mainEvent.id
         JOIN mainEvent AS crossPostedEvent ON crossPost.crossPostedId = crossPostedEvent.id
@@ -48,18 +49,18 @@ import com.dluvian.voyage.data.provider.AnnotatedStringProvider
         LEFT JOIN rootPost ON rootPost.eventId = crossPost.crossPostedId
         LEFT JOIN (
             SELECT DISTINCT hashtag.eventId, MIN(hashtag.hashtag) AS min_hashtag
-            FROM hashtag 
+            FROM hashtag
             JOIN topic ON hashtag.hashtag = topic.topic
             WHERE topic.myPubkey = (SELECT pubkey FROM account LIMIT 1)
             GROUP BY hashtag.eventId
         ) AS ht ON ht.eventId = mainEvent.id
         LEFT JOIN (
-            SELECT legacyReply.parentId, COUNT(*) AS legacyReplyCount 
+            SELECT legacyReply.parentId, COUNT(*) AS legacyReplyCount
             FROM legacyReply
             GROUP BY legacyReply.parentId
         ) AS legacyReplies ON legacyReplies.parentId = crossPost.crossPostedId
         LEFT JOIN (
-            SELECT comment.parentId, COUNT(*) AS commentCount 
+            SELECT comment.parentId, COUNT(*) AS commentCount
             FROM comment
             GROUP BY comment.parentId
         ) AS comments ON comments.parentId = crossPost.crossPostedId
@@ -71,8 +72,8 @@ import com.dluvian.voyage.data.provider.AnnotatedStringProvider
         LEFT JOIN lock ON lock.pubkey = mainEvent.pubkey
         LEFT JOIN vote ON vote.eventId = crossPost.crossPostedId AND vote.pubkey = (SELECT pubkey FROM account LIMIT 1)
         LEFT JOIN (
-            SELECT vote.eventId, COUNT(*) AS upvoteCount 
-            FROM vote 
+            SELECT vote.eventId, COUNT(*) AS upvoteCount
+            FROM vote
             GROUP BY vote.eventId
         ) AS upvotes ON upvotes.eventId = crossPost.crossPostedId
         LEFT JOIN account AS cross_posted_account ON cross_posted_account.pubkey = crossPostedEvent.pubkey
@@ -95,6 +96,7 @@ data class CrossPostView(
     val authorIsLocked: Boolean,
     val myTopic: Topic?,
     val createdAt: Long,
+    val blurhashes: Map<String, String>?,
     val crossPostedSubject: String?,
     val crossPostedContent: String,
     val crossPostedIsUpvoted: Boolean,

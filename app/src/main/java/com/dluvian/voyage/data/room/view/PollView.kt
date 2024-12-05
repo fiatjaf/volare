@@ -11,14 +11,15 @@ import com.dluvian.voyage.data.provider.AnnotatedStringProvider
 
 @DatabaseView(
     """
-        SELECT 
-            mainEvent.id, 
-            mainEvent.pubkey, 
-            mainEvent.content, 
+        SELECT
+            mainEvent.id,
+            mainEvent.pubkey,
+            mainEvent.content,
             poll.endsAt,
-            mainEvent.createdAt, 
-            mainEvent.relayUrl, 
-            mainEvent.isMentioningMe, 
+            mainEvent.createdAt,
+            mainEvent.relayUrl,
+            mainEvent.isMentioningMe,
+            mainEvent.blurhashes,
             profile.name AS authorName,
             ht.min_hashtag AS myTopic,
             CASE WHEN account.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsOneself,
@@ -37,7 +38,7 @@ import com.dluvian.voyage.data.provider.AnnotatedStringProvider
         LEFT JOIN profile ON profile.pubkey = mainEvent.pubkey
         LEFT JOIN (
             SELECT DISTINCT hashtag.eventId, MIN(hashtag.hashtag) AS min_hashtag
-            FROM hashtag 
+            FROM hashtag
             JOIN topic ON hashtag.hashtag = topic.topic
             WHERE topic.myPubkey = (SELECT pubkey FROM account LIMIT 1)
             GROUP BY hashtag.eventId
@@ -50,12 +51,12 @@ import com.dluvian.voyage.data.provider.AnnotatedStringProvider
         LEFT JOIN lock ON lock.pubkey = mainEvent.pubkey
         LEFT JOIN vote ON vote.eventId = mainEvent.id AND vote.pubkey = (SELECT pubkey FROM account LIMIT 1)
         LEFT JOIN (
-            SELECT vote.eventId, COUNT(*) AS upvoteCount 
-            FROM vote 
+            SELECT vote.eventId, COUNT(*) AS upvoteCount
+            FROM vote
             GROUP BY vote.eventId
         ) AS upvotes ON upvotes.eventId = mainEvent.id
         LEFT JOIN (
-            SELECT comment.parentId, COUNT(*) AS commentCount 
+            SELECT comment.parentId, COUNT(*) AS commentCount
             FROM comment
             GROUP BY comment.parentId
         ) AS comments ON comments.parentId = mainEvent.id
@@ -81,6 +82,7 @@ data class PollView(
     val relayUrl: RelayUrl,
     val isBookmarked: Boolean,
     val isMentioningMe: Boolean,
+    val blurhashes: Map<String, String>?,
     val latestResponse: Long?,
 ) {
     fun mapToPollUI(

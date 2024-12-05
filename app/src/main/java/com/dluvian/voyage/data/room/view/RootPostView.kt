@@ -11,14 +11,15 @@ import com.dluvian.voyage.data.provider.AnnotatedStringProvider
 
 @DatabaseView(
     """
-        SELECT 
-            mainEvent.id, 
-            mainEvent.pubkey, 
-            rootPost.subject, 
-            mainEvent.content, 
-            mainEvent.createdAt, 
-            mainEvent.relayUrl, 
-            mainEvent.isMentioningMe, 
+        SELECT
+            mainEvent.id,
+            mainEvent.pubkey,
+            rootPost.subject,
+            mainEvent.content,
+            mainEvent.createdAt,
+            mainEvent.relayUrl,
+            mainEvent.isMentioningMe,
+            mainEvent.blurhashes,
             profile.name AS authorName,
             ht.min_hashtag AS myTopic,
             CASE WHEN account.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsOneself,
@@ -31,13 +32,13 @@ import com.dluvian.voyage.data.provider.AnnotatedStringProvider
             upvotes.upvoteCount,
             legacyReplies.legacyReplyCount,
             comments.commentCount,
-            (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked 
+            (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked
         FROM rootPost
         JOIN mainEvent ON mainEvent.id = rootPost.eventId
         LEFT JOIN profile ON profile.pubkey = mainEvent.pubkey
         LEFT JOIN (
             SELECT DISTINCT hashtag.eventId, MIN(hashtag.hashtag) AS min_hashtag
-            FROM hashtag 
+            FROM hashtag
             JOIN topic ON hashtag.hashtag = topic.topic
             WHERE topic.myPubkey = (SELECT pubkey FROM account LIMIT 1)
             GROUP BY hashtag.eventId
@@ -50,17 +51,17 @@ import com.dluvian.voyage.data.provider.AnnotatedStringProvider
         LEFT JOIN lock ON lock.pubkey = mainEvent.pubkey
         LEFT JOIN vote ON vote.eventId = mainEvent.id AND vote.pubkey = (SELECT pubkey FROM account LIMIT 1)
         LEFT JOIN (
-            SELECT vote.eventId, COUNT(*) AS upvoteCount 
-            FROM vote 
+            SELECT vote.eventId, COUNT(*) AS upvoteCount
+            FROM vote
             GROUP BY vote.eventId
         ) AS upvotes ON upvotes.eventId = mainEvent.id
         LEFT JOIN (
-            SELECT legacyReply.parentId, COUNT(*) AS legacyReplyCount 
+            SELECT legacyReply.parentId, COUNT(*) AS legacyReplyCount
             FROM legacyReply
             GROUP BY legacyReply.parentId
         ) AS legacyReplies ON legacyReplies.parentId = mainEvent.id
         LEFT JOIN (
-            SELECT comment.parentId, COUNT(*) AS commentCount 
+            SELECT comment.parentId, COUNT(*) AS commentCount
             FROM comment
             GROUP BY comment.parentId
         ) AS comments ON comments.parentId = mainEvent.id
@@ -87,6 +88,7 @@ data class RootPostView(
     val relayUrl: RelayUrl,
     val isBookmarked: Boolean,
     val isMentioningMe: Boolean,
+    val blurhashes: Map<String, String>?,
 ) {
     fun mapToRootPostUI(
         forcedVotes: Map<EventIdHex, Boolean>,

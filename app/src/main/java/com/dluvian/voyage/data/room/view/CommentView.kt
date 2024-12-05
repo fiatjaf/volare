@@ -18,6 +18,7 @@ import com.dluvian.voyage.ui.components.row.mainEvent.ThreadReplyCtx
             "mainEvent.createdAt, " +
             "mainEvent.relayUrl, " +
             "mainEvent.isMentioningMe, " +
+            "mainEvent.blurhashes, " +
             "(SELECT name FROM profile WHERE profile.pubkey = mainEvent.pubkey) AS authorName, " +
             "(SELECT EXISTS(SELECT * FROM account WHERE account.pubkey = mainEvent.pubkey)) AS authorIsOneself, " +
             "(SELECT EXISTS(SELECT * FROM friend WHERE friend.friendPubkey = mainEvent.pubkey)) AS authorIsFriend, " +
@@ -52,6 +53,7 @@ data class CommentView(
     val relayUrl: RelayUrl,
     val isBookmarked: Boolean,
     val isMentioningMe: Boolean,
+    val blurhashes: Map<String, String>?,
 ) {
     fun mapToThreadReplyCtx(
         level: Int,

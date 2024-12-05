@@ -2,6 +2,7 @@ package com.dluvian.voyage.data.room
 
 import androidx.room.AutoMigration
 import androidx.room.Database
+import androidx.room.TypeConverters
 import androidx.room.DeleteColumn
 import androidx.room.DeleteTable
 import androidx.room.RenameTable
@@ -81,55 +82,9 @@ import com.dluvian.voyage.data.room.view.PollView
 import com.dluvian.voyage.data.room.view.RootPostView
 import com.dluvian.voyage.data.room.view.SimplePostView
 
-@DeleteColumn(tableName = "vote", columnName = "isPositive")
-class V10 : AutoMigrationSpec
-
-@DeleteTable.Entries(
-    DeleteTable(tableName = "post"),
-    DeleteTable(tableName = "vote"),
-    DeleteTable(tableName = "hashtag"),
-    DeleteTable(tableName = "bookmark"),
-)
-class V24 : AutoMigrationSpec
-
-@RenameTable.Entries(
-    RenameTable(fromTableName = "post2", toTableName = "post"),
-    RenameTable(fromTableName = "vote2", toTableName = "vote"),
-    RenameTable(fromTableName = "hashtag2", toTableName = "hashtag"),
-    RenameTable(fromTableName = "bookmark2", toTableName = "bookmark"),
-)
-class V25 : AutoMigrationSpec
-
 @Database(
-    version = 26,
+    version = 1,
     exportSchema = true,
-    autoMigrations = [
-        AutoMigration(from = 1, to = 2),
-        AutoMigration(from = 2, to = 3),
-        AutoMigration(from = 3, to = 4),
-        AutoMigration(from = 4, to = 5),
-        AutoMigration(from = 5, to = 6),
-        AutoMigration(from = 6, to = 7),
-        AutoMigration(from = 7, to = 8),
-        AutoMigration(from = 8, to = 9),
-        AutoMigration(from = 9, to = 10, spec = V10::class),
-        AutoMigration(from = 10, to = 11),
-        AutoMigration(from = 11, to = 12),
-        AutoMigration(from = 12, to = 13),
-        AutoMigration(from = 13, to = 14),
-        AutoMigration(from = 14, to = 15),
-        AutoMigration(from = 15, to = 16),
-        AutoMigration(from = 16, to = 17),
-        AutoMigration(from = 17, to = 18),
-        AutoMigration(from = 18, to = 19),
-        AutoMigration(from = 19, to = 20),
-        AutoMigration(from = 20, to = 21),
-        AutoMigration(from = 21, to = 22),
-        AutoMigration(from = 22, to = 23),
-        AutoMigration(from = 23, to = 24, spec = V24::class),
-        AutoMigration(from = 24, to = 25, spec = V25::class),
-        AutoMigration(from = 25, to = 26),
-    ],
     entities = [
         // Main
         MainEventEntity::class,
@@ -175,6 +130,7 @@ class V25 : AutoMigrationSpec
         PollOptionView::class,
     ]
 )
+@TypeConverters(StringStringHashMapConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun accountDao(): AccountDao
     abstract fun voteDao(): VoteDao

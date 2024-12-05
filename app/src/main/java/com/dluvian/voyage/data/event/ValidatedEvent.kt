@@ -26,6 +26,7 @@ sealed class ValidatedThreadableEvent(
     open val content: String,
     open val json: String,
     open val isMentioningMe: Boolean,
+    open val blurhashes: Map<String, String>? = null,
 ) : ValidatedMainEvent(
     id = id,
     pubkey = pubkey,
@@ -41,6 +42,7 @@ sealed class ValidatedTextNote(
     override val content: String,
     override val json: String,
     override val isMentioningMe: Boolean,
+    override val blurhashes: Map<String, String>? = null,
 ) : ValidatedThreadableEvent(
     id = id,
     pubkey = pubkey,
@@ -48,7 +50,8 @@ sealed class ValidatedTextNote(
     relayUrl = relayUrl,
     content = content,
     json = json,
-    isMentioningMe = isMentioningMe
+    isMentioningMe = isMentioningMe,
+    blurhashes = blurhashes,
 )
 
 data class ValidatedRootPost(
@@ -59,6 +62,7 @@ data class ValidatedRootPost(
     override val content: String,
     override val json: String,
     override val isMentioningMe: Boolean,
+    override val blurhashes: Map<String, String>? = null,
     val topics: List<String>,
     val subject: String,
 ) : ValidatedTextNote(
@@ -68,8 +72,10 @@ data class ValidatedRootPost(
     relayUrl = relayUrl,
     content = content,
     json = json,
-    isMentioningMe = isMentioningMe
+    isMentioningMe = isMentioningMe,
+    blurhashes = blurhashes,
 )
+
 
 data class ValidatedLegacyReply(
     override val id: EventIdHex,
@@ -79,6 +85,7 @@ data class ValidatedLegacyReply(
     override val content: String,
     override val json: String,
     override val isMentioningMe: Boolean,
+    override val blurhashes: Map<String, String>? = null,
     val parentId: EventIdHex,
 ) : ValidatedTextNote(
     id = id,
@@ -87,7 +94,8 @@ data class ValidatedLegacyReply(
     relayUrl = relayUrl,
     content = content,
     json = json,
-    isMentioningMe = isMentioningMe
+    isMentioningMe = isMentioningMe,
+    blurhashes = blurhashes,
 )
 
 data class ValidatedComment(
@@ -98,6 +106,7 @@ data class ValidatedComment(
     override val content: String,
     override val json: String,
     override val isMentioningMe: Boolean,
+    override val blurhashes: Map<String, String>? = null,
     val parentId: EventIdHex?,
     val parentKind: UShort?,
 ) : ValidatedThreadableEvent(
@@ -107,7 +116,8 @@ data class ValidatedComment(
     relayUrl = relayUrl,
     content = content,
     json = json,
-    isMentioningMe = isMentioningMe
+    isMentioningMe = isMentioningMe,
+    blurhashes = blurhashes,
 )
 
 class ValidatedPoll(
@@ -118,6 +128,7 @@ class ValidatedPoll(
     override val content: String,
     override val json: String,
     override val isMentioningMe: Boolean,
+    override val blurhashes: Map<String, String>? = null,
     val options: List<Pair<OptionId, Label>>,
     val topics: List<Topic>,
     val endsAt: Long?,
@@ -129,7 +140,8 @@ class ValidatedPoll(
     relayUrl = relayUrl,
     content = content,
     json = json,
-    isMentioningMe = isMentioningMe
+    isMentioningMe = isMentioningMe,
+    blurhashes = blurhashes,
 )
 
 data class ValidatedCrossPost(

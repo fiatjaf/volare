@@ -85,7 +85,7 @@ class PostSender(
                 createdAt = event.createdAt().secs(),
                 relayUrl = "", // We don't know which relay accepted this note
                 json = event.asJson(),
-                isMentioningMe = mentions.contains(myPubkeyProvider.getPubkeyHex())
+                isMentioningMe = mentions.contains(myPubkeyProvider.getPubkeyHex()),
             )
             mainEventInsertDao.insertRootPosts(roots = listOf(validatedPost))
         }.onFailure {

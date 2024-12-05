@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Brush
 import coil3.compose.AsyncImage
+import com.dluvian.voyage.ui.components.image.Blurhash
 import com.dluvian.voyage.ui.components.video.VideoPlayer
 import com.dluvian.voyage.data.provider.TextItem
 
@@ -63,7 +64,7 @@ fun AnnotatedText(
                                 .height(21.dp)
                                 .background(gradientBrush)
                         ) {
-                            AsyncImage(model = item.value.text, contentDescription = null)
+                            Blurhash("LvF7o6RiV@ofL4j?ozay4ptQkCfk")
                             Text(text = item.short, style = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp))
                         }
                     } else {

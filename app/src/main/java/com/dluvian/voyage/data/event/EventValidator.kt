@@ -141,6 +141,7 @@ class EventValidator(
                     topics = event.getNormalizedTopics(limit = MAX_TOPICS),
                     endsAt = endsAt,
                     relays = event.getPollRelays(),
+                    blurhashes = event.getBlurhashes(),
                 )
             }
 
@@ -324,9 +325,10 @@ class EventValidator(
                     createdAt = event.createdAt().secs(),
                     relayUrl = relayUrl,
                     json = event.asJson(),
-                    isMentioningMe = event.isMentioningMe(myPubkey = myPubkey),
+                    isMentioningMe = event.isMentioningMe(myPubkey),
                     topics = event.getNormalizedTopics(limit = MAX_TOPICS),
                     subject = subject.orEmpty(),
+                    blurhashes = event.getBlurhashes(),
                 )
             } else {
                 if (content.isEmpty() || replyToId == event.id().toHex()) return null
@@ -337,8 +339,9 @@ class EventValidator(
                     createdAt = event.createdAt().secs(),
                     relayUrl = relayUrl,
                     json = event.asJson(),
-                    isMentioningMe = event.isMentioningMe(myPubkey = myPubkey),
+                    isMentioningMe = event.isMentioningMe(myPubkey),
                     parentId = replyToId,
+                    blurhashes = event.getBlurhashes(),
                 )
             }
         }
@@ -361,6 +364,7 @@ class EventValidator(
                 // Null means we don't support the parent (i and a tags)
                 parentId = event.getParentId(),
                 parentKind = event.getKindTag(),
+                blurhashes = event.getBlurhashes(),
             )
         }
 
@@ -399,4 +403,26 @@ class EventValidator(
 
 private fun Event.isMentioningMe(myPubkey: PublicKey): Boolean {
     return this.tags().publicKeys().any { it == myPubkey }
+}
+
+private fun Event.getBlurhashes(): Map<String, String> {
+    val blurhashes = mutableMapOf<String, String>()
+    for (tag in this.tags().toVec()) {
+        if (tag.kindStr() == "imeta") {
+            var url: String? = null
+            for (item in tag.asVec()) {
+                if (item.startsWith("url")) {
+                    url = item.drop(4)
+                    continue
+                }
+                if (item.startsWith("blurhash")) {
+                    url?.let {
+                        blurhashes[it] = item.drop(9)
+                    }
+                    break
+                }
+            }
+        }
+    }
+    return blurhashes
 }
