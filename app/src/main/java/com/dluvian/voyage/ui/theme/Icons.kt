@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.rounded.Reply
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.automirrored.rounded.VolumeOff
 import androidx.compose.material.icons.filled.ThumbUpAlt
+import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.FilterAlt
@@ -88,3 +89,4 @@ val WarningIcon = Icons.Rounded.WarningAmber
 val VotedIcon = Icons.Rounded.CheckCircleOutline
 val PollIcon = Icons.Outlined.Poll
 val TextIcon = Icons.Outlined.Create
+val VideoIcon = Icons.Default.PlayCircle

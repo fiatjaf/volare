@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +25,7 @@ import androidx.compose.ui.graphics.Brush
 import coil3.compose.AsyncImage
 import com.dluvian.voyage.ui.components.image.Blurhash
 import com.dluvian.voyage.ui.components.video.VideoPlayer
+import com.dluvian.voyage.ui.theme.VideoIcon
 import com.dluvian.voyage.data.provider.TextItem
 
 @Composable
@@ -98,7 +100,10 @@ fun AnnotatedText(
                                 .height(21.dp)
                                 .background(gradientBrush)
                         ) {
-                            AsyncImage(model = item.value.text, contentDescription = null)
+                            Icon(
+                                imageVector = VideoIcon,
+                                contentDescription = null,
+                            )
                             Text(text = item.short, style = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp))
                         }
                     } else {
