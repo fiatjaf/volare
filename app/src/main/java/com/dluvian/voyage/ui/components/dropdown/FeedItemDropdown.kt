@@ -1,6 +1,7 @@
 package com.dluvian.voyage.ui.components.dropdown
 
 
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.DropdownMenu
@@ -37,6 +38,7 @@ import com.dluvian.voyage.core.utils.createProcessTextIntent
 import com.dluvian.voyage.core.utils.getTranslators
 import com.dluvian.voyage.data.nostr.createNevent
 import com.dluvian.voyage.data.nostr.createNeventUri
+import com.dluvian.voyage.data.nostr.NOSTR_URI
 import com.dluvian.voyage.data.provider.TextItem
 
 @Composable
@@ -71,19 +73,32 @@ fun FeedItemDropdown(
                 })
         }
 
-        val clip = LocalClipboardManager.current
         val context = LocalContext.current
+        val nevent = createNeventUri(
+            hex = mainEvent.getRelevantId(),
+            author = mainEvent.getRelevantPubkey(),
+            relays = listOf(mainEvent.relayUrl).filter { it.isNotEmpty() },
+            kind = mainEvent.getRelevantKind()
+        )
+        SimpleDropdownItem(
+            text = stringResource(id = R.string.share_web),
+            onClick = {
+                context.startActivity(Intent.createChooser(Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, "https://njump.me/${nevent.drop(NOSTR_URI.length)}")
+                    type = "text/plain"
+                }, null))
+                onDismiss()
+            }
+        )
+
+        val clip = LocalClipboardManager.current
         val idCopiedToast = stringResource(id = R.string.note_uri_copied)
         SimpleDropdownItem(
             text = stringResource(id = R.string.copy_uri),
             onClick = {
                 copyAndToast(
-                    text = createNeventUri(
-                        hex = mainEvent.getRelevantId(),
-                        author = mainEvent.getRelevantPubkey(),
-                        relays = listOf(mainEvent.relayUrl).filter { it.isNotEmpty() },
-                        kind = mainEvent.getRelevantKind()
-                    ),
+                    text = nevent,
                     toast = idCopiedToast,
                     context = context,
                     clip = clip
@@ -91,6 +106,7 @@ fun FeedItemDropdown(
                 onDismiss()
             }
         )
+
         val contentCopiedToast = stringResource(id = R.string.content_copied)
         SimpleDropdownItem(
             text = stringResource(id = R.string.copy_content),
