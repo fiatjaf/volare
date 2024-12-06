@@ -315,11 +315,12 @@ private fun AppSection(vm: SettingsViewModel, onUpdate: OnUpdate) {
             checked = vm.isAddingClientTag.value,
             onClickChange = { onUpdate(AddClientTag(addClientTag = it)) })
 
-        ClickableRowCheckbox(
-            header = stringResource(id = R.string.always_use_v2_replies),
-            text = stringResource(id = R.string.this_format_is_not_widely_adopted_yet),
-            checked = vm.useV2Replies.value,
-            onClickChange = { onUpdate(UseV2Replies(useV2Replies = it)) })
+        // temporarily hide this -- we can't push Nostr too much
+        // ClickableRowCheckbox(
+        //     header = stringResource(id = R.string.always_use_v2_replies),
+        //     text = stringResource(id = R.string.this_format_is_not_widely_adopted_yet),
+        //     checked = vm.useV2Replies.value,
+        //     onClickChange = { onUpdate(UseV2Replies(useV2Replies = it)) })
 
         ClickableRow(
             header = stringResource(id = R.string.upvote_event_content) + ": ${vm.currentUpvote.value}",
