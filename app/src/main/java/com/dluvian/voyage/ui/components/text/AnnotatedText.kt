@@ -64,7 +64,7 @@ fun AnnotatedText(
                                 .height(21.dp)
                                 .background(gradientBrush)
                         ) {
-                            Blurhash("LvF7o6RiV@ofL4j?ozay4ptQkCfk")
+                            Blurhash(item.blurhash)
                             Text(text = item.short, style = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp))
                         }
                     } else {
@@ -78,7 +78,10 @@ fun AnnotatedText(
                                 .padding(bottom = 8.dp)
                                 .background(gradientBrush)
                         ) {
-                            AsyncImage(model = item.value.text, contentDescription = null)
+                            AsyncImage(
+                                model = item.value.text,
+                                contentDescription = null,
+                            )
                             Text(text = item.value, style = TextStyle(fontSize = 16.sp))
                         }
                     }
