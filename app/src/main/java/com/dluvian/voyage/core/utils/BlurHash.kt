@@ -33,12 +33,8 @@ object BlurHash {
 
     /**
      * Decode a blur hash into a new bitmap.
-     *
-     * @param useCache use in memory cache for the calculated math, reused by images with same size.
-     *                 if the cache does not exist yet it will be created and populated with new calculations.
-     *                 By default it is true.
      */
-    fun decode(blurHash: String, width: Int, height: Int, punch: Float = 1f, useCache: Boolean = true): Bitmap? {
+    fun decode(blurHash: String, width: Int, height: Int, punch: Float = 1f): Bitmap? {
         val numCompEnc = decode83(blurHash, 0, 1)
         val numCompX = (numCompEnc % 9) + 1
         val numCompY = (numCompEnc / 9) + 1
@@ -57,7 +53,7 @@ object BlurHash {
                 decodeAc(colorEnc, maxAc * punch)
             }
         }
-        return composeBitmap(width, height, numCompX, numCompY, colors, useCache)
+        return composeBitmap(width, height, numCompX, numCompY, colors)
     }
 
     private fun decode83(str: String, from: Int = 0, to: Int = str.length): Int {
@@ -104,13 +100,12 @@ object BlurHash {
             width: Int, height: Int,
             numCompX: Int, numCompY: Int,
             colors: Array<FloatArray>,
-            useCache: Boolean
     ): Bitmap {
         // use an array for better performance when writing pixel colors
         val imageArray = IntArray(width * height)
-        val calculateCosX = !useCache || !cacheCosinesX.containsKey(width * numCompX)
+        val calculateCosX = !cacheCosinesX.containsKey(width * numCompX)
         val cosinesX = getArrayForCosinesX(calculateCosX, width, numCompX)
-        val calculateCosY = !useCache || !cacheCosinesY.containsKey(height * numCompY)
+        val calculateCosY = !cacheCosinesY.containsKey(height * numCompY)
         val cosinesY = getArrayForCosinesY(calculateCosY, height, numCompY)
         for (y in 0 until height) {
             for (x in 0 until width) {

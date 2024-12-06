@@ -138,9 +138,11 @@ fun ImageRow(
     gradientBrush: Brush,
 ) {
     fun paintBlurhash (big: Boolean): BitmapPainter {
-        val (x, y) = if (big) Pair(360, 280) else Pair(36, 28)
+        val x = if (big) 360 else 36
+        val y = ((item.blurhash.dim?.let { (x, y) -> y.toDouble() / x.toDouble() } ?: 0.78) * x).toInt()
+
         return BitmapPainter(
-            ( BlurHash.decode(item.blurhash.blurhash, (item.blurhash.dim?.first ?: y), (item.blurhash.dim?.second ?: y))
+            ( BlurHash.decode(item.blurhash.blurhash, x, y)
                 ?: Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888)
             ).asImageBitmap()
         )

@@ -106,7 +106,6 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.3")
     implementation("io.coil-kt.coil3:coil-gif:3.0.3")
     implementation("io.coil-kt.coil3:coil-svg:3.0.3")
-    implementation("io.coil-kt.coil3:coil-video:3.0.3")
 
     // video stuff
     implementation("androidx.media3:media3-exoplayer:1.5.0")
