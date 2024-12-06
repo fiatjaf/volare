@@ -1,7 +1,6 @@
 package com.dluvian.voyage.data.nostr
 
 import androidx.core.text.isDigitsOnly
-import cash.z.ecc.android.bip39.Mnemonics
 import com.dluvian.voyage.core.Label
 import com.dluvian.voyage.core.OptionId
 import rust.nostr.sdk.Alphabet
@@ -81,14 +80,6 @@ fun createCommentETag(
     pubkeyHint: String,
 ): Tag {
     return Tag.parse(listOf("e", parentEventId.toHex(), relayHint, pubkeyHint))
-}
-
-fun generateMnemonic(): String {
-    val random = SecureRandom()
-    val entropy = ByteArray(16)
-    random.nextBytes(entropy)
-
-    return Mnemonics.MnemonicCode(entropy).words.joinToString(separator = " ") { String(it) }
 }
 
 fun Timestamp.secs(): Long {

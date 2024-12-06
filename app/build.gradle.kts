@@ -97,7 +97,6 @@ dependencies {
 
     implementation("org.rust-nostr:nostr-sdk:0.36.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("cash.z.ecc.android:kotlin-bip39:1.0.8")
     implementation("com.anggrayudi:storage:2.0.0")
 
     // image stuff
