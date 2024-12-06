@@ -4,6 +4,7 @@ import androidx.room.DatabaseView
 import com.dluvian.voyage.core.EventIdHex
 import com.dluvian.voyage.core.PubkeyHex
 import com.dluvian.voyage.core.Topic
+import com.dluvian.voyage.core.utils.BlurHashDef
 import com.dluvian.voyage.core.model.RootPost
 import com.dluvian.voyage.core.model.TrustType
 import com.dluvian.voyage.data.nostr.RelayUrl
@@ -88,7 +89,7 @@ data class RootPostView(
     val relayUrl: RelayUrl,
     val isBookmarked: Boolean,
     val isMentioningMe: Boolean,
-    val blurhashes: Map<String, String>?,
+    val blurhashes: List<BlurHashDef>?,
 ) {
     fun mapToRootPostUI(
         forcedVotes: Map<EventIdHex, Boolean>,

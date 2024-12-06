@@ -130,7 +130,7 @@ import com.dluvian.voyage.data.room.view.SimplePostView
         PollOptionView::class,
     ]
 )
-@TypeConverters(StringStringHashMapConverter::class)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun accountDao(): AccountDao
     abstract fun voteDao(): VoteDao

@@ -5,6 +5,14 @@ import android.graphics.Color
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.withSign
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class BlurHashDef (
+    val url: String,
+    val blurhash: String,
+    val dim: Pair<Int, Int>?,
+)
 
 object BlurHash {
     // cache Math.cos() calculations to improve performance.

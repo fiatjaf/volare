@@ -21,6 +21,7 @@ import com.dluvian.voyage.core.utils.extractNostrMentions
 import com.dluvian.voyage.core.utils.extractUrls
 import com.dluvian.voyage.core.utils.shortenBech32
 import com.dluvian.voyage.core.utils.shortenUrl
+import com.dluvian.voyage.core.utils.BlurHashDef
 import com.dluvian.voyage.data.nostr.createNprofile
 import com.dluvian.voyage.ui.theme.HashtagStyle
 import com.dluvian.voyage.ui.theme.MentionStyle
@@ -30,7 +31,7 @@ private const val TAG = "AnnotatedStringProvider"
 
 sealed class TextItem {
   data class AString (val value: AnnotatedString): TextItem()
-  data class ImageURL (val value: AnnotatedString, val short: String, val blurhash: String): TextItem()
+  data class ImageURL (val value: AnnotatedString, val short: String, val blurhash: BlurHashDef): TextItem()
   data class VideoURL (val value: AnnotatedString, val short: String): TextItem()
 }
 
@@ -59,18 +60,18 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
         Collections.synchronizedMap(mutableMapOf())
 
     fun annotate(str: String): AnnotatedString {
-        val first = annotateInternal(str, false, mapOf()).first()
+        val first = annotateInternal(str, false, null).first()
         when (first) {
           is TextItem.AString -> return first.value
           else -> throw Exception("unexpected first item on annotate()")
         }
     }
 
-    fun annotateWithMedia(str: String, blurhashes: Map<String, String>?): List<TextItem> {
+    fun annotateWithMedia(str: String, blurhashes: List<BlurHashDef>?): List<TextItem> {
         return annotateInternal(str, true, blurhashes)
     }
 
-    private fun annotateInternal(str: String, withMedia: Boolean, blurhashes: Map<String, String>?): List<TextItem> {
+    private fun annotateInternal(str: String, withMedia: Boolean, blurhashes: List<BlurHashDef>?): List<TextItem> {
         if (str.isEmpty()) return mutableListOf(TextItem.AString(AnnotatedString("")))
         val cached = cache[str]
         if (cached != null) return cached
@@ -129,7 +130,8 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
                             media = TextItem.ImageURL(
                                 value = buildAnnotatedString { pushRawUrlAnnotation(token.value) },
                                 short = shortenUrl(token.value),
-                                blurhash = blurhashes?.get(token.value) ?: "LkIOOl9aM|oJ.ARjRlxYt8WBR*of"
+                                blurhash = blurhashes?.find { it.url == token.value }
+                                    ?: BlurHashDef("", "LkIOOl9aM|oJ.ARjRlxYt8WBR*of", null)
                             )
                             break
                         } else if (withMedia &&

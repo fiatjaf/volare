@@ -137,10 +137,11 @@ fun ImageRow(
     onUnselect: () -> Unit,
     gradientBrush: Brush,
 ) {
-    val blurhash = remember {
-        BitmapPainter(
-            (
-                BlurHash.decode(item.blurhash, 36, 36) ?: Bitmap.createBitmap(36, 36, Bitmap.Config.ARGB_8888)
+    fun paintBlurhash (big: Boolean): BitmapPainter {
+        val (x, y) = if (big) Pair(360, 280) else Pair(36, 28)
+        return BitmapPainter(
+            ( BlurHash.decode(item.blurhash.blurhash, (item.blurhash.dim?.first ?: y), (item.blurhash.dim?.second ?: y))
+                ?: Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888)
             ).asImageBitmap()
         )
     }
@@ -160,12 +161,12 @@ fun ImageRow(
                 AsyncImage(
                     model = item.value.text,
                     contentDescription = null,
-                    placeholder = blurhash,
                 )
             } else {
                 Image(
-                    painter = blurhash,
+                    painter = paintBlurhash(false),
                     contentDescription = null,
+                    modifier = Modifier.height(36.dp)
                 )
             }
             Text(text = item.short, style = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp))
@@ -185,6 +186,7 @@ fun ImageRow(
                 onSuccess = {
                     setLoaded(true)
                 },
+                placeholder = paintBlurhash(true),
                 contentScale = ContentScale.FillWidth
             )
             Text(text = item.value, style = TextStyle(fontSize = 16.sp))

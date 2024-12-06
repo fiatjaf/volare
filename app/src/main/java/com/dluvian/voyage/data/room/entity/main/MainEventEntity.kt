@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import com.dluvian.voyage.core.EventIdHex
 import com.dluvian.voyage.core.PubkeyHex
+import com.dluvian.voyage.core.utils.BlurHashDef
 import com.dluvian.voyage.data.event.ValidatedComment
 import com.dluvian.voyage.data.event.ValidatedCrossPost
 import com.dluvian.voyage.data.event.ValidatedLegacyReply
@@ -28,7 +29,7 @@ data class MainEventEntity(
     val content: String,
     val relayUrl: RelayUrl,
     val isMentioningMe: Boolean,
-    val blurhashes: Map<String, String>?,
+    val blurhashes: List<BlurHashDef>?,
     val json: String?,
 ) {
     companion object {

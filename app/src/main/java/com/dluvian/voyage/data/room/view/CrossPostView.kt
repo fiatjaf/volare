@@ -4,6 +4,7 @@ import androidx.room.DatabaseView
 import com.dluvian.voyage.core.EventIdHex
 import com.dluvian.voyage.core.PubkeyHex
 import com.dluvian.voyage.core.Topic
+import com.dluvian.voyage.core.utils.BlurHashDef
 import com.dluvian.voyage.core.model.CrossPost
 import com.dluvian.voyage.core.model.TrustType
 import com.dluvian.voyage.data.nostr.RelayUrl
@@ -96,7 +97,7 @@ data class CrossPostView(
     val authorIsLocked: Boolean,
     val myTopic: Topic?,
     val createdAt: Long,
-    val blurhashes: Map<String, String>?,
+    val blurhashes: List<BlurHashDef>?,
     val crossPostedSubject: String?,
     val crossPostedContent: String,
     val crossPostedIsUpvoted: Boolean,

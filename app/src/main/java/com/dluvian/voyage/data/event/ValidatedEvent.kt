@@ -7,6 +7,7 @@ import com.dluvian.voyage.core.PubkeyHex
 import com.dluvian.voyage.core.Topic
 import com.dluvian.voyage.data.nostr.Nip65Relay
 import com.dluvian.voyage.data.nostr.RelayUrl
+import com.dluvian.voyage.core.utils.BlurHashDef
 import rust.nostr.sdk.Metadata
 
 sealed class ValidatedEvent
@@ -26,7 +27,7 @@ sealed class ValidatedThreadableEvent(
     open val content: String,
     open val json: String,
     open val isMentioningMe: Boolean,
-    open val blurhashes: Map<String, String>? = null,
+    open val blurhashes: List<BlurHashDef>? = null,
 ) : ValidatedMainEvent(
     id = id,
     pubkey = pubkey,
@@ -42,7 +43,7 @@ sealed class ValidatedTextNote(
     override val content: String,
     override val json: String,
     override val isMentioningMe: Boolean,
-    override val blurhashes: Map<String, String>? = null,
+    override val blurhashes: List<BlurHashDef>? = null,
 ) : ValidatedThreadableEvent(
     id = id,
     pubkey = pubkey,
@@ -62,7 +63,7 @@ data class ValidatedRootPost(
     override val content: String,
     override val json: String,
     override val isMentioningMe: Boolean,
-    override val blurhashes: Map<String, String>? = null,
+    override val blurhashes: List<BlurHashDef>? = null,
     val topics: List<String>,
     val subject: String,
 ) : ValidatedTextNote(
@@ -85,7 +86,7 @@ data class ValidatedLegacyReply(
     override val content: String,
     override val json: String,
     override val isMentioningMe: Boolean,
-    override val blurhashes: Map<String, String>? = null,
+    override val blurhashes: List<BlurHashDef>? = null,
     val parentId: EventIdHex,
 ) : ValidatedTextNote(
     id = id,
@@ -106,7 +107,7 @@ data class ValidatedComment(
     override val content: String,
     override val json: String,
     override val isMentioningMe: Boolean,
-    override val blurhashes: Map<String, String>? = null,
+    override val blurhashes: List<BlurHashDef>? = null,
     val parentId: EventIdHex?,
     val parentKind: UShort?,
 ) : ValidatedThreadableEvent(
@@ -128,7 +129,7 @@ class ValidatedPoll(
     override val content: String,
     override val json: String,
     override val isMentioningMe: Boolean,
-    override val blurhashes: Map<String, String>? = null,
+    override val blurhashes: List<BlurHashDef>? = null,
     val options: List<Pair<OptionId, Label>>,
     val topics: List<Topic>,
     val endsAt: Long?,

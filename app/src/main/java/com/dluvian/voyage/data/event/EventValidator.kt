@@ -11,6 +11,7 @@ import com.dluvian.voyage.core.utils.getNormalizedTitle
 import com.dluvian.voyage.core.utils.getNormalizedTopics
 import com.dluvian.voyage.core.utils.getTrimmedSubject
 import com.dluvian.voyage.core.utils.takeRandom
+import com.dluvian.voyage.core.utils.BlurHashDef
 import com.dluvian.voyage.data.account.IMyPubkeyProvider
 import com.dluvian.voyage.data.nostr.RelayUrl
 import com.dluvian.voyage.data.nostr.SubId
@@ -405,22 +406,35 @@ private fun Event.isMentioningMe(myPubkey: PublicKey): Boolean {
     return this.tags().publicKeys().any { it == myPubkey }
 }
 
-private fun Event.getBlurhashes(): Map<String, String> {
-    val blurhashes = mutableMapOf<String, String>()
+private fun Event.getBlurhashes(): List<BlurHashDef> {
+    val blurhashes = mutableListOf<BlurHashDef>()
+
     for (tag in this.tags().toVec()) {
         if (tag.kindStr() == "imeta") {
             var url: String? = null
+            var blurhash: String? = null
+            var dim: Pair<Int, Int>? = null
+
             for (item in tag.asVec()) {
-                if (item.startsWith("url")) {
+                if (item.startsWith("url ")) {
                     url = item.drop(4)
                     continue
                 }
-                if (item.startsWith("blurhash")) {
-                    url?.let {
-                        blurhashes[it] = item.drop(9)
-                    }
-                    break
+                if (item.startsWith("dim ")) {
+                    try {
+                        val spl = item.drop(4).split("x")
+                            dim = Pair(spl[0].toInt(), spl[1].toInt())
+                    } catch (e: Exception) {}
+                    continue
                 }
+                if (item.startsWith("blurhash ")) {
+                    blurhash = item.drop(9)
+                    continue
+                }
+            }
+
+            if (url != null && blurhash != null) {
+                blurhashes.add(BlurHashDef(url, blurhash, dim))
             }
         }
     }

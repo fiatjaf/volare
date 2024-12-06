@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -98,6 +99,7 @@ dependencies {
     implementation("org.rust-nostr:nostr-sdk:0.36.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.anggrayudi:storage:2.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     // image stuff
     implementation("io.coil-kt.coil3:coil-compose:3.0.3")
