@@ -1,5 +1,7 @@
 package com.dluvian.voyage.ui.components.text
 
+import android.util.Log
+import android.graphics.Bitmap
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.Image
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
@@ -22,11 +24,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
-import com.dluvian.voyage.ui.components.image.Blurhash
 import com.dluvian.voyage.ui.components.video.VideoPlayer
 import com.dluvian.voyage.ui.theme.VideoIcon
 import com.dluvian.voyage.data.provider.TextItem
+import com.dluvian.voyage.core.utils.BlurHash
+
+val TAG = "AnnotatedText"
 
 @Composable
 fun AnnotatedText(
@@ -38,7 +46,7 @@ fun AnnotatedText(
     // TODO: handle maxlines somehow
 
     val gradientBrush = Brush.linearGradient(colors = listOf(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.background))
-    var (bigImage, setBigImage) = remember { mutableStateOf(-1) }
+    val (bigImage, setBigImage) = remember { mutableStateOf(-1) }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -54,39 +62,13 @@ fun AnnotatedText(
                         style = style.copy(color = MaterialTheme.colorScheme.onSurface),
                     )
                 is TextItem.ImageURL ->
-                    if (bigImage != index) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier
-                                .clickable {
-                                    setBigImage(index)
-                                }
-                                .fillMaxWidth()
-                                .height(21.dp)
-                                .background(gradientBrush)
-                        ) {
-                            Blurhash(item.blurhash)
-                            Text(text = item.short, style = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp))
-                        }
-                    } else {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier
-                                .clickable {
-                                    setBigImage(-1)
-                                }
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp)
-                                .background(gradientBrush)
-                        ) {
-                            AsyncImage(
-                                model = item.value.text,
-                                contentDescription = null,
-                            )
-                            Text(text = item.value, style = TextStyle(fontSize = 16.sp))
-                        }
-                    }
+                    ImageRow(
+                        item = item,
+                        isSelected = index == bigImage,
+                        onSelect = { setBigImage(index) },
+                        onUnselect = { setBigImage(-1) },
+                        gradientBrush = gradientBrush,
+                    )
                 is TextItem.VideoURL ->
                     if (bigImage != index) {
                         Row(
@@ -144,5 +126,68 @@ fun AnnotatedText(
             overflow = TextOverflow.Ellipsis,
             style = style.copy(color = MaterialTheme.colorScheme.onSurface),
         )
+    }
+}
+
+@Composable
+fun ImageRow(
+    item: TextItem.ImageURL,
+    isSelected: Boolean,
+    onSelect: () -> Unit,
+    onUnselect: () -> Unit,
+    gradientBrush: Brush,
+) {
+    val blurhash = remember {
+        BitmapPainter(
+            (
+                BlurHash.decode(item.blurhash, 36, 36) ?: Bitmap.createBitmap(36, 36, Bitmap.Config.ARGB_8888)
+            ).asImageBitmap()
+        )
+    }
+    val (loaded, setLoaded) = remember { mutableStateOf(false) }
+
+    if (!isSelected) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier
+                .clickable { onSelect() }
+                .fillMaxWidth()
+                .height(21.dp)
+                .background(gradientBrush)
+        ) {
+            if (loaded) {
+                AsyncImage(
+                    model = item.value.text,
+                    contentDescription = null,
+                    placeholder = blurhash,
+                )
+            } else {
+                Image(
+                    painter = blurhash,
+                    contentDescription = null,
+                )
+            }
+            Text(text = item.short, style = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp))
+        }
+    } else {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier
+                .clickable{ onUnselect() }
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+                .background(gradientBrush)
+        ) {
+            AsyncImage(
+                model = item.value.text,
+                contentDescription = null,
+                onSuccess = {
+                    setLoaded(true)
+                },
+                contentScale = ContentScale.FillWidth
+            )
+            Text(text = item.value, style = TextStyle(fontSize = 16.sp))
+        }
     }
 }

@@ -1,30 +1,12 @@
-package com.dluvian.voyage.ui.components.image
+package com.dluvian.voyage.core.utils
 
 import android.graphics.Bitmap
 import android.graphics.Color
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.Image
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.asImageBitmap
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.withSign
 
-@Composable
-fun Blurhash(
-    blurhash: String,
-    modifier: Modifier = Modifier,
-) {
-    val bmp = BlurHashDecoder.decode(blurhash, 36, 36) ?: Bitmap.createBitmap(36, 36, Bitmap.Config.ARGB_8888)
-    Image(
-        bitmap = bmp.asImageBitmap(),
-        contentDescription = null,
-        modifier = modifier
-    )
-}
-
-
-object BlurHashDecoder {
+object BlurHash {
     // cache Math.cos() calculations to improve performance.
     // The number of calculations can be huge for many bitmaps: width * height * numCompX * numCompY * 2 * nBitmaps
     // the cache is enabled by default, it is recommended to disable it only when just a few images are displayed
