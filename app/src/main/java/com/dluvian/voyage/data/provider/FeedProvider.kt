@@ -42,7 +42,6 @@ class FeedProvider(
     private val forcedFollows: Flow<Map<PubkeyHex, Boolean>>,
     private val forcedBookmarks: Flow<Map<EventIdHex, Boolean>>,
     private val muteProvider: MuteProvider,
-    private val showAuthorName: State<Boolean>,
 ) {
     private val staticFeedProvider = StaticFeedProvider(
         room = room,
@@ -117,18 +116,16 @@ class FeedProvider(
                 )
 
                 nostrSubscriber.subPollResponses(polls = filtered.filterIsInstance<Poll>())
-                if (showAuthorName.value) {
-                    val pubkeys = filtered.filter { it.authorName.isNullOrEmpty() }
-                        .map { it.pubkey }
-                        .toMutableSet()
-                    val crossPostedPubkeys = filtered.mapNotNull {
-                        if (it is CrossPost && it.crossPostedAuthorName.isNullOrEmpty())
-                            it.crossPostedPubkey
-                        else null
-                    }
-                    pubkeys.addAll(crossPostedPubkeys)
-                    nostrSubscriber.subProfiles(pubkeys = pubkeys)
+                val pubkeys = filtered.filter { it.authorName.isNullOrEmpty() }
+                    .map { it.pubkey }
+                    .toMutableSet()
+                val crossPostedPubkeys = filtered.mapNotNull {
+                    if (it is CrossPost && it.crossPostedAuthorName.isNullOrEmpty())
+                        it.crossPostedPubkey
+                    else null
                 }
+                pubkeys.addAll(crossPostedPubkeys)
+                nostrSubscriber.subProfiles(pubkeys = pubkeys)
             }
     }
 

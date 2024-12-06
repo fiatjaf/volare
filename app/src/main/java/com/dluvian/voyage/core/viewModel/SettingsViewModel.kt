@@ -25,7 +25,6 @@ import com.dluvian.voyage.core.RebroadcastMyLockEvent
 import com.dluvian.voyage.core.RequestExternalAccount
 import com.dluvian.voyage.core.SendAuth
 import com.dluvian.voyage.core.SettingsViewAction
-import com.dluvian.voyage.core.ShowUsernames
 import com.dluvian.voyage.core.UpdateAutopilotRelays
 import com.dluvian.voyage.core.UpdateRootPostThreshold
 import com.dluvian.voyage.core.UsePlainKeyAccount
@@ -77,7 +76,6 @@ class SettingsViewModel(
     val currentUpvote = mutableStateOf(eventPreferences.getUpvoteContent())
     val isAddingClientTag = mutableStateOf(eventPreferences.isAddingClientTag())
     val useV2Replies = mutableStateOf(eventPreferences.isUsingV2Replies())
-    val showUsernames = appPreferences.showAuthorNameState
     val isLocking = mutableStateOf(false)
     val isLocked = accountLocker.isLocked
     val isLockedForced = mutableStateOf(false)
@@ -128,8 +126,6 @@ class SettingsViewModel(
                 eventPreferences.setIsUsingV2Replies(useV2Replies = action.useV2Replies)
                 this.useV2Replies.value = action.useV2Replies
             }
-
-            is ShowUsernames -> appPreferences.setShowAuthorName(showAuthorName = action.showUsernames)
 
             is ExportDatabase -> exportDatabase(uiScope = action.uiScope)
 

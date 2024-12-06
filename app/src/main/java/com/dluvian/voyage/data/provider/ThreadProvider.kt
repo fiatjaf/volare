@@ -45,7 +45,6 @@ class ThreadProvider(
     private val forcedFollows: Flow<Map<PubkeyHex, Boolean>>,
     private val forcedBookmarks: Flow<Map<EventIdHex, Boolean>>,
     private val muteProvider: MuteProvider,
-    private val showAuthorName: State<Boolean>,
 ) {
 
     fun getLocalRoot(
@@ -59,13 +58,11 @@ class ThreadProvider(
                 nostrSubscriber.subPost(nevent = nevent)
                 delay(DELAY_1SEC)
             }
-            if (showAuthorName.value) {
-                val author = nevent.author()?.toHex() ?: room.mainEventDao().getAuthor(id = id)
-                if (author != null) {
-                    lazyNostrSubscriber.lazySubUnknownProfiles(
-                        selection = SingularPubkey(pubkey = author)
-                    )
-                }
+            val author = nevent.author()?.toHex() ?: room.mainEventDao().getAuthor(id = id)
+            if (author != null) {
+                lazyNostrSubscriber.lazySubUnknownProfiles(
+                    selection = SingularPubkey(pubkey = author)
+                )
             }
 
             val poll = room.pollDao().getPoll(pollId = id)
@@ -239,12 +236,10 @@ class ThreadProvider(
             val ids = it.map { reply -> reply.reply.getRelevantId() }
             nostrSubscriber.subVotes(parentIds = ids)
             nostrSubscriber.subReplies(parentIds = ids)
-            if (showAuthorName.value) {
-                nostrSubscriber.subProfiles(
-                    pubkeys = it.filter { reply -> reply.reply.authorName.isNullOrEmpty() }
-                        .map { reply -> reply.reply.pubkey }
-                )
-            }
+            nostrSubscriber.subProfiles(
+                pubkeys = it.filter { reply -> reply.reply.authorName.isNullOrEmpty() }
+                    .map { reply -> reply.reply.pubkey }
+            )
         }
     }
 
