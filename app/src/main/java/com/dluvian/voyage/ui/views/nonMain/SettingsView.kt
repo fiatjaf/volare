@@ -311,7 +311,7 @@ private fun AppSection(vm: SettingsViewModel, onUpdate: OnUpdate) {
 
         ClickableRowCheckbox(
             header = stringResource(id = R.string.add_client_tag),
-            text = stringResource(id = R.string.let_other_clients_know_that_you_are_posting_with_voyage),
+            text = stringResource(id = R.string.let_other_clients_know),
             checked = vm.isAddingClientTag.value,
             onClickChange = { onUpdate(AddClientTag(addClientTag = it)) })
 
