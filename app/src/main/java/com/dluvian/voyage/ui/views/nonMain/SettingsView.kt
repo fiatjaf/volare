@@ -54,6 +54,7 @@ import com.dluvian.voyage.core.UseV2Replies
 import com.dluvian.voyage.core.UsePlainKeyAccount
 import com.dluvian.voyage.core.model.AccountType
 import com.dluvian.voyage.core.model.PlainKeyAccount
+import com.dluvian.voyage.core.model.BunkerAccount
 import com.dluvian.voyage.core.model.ExternalAccount
 import com.dluvian.voyage.core.model.Locked
 import com.dluvian.voyage.core.utils.toShortenedNpub
@@ -129,6 +130,7 @@ private fun AccountSection(
             header = when (accountType) {
                 is ExternalAccount -> stringResource(id = R.string.external_signer)
                 is PlainKeyAccount -> stringResource(id = R.string.plain_key_account)
+                is BunkerAccount -> stringResource(id = R.string.bunker_account)
             },
             text = shortenedNpub,
             leadingIcon = AccountIcon,
@@ -357,7 +359,7 @@ private fun AccountRowButton(
                     Text(text = stringResource(id = R.string.use_another_account))
                 }
             }
-            is PlainKeyAccount -> Row {
+            is PlainKeyAccount, is BunkerAccount -> Row {
                 TextButton(onClick = { showKeyDialog.value = true }) {
                     Text(text = stringResource(id = R.string.use_another_account))
                 }

@@ -13,6 +13,7 @@ import com.dluvian.voyage.data.account.AccountManager
 import com.dluvian.voyage.data.account.AccountSwitcher
 import com.dluvian.voyage.data.account.ExternalSigner
 import com.dluvian.voyage.data.account.PlainKeySigner
+import com.dluvian.voyage.data.account.BunkerSigner
 import com.dluvian.voyage.data.event.EventCounter
 import com.dluvian.voyage.data.event.EventDeletor
 import com.dluvian.voyage.data.event.EventMaker
@@ -87,6 +88,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     val snackbar = SnackbarHostState()
     private val nostrClient = NostrClient()
     val plainKeySigner = PlainKeySigner(context)
+    val bunkerSigner = BunkerSigner(context)
     val externalSignerHandler = ExternalSignerHandler()
     private val externalSigner = ExternalSigner(handler = externalSignerHandler)
 
@@ -109,6 +111,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     val accountManager = AccountManager(
         plainKeySigner = plainKeySigner,
         externalSigner = externalSigner,
+        bunkerSigner = bunkerSigner,
         accountDao = roomDb.accountDao(),
     )
 

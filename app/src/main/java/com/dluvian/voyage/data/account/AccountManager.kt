@@ -5,6 +5,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.dluvian.voyage.core.model.AccountType
 import com.dluvian.voyage.core.model.PlainKeyAccount
+import com.dluvian.voyage.core.model.BunkerAccount
 import com.dluvian.voyage.core.model.ExternalAccount
 import com.dluvian.voyage.data.room.dao.AccountDao
 import com.dluvian.voyage.data.room.entity.AccountEntity
@@ -21,6 +22,7 @@ private const val TAG = "AccountManager"
 
 class AccountManager(
     val plainKeySigner: PlainKeySigner,
+    val bunkerSigner: BunkerSigner,
     private val externalSigner: ExternalSigner,
     private val accountDao: AccountDao,
 ) : IMyPubkeyProvider {
@@ -59,25 +61,25 @@ class AccountManager(
             is PlainKeyAccount -> {
                 plainKeySigner.sign(unsignedEvent = unsignedEvent)
             }
-
+            is BunkerAccount -> {
+                bunkerSigner.sign(unsignedEvent = unsignedEvent)
+                    .onSuccess {
+                        Log.i(TAG, "bunker signed event of kind ${unsignedEvent.kind().asU16()}")
+                    }
+                    .onFailure {
+                        Log.w(TAG, "bunker to sign event of kind ${unsignedEvent.kind().asU16()}")
+                    }
+            }
             is ExternalAccount -> {
                 externalSigner.sign(
                     unsignedEvent = unsignedEvent,
                     packageName = accountDao.getPackageName()
                 )
                     .onSuccess {
-                        Log.i(
-                            TAG,
-                            "Externally signed event of kind ${unsignedEvent.kind().asU16()}"
-                        )
+                        Log.i(TAG, "Externally signed event of kind ${unsignedEvent.kind().asU16()}")
                     }
                     .onFailure {
-                        Log.w(
-                            TAG,
-                            "Failed to externally sign event of kind ${
-                                unsignedEvent.kind().asU16()
-                            }"
-                        )
+                        Log.w(TAG, "Failed to externally sign event of kind ${unsignedEvent.kind().asU16()}")
                     }
             }
         }

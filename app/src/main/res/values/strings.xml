@@ -20,6 +20,7 @@
     <string name="app">App</string>
     <string name="external_signer">External signer</string>
     <string name="plain_key_account">Plain key account</string>
+    <string name="bunker_account">Bunker account</string>
     <string name="logout">Logout</string>
     <string name="use_another_account">Use a different account</string>
     <string name="login_with_external_signer">Login with external signer</string>

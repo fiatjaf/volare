@@ -9,6 +9,7 @@ import com.dluvian.voyage.core.DELAY_1SEC
 import com.dluvian.voyage.core.FEED_PAGE_SIZE
 import com.dluvian.voyage.core.model.AccountType
 import com.dluvian.voyage.core.model.PlainKeyAccount
+import com.dluvian.voyage.core.model.BunkerAccount
 import com.dluvian.voyage.core.model.ExternalAccount
 import com.dluvian.voyage.data.event.IdCacheClearer
 import com.dluvian.voyage.data.nostr.LazyNostrSubscriber
@@ -51,6 +52,16 @@ class AccountSwitcher(
         accountManager.plainKeySigner.setKey(key)
         val pubkey = accountManager.plainKeySigner.getPublicKey()
         accountManager.accountType.value = PlainKeyAccount(publicKey = pubkey)
+
+        updateAndReset(account = AccountEntity(pubkey = pubkey.toHex()))
+    }
+
+    suspend fun usebunkerAccount(uri: String) {
+        Log.i(TAG, "Use bunker account $uri")
+
+        accountManager.bunkerSigner.setBunkerUri(uri)
+        val pubkey = accountManager.bunkerSigner.getPublicKey()
+        accountManager.accountType.value = BunkerAccount(publicKey = pubkey)
 
         updateAndReset(account = AccountEntity(pubkey = pubkey.toHex()))
     }

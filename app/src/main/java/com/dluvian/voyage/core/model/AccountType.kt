@@ -9,4 +9,7 @@ sealed class AccountType(open val publicKey: PublicKey)
 data class PlainKeyAccount(override val publicKey: PublicKey) : AccountType(publicKey = publicKey)
 
 @Immutable
+data class BunkerAccount(override val publicKey: PublicKey) : AccountType(publicKey = publicKey)
+
+@Immutable
 data class ExternalAccount(override val publicKey: PublicKey) : AccountType(publicKey = publicKey)
