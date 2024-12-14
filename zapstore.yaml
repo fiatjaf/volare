@@ -4,7 +4,7 @@ volare:
     description: Lightweight nostr client
     license: MIT
     builder: npub1useke4f9maul5nf67dj0m9sq6jcsmnjzzk4ycvldwl4qss35fvgqjdk5ks
-    repository: https://github.com/dluvian/volare
+    repository: https://github.com/fiatjaf/volare
     artifacts:
       - app-arm64-v8a-release.apk
       - app-universal-release.apk

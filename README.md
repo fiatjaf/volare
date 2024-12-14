@@ -13,8 +13,8 @@ compliant nostr client like
 
 Install it via [zap.store](https://zap.store/download),
 [Obtainium](https://github.com/ImranR98/Obtainium),
-[IzzyOnDroid](https://apt.izzysoft.de/fdroid/index/apk/com.dluvian.volare) or go to the
-[release page](https://github.com/dluvian/volare/releases) and download the latest apk file.
+[IzzyOnDroid](https://apt.izzysoft.de/fdroid/index/apk/com.fiatjaf.volare) or go to the
+[release page](https://github.com/fiatjaf/volare/releases) and download the latest apk file.
 
 I don't plan to publish this app in the Google Play Store.
 
@@ -69,7 +69,7 @@ I don't plan to publish this app in the Google Play Store.
 
 ## License
 
-[MIT licence](https://github.com/dluvian/volare/blob/master/LICENSE)
+[MIT licence](https://github.com/fiatjaf/volare/blob/master/LICENSE)
 
 ## Resources
 
