@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.dluvian.voyage"
+    namespace = "com.dluvian.volare"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.dluvian.voyage"
+        applicationId = "com.dluvian.volare"
         minSdk = 26 // Android Oreo (Aug 2017 - Jan 2021)
         targetSdk = 35
         versionCode = 21

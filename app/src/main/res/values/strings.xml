@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name" translatable="false">Voyage</string>
+    <string name="app_name" translatable="false">Volare</string>
     <string name="version">Version</string>
     <string name="version_nr" translatable="false">v0.16.0</string>
     <string name="home">Home</string>
@@ -265,8 +265,8 @@
     <string name="bug_report">Bug report</string>
     <string name="enhancement_request">Enhancement request</string>
     <string name="indexed_topics">Indexed topics</string>
-    <string name="add_client_tag">Add Voyage client tag</string>
-    <string name="let_other_clients_know">Let other clients know that you are posting with Voyage.</string>
+    <string name="add_client_tag">Add Volare client tag</string>
+    <string name="let_other_clients_know">Let other clients know that you are posting with Volare.</string>
     <string name="time">Time</string>
     <string name="client">Client</string>
     <string name="parent_event_is_not_supported">Parent event is not supported.</string>

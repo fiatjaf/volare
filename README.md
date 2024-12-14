@@ -1,11 +1,11 @@
-# voyage
+# volare
 
-Voyage is a lightweight nostr client for Android.
+Volare is a lightweight nostr client for Android.
 
 ### Where is the issue section?
 
 The issue section on this GitHub repository is disabled.
-Issues can be submitted within the Voyage app (Settings -> Give us feedback) or with any other nip34
+Issues can be submitted within the Volare app (Settings -> Give us feedback) or with any other nip34
 compliant nostr client like
 [gitworkshop.dev](https://gitworkshop.dev/r/naddr1qqr8vmmev9nk2qgdwaehxw309ahx7uewd3hkcq3quseke4f9maul5nf67dj0m9sq6jcsmnjzzk4ycvldwl4qss35fvgqxpqqqpmejktjr8t/issues).
 
@@ -13,14 +13,14 @@ compliant nostr client like
 
 Install it via [zap.store](https://zap.store/download),
 [Obtainium](https://github.com/ImranR98/Obtainium),
-[IzzyOnDroid](https://apt.izzysoft.de/fdroid/index/apk/com.dluvian.voyage) or go to the
-[release page](https://github.com/dluvian/voyage/releases) and download the latest apk file.
+[IzzyOnDroid](https://apt.izzysoft.de/fdroid/index/apk/com.dluvian.volare) or go to the
+[release page](https://github.com/dluvian/volare/releases) and download the latest apk file.
 
 I don't plan to publish this app in the Google Play Store.
 
 ## Some points of difference
 
-- Outbox model: Voyage discovers relays through nip-65 events and encoded relays in
+- Outbox model: Volare discovers relays through nip-65 events and encoded relays in
   nprofiles/nevents. It fetches data only from relays expected to contain the desired information.
 - Sign-in only via an external signer.
 - App can be used offline because posts are stored locally.
@@ -69,7 +69,7 @@ I don't plan to publish this app in the Google Play Store.
 
 ## License
 
-[MIT licence](https://github.com/dluvian/voyage/blob/master/LICENSE)
+[MIT licence](https://github.com/dluvian/volare/blob/master/LICENSE)
 
 ## Resources
 
