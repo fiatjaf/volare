@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.fiatjaf.volare"
-        minSdk = 26 // Android Oreo (Aug 2017 - Jan 2021)
+        minSdk = 26
         targetSdk = 35
         versionCode = 21
         versionName = "v0.16.0"
