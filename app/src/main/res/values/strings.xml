@@ -25,7 +25,8 @@
     <string name="use_another_account">Use a different account</string>
     <string name="login_with_external_signer">Login with external signer</string>
     <string name="no_external_signer_installed">You don\'t have an external signer installed</string>
-    <string name="paste_key_or_bunker">Paste your nsec</string>
+    <string name="failed_to_contact_bunker">Failed to contact bunker</string>
+    <string name="paste_key_or_bunker">Paste your nsec or bunker code</string>
     <string name="failed_to_get_permission">Failed to get permission</string>
     <string name="received_invalid_data">Received invalid data</string>
     <string name="failed_to_sign_vote">Failed to sign vote</string>

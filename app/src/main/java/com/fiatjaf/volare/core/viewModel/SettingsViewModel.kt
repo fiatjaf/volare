@@ -28,6 +28,7 @@ import com.fiatjaf.volare.core.SettingsViewAction
 import com.fiatjaf.volare.core.UpdateAutopilotRelays
 import com.fiatjaf.volare.core.UpdateRootPostThreshold
 import com.fiatjaf.volare.core.UsePlainKeyAccount
+import com.fiatjaf.volare.core.UseBunkerAccount
 import com.fiatjaf.volare.core.UseV2Replies
 import com.fiatjaf.volare.core.model.AccountType
 import com.fiatjaf.volare.core.model.PlainKeyAccount
@@ -85,6 +86,7 @@ class SettingsViewModel(
     fun handle(action: SettingsViewAction) {
         when (action) {
             is UsePlainKeyAccount -> usePlainKeyAccount(action.key)
+            is UseBunkerAccount -> useBunkerAccount(action.uri, action.context)
 
             is RequestExternalAccount -> requestExternalAccountData(action = action)
             is ProcessExternalAccount -> processExternalAccountData(
@@ -142,6 +144,22 @@ class SettingsViewModel(
 
         viewModelScope.launchIO {
             accountSwitcher.usePlainKeyAccount(key)
+        }.invokeOnCompletion {
+            isLoadingAccount.value = false
+        }
+    }
+
+    private fun useBunkerAccount(uri: String, context: Context) {
+        isLoadingAccount.value = true
+
+        viewModelScope.launchIO {
+            accountSwitcher.useBunkerAccount(uri)
+                .onFailure {
+                    snackbar.showToast(
+                        scope = viewModelScope,
+                        msg = context.getString(R.string.failed_to_contact_bunker)
+                    )
+                }
         }.invokeOnCompletion {
             isLoadingAccount.value = false
         }

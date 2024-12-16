@@ -312,6 +312,7 @@ data class SaveProfile(
 
 sealed class SettingsViewAction : UIEvent()
 data class UsePlainKeyAccount(val key: String): SettingsViewAction()
+data class UseBunkerAccount(val uri: String, val context: Context): SettingsViewAction()
 data class RequestExternalAccount(val context: Context) : SettingsViewAction()
 data class ProcessExternalAccount(
     val activityResult: ActivityResult,

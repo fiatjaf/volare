@@ -47,7 +47,7 @@ class AccountSwitcher(
     }
 
     suspend fun usePlainKeyAccount(key: String) {
-        Log.i(TAG, "Use plain key account $key")
+        Log.i(TAG, "use plain key account $key")
 
         accountManager.plainKeySigner.setKey(key)
         val pubkey = accountManager.plainKeySigner.getPublicKey()
@@ -56,19 +56,20 @@ class AccountSwitcher(
         updateAndReset(account = AccountEntity(pubkey = pubkey.toHex()))
     }
 
-    suspend fun usebunkerAccount(uri: String) {
-        Log.i(TAG, "Use bunker account $uri")
+    suspend fun useBunkerAccount(uri: String): Result<Unit> {
+        Log.i(TAG, "use bunker account $uri")
 
-        accountManager.bunkerSigner.setBunkerUri(uri)
-        val pubkey = accountManager.bunkerSigner.getPublicKey()
-        accountManager.accountType.value = BunkerAccount(publicKey = pubkey)
-
-        updateAndReset(account = AccountEntity(pubkey = pubkey.toHex()))
+        return accountManager.bunkerSigner.setBunkerUri(uri)
+            .onSuccess {
+                val pubkey = accountManager.bunkerSigner.getPublicKey()
+                accountManager.accountType.value = BunkerAccount(publicKey = pubkey)
+                updateAndReset(account = AccountEntity(pubkey = pubkey.toHex()))
+            }
     }
 
     suspend fun useExternalAccount(publicKey: PublicKey, packageName: String) {
         if (accountManager.accountType.value is ExternalAccount) return
-        Log.i(TAG, "Use external account")
+        Log.i(TAG, "use external account")
 
         // Set accountType first, bc it's needed for subbing events
         accountManager.accountType.value = ExternalAccount(publicKey = publicKey)

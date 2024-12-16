@@ -12,20 +12,18 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
-import rust.nostr.sdk.Keys
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.Fn
-
+import backend.Backend
 
 @Composable
 fun SetKeyOrBunkerDialog(
-    onSet: (String) -> Unit,
+    onSetKey: (String) -> Unit,
+    onSetBunker: (String) -> Unit,
     onDismiss: Fn,
 ) {
     val input = remember { mutableStateOf(TextFieldValue("")) }
-    val showConfirmationButton = remember(input.value) {
-        runCatching { Keys.parse(input.value.text) }.isSuccess
-    }
+    val showConfirmationButton = remember(input.value) { Backend.isValidKeyOrBunker(input.value.text) }
     val focusRequester = remember { FocusRequester() }
 
     BaseAddDialog(
@@ -36,7 +34,7 @@ fun SetKeyOrBunkerDialog(
                 modifier = Modifier.focusRequester(focusRequester = focusRequester),
                 value = input.value,
                 onValueChange = { input.value = it },
-                placeholder = { Text(text = "nsec...") })
+                placeholder = { Text(text = "nsec1... or bunker://...") })
         },
         onDismiss = {
             onDismiss()
@@ -46,7 +44,11 @@ fun SetKeyOrBunkerDialog(
             if (showConfirmationButton) {
                 TextButton(
                     onClick = {
-                        onSet(input.value.text)
+                        if (Backend.isValidBunker(input.value.text)) {
+                            onSetBunker(input.value.text)
+                        } else {
+                            onSetKey(input.value.text)
+                        }
                         onDismiss()
                     }
                 ) {

@@ -1,21 +1,21 @@
 package com.fiatjaf.volare.data.account
 
 import kotlinx.coroutines.*
-import android.net.Uri
 import android.util.Log
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import rust.nostr.sdk.Keys
-import rust.nostr.sdk.Kind
 import rust.nostr.sdk.Event
-import rust.nostr.sdk.Filter
 import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.UnsignedEvent
 import com.fiatjaf.volare.data.nostr.NostrPool
 import com.fiatjaf.volare.data.nostr.SubscriptionHandler
 import com.fiatjaf.volare.data.account.IMyPubkeyProvider
-import rust.nostr.sdk.KindEnum
+import backend.Backend
+import backend.BunkerSession
+import backend.AuthURLHandler
+import com.anggrayudi.storage.extension.launchOnUiThread
 
 private const val TAG = "BunkerSigner"
 private const val BUNKERURI = "bunkeruri"
@@ -37,122 +37,68 @@ class BunkerSigner(context: Context) : IMyPubkeyProvider {
     )
 
     private var pk: PublicKey? = null
-    private var bunker: Bunker? = null
-    private var clientKeys: Keys
+    private var bunker: BunkerSession? = null
+    private var clientKey: String
+
+    private var auh = InternalAuthURLHandler()
 
     init {
-        var keys = sharedPreferences.getString(CLIENTSECRET, null)?.let {
-            runCatching { Keys.parse(it) }.getOrNull()
-        }
-        if (keys == null) {
-            keys = Keys.generate()
+        var sk = sharedPreferences.getString(CLIENTSECRET, null)
+        if (sk == null) {
+            sk = Backend.generateKey()
             sharedPreferences.edit()
-                .putString(CLIENTSECRET, keys.secretKey().toHex())
+                .putString(CLIENTSECRET, sk)
                 .apply()
+            this.clientKey = sk
+        } else {
+            this.clientKey = sk
         }
-        clientKeys = keys
 
         val pubkey = sharedPreferences.getString(USERPUBKEY, null)
         if (pubkey != null) {
-            pk = Keys.parse(pubkey).publicKey()
+            this.pk = PublicKey.parse(pubkey)
         }
 
         val bunkerUri = sharedPreferences.getString(BUNKERURI, null)
         if (bunkerUri != null) {
             runCatching {
-                Bunker(clientKeys, Uri.parse(bunkerUri))
+                val bunker = Backend.startBunkerSession(clientKey, bunkerUri, this.auh)
+                this.bunker = bunker
+                val pkh = bunker.getPublicKey()
+                sharedPreferences.edit()
+                    .putString(USERPUBKEY, pkh)
+                    .apply()
+                this.pk = PublicKey.parse(pkh)
             }
-                .onSuccess { bunker: Bunker ->
-                    this.bunker = bunker
-                    // launch {
-                    //     this@BunkerSigner.pk = async { bunker.getPublicKey() }.await()
-                    //     sharedPreferences.edit()
-                    //         .putString(USERPUBKEY, pk!!.toHex())
-                    //         .apply()
-                    // }
-                }
         }
     }
 
     override fun getPublicKey(): PublicKey = this.pk!!
 
     suspend fun sign(unsignedEvent: UnsignedEvent): Result<Event> {
-        if (this.bunker == null) {
-            return Result.failure(Exception("bunker not connected"))
-        }
+        if (this.bunker == null) return Result.failure(Exception("bunker not connected"))
 
         return runCatching {
-            this.bunker!!.signEvent(unsignedEvent)
+            val res = this.bunker!!.signEvent(unsignedEvent.asJson())
+            Event.fromJson(res)
         }
     }
 
-    suspend fun setBunkerUri(bunkerUri: String): Result<Unit> {
+    fun setBunkerUri(bunkerUri: String): Result<Unit> {
         return runCatching {
-            val parsed = Uri.parse(bunkerUri)
-            this.bunker = Bunker(clientKeys = clientKeys, uri = parsed)
-            this.pk = this.bunker!!.getPublicKey()
+            this.bunker = Backend.startBunkerSession(clientKey, bunkerUri, this.auh)
+            val pkh = this.bunker!!.getPublicKey()
+            this.pk = PublicKey.parse(pkh)
             sharedPreferences.edit()
                 .putString(BUNKERURI, bunkerUri)
-                .putString(USERPUBKEY, this.pk!!.toHex())
+                .putString(USERPUBKEY, pkh)
                 .apply()
         }
     }
 }
 
-class Bunker(
-    val clientKeys: Keys,
-    uri: Uri,
-) {
-    val bunkerPublicKey: PublicKey = PublicKey.fromHex(hex = uri.host!!)
-    private var secret: String?
-    var serial: Int = 0
-    val relays: List<String> = uri.getQueryParameters("relay")
-    val listeners: Map<String, Job> = mutableMapOf()
-
-    init {
-        if (this.relays.isEmpty()) {
-            throw Exception("bunker URL must contain relays")
-        }
-
-        this.secret = uri.getQueryParameter("secret")
-
-        NostrPool.subscribe(
-            filter = Filter()
-                .kind(Kind.fromEnum(KindEnum.NostrConnect))
-                .author(this.bunkerPublicKey)
-                .pubkey(this.clientKeys.publicKey()),
-            urls = this.relays,
-            handler = SubscriptionHandler(
-                onEvent = fun (evt: Event) {
-                    Log.d(TAG, "got event: $evt")
-                    rust.nostr.sdk.nip44Decrypt(
-                        secretKey = this.clientKeys.secretKey(),
-                        publicKey = this.bunkerPublicKey,
-                        payload = evt.content()
-                    )
-                },
-                onEOSE = fun () {},
-                onClosed = fun (reason: String) {},
-            ),
-        )
-    }
-
-    suspend fun getPublicKey(): PublicKey {
-        // return Keys.parse(result)
-        return TODO("Provide the return value")
-    }
-
-    suspend fun signEvent(unsigned: UnsignedEvent): Event {
-        return TODO("Provide the return value")
-    }
-
-    private suspend fun rpc(method: String, args: List<String>): String {
-        serial++
-        rust.nostr.sdk.nip44Encrypt(
-            secretKey = TODO(),
-            publicKey = TODO(),
-            content = TODO(),
-            version = TODO()
-        )
+class InternalAuthURLHandler: AuthURLHandler {
+    override fun handle (url: String) {
+        Log.i(TAG, "got bunker url: $url")
     }
 }

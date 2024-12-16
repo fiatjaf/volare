@@ -102,6 +102,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.anggrayudi:storage:2.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation(files("libs/backend.aar"))
 
     // image stuff
     implementation("io.coil-kt.coil3:coil-compose:3.0.3")

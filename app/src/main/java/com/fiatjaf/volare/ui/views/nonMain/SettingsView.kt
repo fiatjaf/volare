@@ -52,6 +52,7 @@ import com.fiatjaf.volare.core.UpdateAutopilotRelays
 import com.fiatjaf.volare.core.UpdateRootPostThreshold
 import com.fiatjaf.volare.core.UseV2Replies
 import com.fiatjaf.volare.core.UsePlainKeyAccount
+import com.fiatjaf.volare.core.UseBunkerAccount
 import com.fiatjaf.volare.core.model.AccountType
 import com.fiatjaf.volare.core.model.PlainKeyAccount
 import com.fiatjaf.volare.core.model.BunkerAccount
@@ -340,13 +341,15 @@ private fun AccountRowButton(
     onUpdate: OnUpdate
 ) {
     val context = LocalContext.current
-
     val showKeyDialog = remember { mutableStateOf(false) }
 
     if (showKeyDialog.value) {
         SetKeyOrBunkerDialog(
-            onSet = { key ->
+            onSetKey = { key ->
                 onUpdate(UsePlainKeyAccount(key))
+            },
+            onSetBunker = { uri ->
+                onUpdate(UseBunkerAccount(uri, context))
             },
             onDismiss = { showKeyDialog.value = false },
         )

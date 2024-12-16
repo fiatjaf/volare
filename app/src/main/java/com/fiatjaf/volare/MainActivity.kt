@@ -38,6 +38,7 @@ import com.fiatjaf.volare.core.viewModel.SettingsViewModel
 import com.fiatjaf.volare.core.viewModel.ThreadViewModel
 import com.fiatjaf.volare.core.viewModel.TopicViewModel
 import com.fiatjaf.volare.ui.VolareApp
+import backend.Backend
 
 private const val TAG = "MainActivity"
 
@@ -45,6 +46,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var appContainer: AppContainer
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Backend.start()
+
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         val storageHelper = SimpleStorageHelper(this@MainActivity)
