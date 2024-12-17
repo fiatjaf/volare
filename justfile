@@ -9,3 +9,7 @@ gomobile:
         cd backend
         gomobile bind -androidapi 26 -target=android -o ../app/libs/backend.aar
     end
+
+build_release: gomobile
+    ./gradlew assembleRelease
+    ./gradlew installRelease
