@@ -144,15 +144,6 @@ fun <T> Collection<T>.takeRandom(n: Int): List<T> {
     return if (this.size <= n || n < 0) this.toList() else this.shuffled().take(n)
 }
 
-private val urlRegex = Regex(pattern = "https?://[^\\s]+[a-zA-Z0-9/]")
-fun extractUrls(extractFrom: String) = urlRegex.findAll(extractFrom).toList()
-
-
-private val nostrMentionRegex =
-    Regex("(nostr:|@)(npub1|note1|nevent1|nprofile1|naddr1|nrelay)[a-zA-Z0-9]+")
-
-fun extractNostrMentions(extractFrom: String) = nostrMentionRegex.findAll(extractFrom).toList()
-
 fun shortenUrl(url: String): String {
     val u = Uri.parse(url)
 
@@ -189,8 +180,8 @@ fun shortenUrl(url: String): String {
     return res.toString()
 }
 
-private val hashtagRegex = Regex("""#\w+(-\w+)*""")
 private val bareTopicRegex = Regex("[^#\\s]+\$")
+private val hashtagRegex = Regex("""#\w+(-\w+)*""")
 
 fun extractCleanHashtags(content: String): List<Topic> {
     return hashtagRegex.findAll(content)
@@ -198,8 +189,6 @@ fun extractCleanHashtags(content: String): List<Topic> {
         .distinct()
         .toList()
 }
-
-fun extractHashtags(extractFrom: String) = hashtagRegex.findAll(extractFrom).toList()
 
 fun String.isBareTopicStr(): Boolean = bareTopicRegex.matches(this)
 

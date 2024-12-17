@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
 
         appContainer = AppContainer(
             context = this.applicationContext,
-            storageHelper = storageHelper
+            storageHelper = storageHelper,
         )
 
         setContent {
