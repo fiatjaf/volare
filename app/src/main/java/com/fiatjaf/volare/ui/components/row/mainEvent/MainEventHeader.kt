@@ -97,6 +97,14 @@ private fun MainEventHeaderIconsAndName(
     onUpdate: OnUpdate
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
+        when (val mainEvent = ctx.mainEvent) {
+            is CrossPost -> CrossPostIcon(
+                crossPost = mainEvent,
+                onUpdate = onUpdate
+            )
+
+            is LegacyReply, is RootPost, is Comment, is Poll -> {}
+        }
         ClickableTrustIcon(
             trustType = ctx.mainEvent.trustType,
             isOp = when (ctx) {
@@ -112,27 +120,11 @@ private fun MainEventHeaderIconsAndName(
                 onUpdate(OpenProfile(nprofile = createNprofile(hex = ctx.mainEvent.pubkey)))
             }
         )
-        when (val mainEvent = ctx.mainEvent) {
-            is CrossPost -> CrossPostIcon(
-                crossPost = mainEvent,
-                onUpdate = onUpdate
-            )
-
-            is LegacyReply, is RootPost, is Comment, is Poll -> {}
-        }
     }
 }
 
 @Composable
 private fun CrossPostIcon(crossPost: CrossPost, onUpdate: OnUpdate) {
-    Icon(
-        modifier = Modifier
-            .size(sizing.smallIndicator)
-            .padding(horizontal = spacing.small),
-        imageVector = CrossPostIcon,
-        contentDescription = stringResource(id = R.string.cross_posted),
-        tint = MaterialTheme.colorScheme.onBackground.light(0.6f)
-    )
     ClickableTrustIcon(
         trustType = crossPost.crossPostedTrustType,
         authorName = getUiAuthorName(
@@ -142,6 +134,14 @@ private fun CrossPostIcon(crossPost: CrossPost, onUpdate: OnUpdate) {
         onClick = {
             onUpdate(OpenProfile(nprofile = createNprofile(hex = crossPost.crossPostedPubkey)))
         }
+    )
+    Icon(
+        modifier = Modifier
+            .size(sizing.smallIndicator)
+            .padding(horizontal = spacing.small),
+        imageVector = CrossPostIcon,
+        contentDescription = stringResource(id = R.string.cross_posted),
+        tint = MaterialTheme.colorScheme.onBackground.light(0.6f)
     )
 }
 
