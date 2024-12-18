@@ -14,10 +14,10 @@ build_release: gomobile
     ./gradlew assembleRelease
     ./gradlew installRelease
 
-build_emulator: gomobile
-    ./gradlew assembleRelease
-    adb install app/build/outputs/apk/release/app-arm64-v8a-release.apk
-
-build_emulator_debug: gomobile
+emulator: gomobile
     ./gradlew assembleDebug
     adb install app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+
+emulator_release: gomobile
+    ./gradlew assembleRelease
+    adb install app/build/outputs/apk/release/app-arm64-v8a-release.apk
