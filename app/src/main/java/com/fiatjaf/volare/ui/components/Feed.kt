@@ -20,12 +20,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,16 +39,21 @@ import com.fiatjaf.volare.core.FEED_PAGE_SIZE
 import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.model.IPaginator
+import com.fiatjaf.volare.core.utils.debounce
 import com.fiatjaf.volare.core.utils.showScrollButton
 import com.fiatjaf.volare.data.model.PostDetails
 import com.fiatjaf.volare.ui.components.bottomSheet.PostDetailsBottomSheet
 import com.fiatjaf.volare.ui.components.indicator.BaseHint
 import com.fiatjaf.volare.ui.components.indicator.FullLinearProgressIndicator
+import com.fiatjaf.volare.ui.components.row.mainEvent.MainEventCtx
 import com.fiatjaf.volare.ui.components.row.mainEvent.MainEventRow
 import com.fiatjaf.volare.ui.theme.ScrollUpIcon
 import com.fiatjaf.volare.ui.theme.sizing
 import com.fiatjaf.volare.ui.theme.spacing
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+private const val TAG = "Feed"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +76,42 @@ fun Feed(
         derivedStateOf { isAppending || (hasPage && pageTimestamps.isEmpty()) }
     }
 
+    // a complicated scheme to enable preloading images from notes that are likely to be in focus
+    // by the user -- i.e. when the user stops scrolling and the note seems to be more or less
+    // in the top or middle of the screen, it works pretty well actually
+    val coroutineScope = rememberCoroutineScope()
+    val (focused, setFocused) = remember { mutableStateOf<MainEventCtx?>(null) }
+
+    fun guessWhatIndexIsActuallyFocused(state: LazyListState): Int {
+        return when (state.firstVisibleItemScrollOffset) {
+            in 0..45 -> state.firstVisibleItemIndex
+            in 45 .. 200 -> -1
+            in 200 .. 1600 -> state.firstVisibleItemIndex + 1
+            else -> -1
+        }
+    }
+
+    val debouncedScrollingStopped = remember {
+        debounce(1000, coroutineScope) {
+            val index = guessWhatIndexIsActuallyFocused(state)
+            if (state.firstVisibleItemIndex >= 0) {
+                coroutineScope.launch {
+                    delay(1000)
+                    if (guessWhatIndexIsActuallyFocused(state) == index) {
+                        setFocused(filteredPage.getOrNull(index))
+                    }
+                }
+            }
+        }
+    }
+    LaunchedEffect (state) {
+        snapshotFlow { state.isScrollInProgress }
+            .collect {
+                if (it) return@collect
+                debouncedScrollingStopped()
+            }
+    }
+
     PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = onRefresh) {
         if (showProgressIndicator) FullLinearProgressIndicator()
         if (!hasPage && pageTimestamps.isEmpty()) BaseHint(stringResource(id = R.string.no_posts_found))
@@ -75,7 +119,10 @@ fun Feed(
             PostDetailsBottomSheet(postDetails = details, onUpdate = onUpdate)
         }
 
-        LazyColumn(modifier = Modifier.fillMaxSize(), state = state) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = state
+        ) {
             if (hasMoreRecentItems) item {
                 MostRecentPostsTextButton(onClick = {
                     onRefresh()
@@ -86,7 +133,8 @@ fun Feed(
             items(items = filteredPage) { mainEventCtx ->
                 MainEventRow(
                     ctx = mainEventCtx,
-                    onUpdate = onUpdate
+                    onUpdate = onUpdate,
+                    isFocused = focused == mainEventCtx
                 )
                 FullHorizontalDivider()
             }

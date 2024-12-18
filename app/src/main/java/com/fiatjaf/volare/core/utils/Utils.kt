@@ -43,6 +43,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -466,4 +467,19 @@ fun getFullDateTime(ctx: Context, createdAt: Long): String {
                 DateUtils.FORMAT_SHOW_WEEKDAY or
                 DateUtils.FORMAT_ABBREV_ALL
     ) + "  ($createdAt)"
+}
+
+fun debounce(
+    waitMs: Long = 300L,
+    coroutineScope: CoroutineScope,
+    destinationFunction: () -> Unit
+): () -> Unit {
+    var debounceJob: Job? = null
+    return {
+        debounceJob?.cancel()
+        debounceJob = coroutineScope.launch {
+            delay(waitMs)
+            destinationFunction()
+        }
+    }
 }

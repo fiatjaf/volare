@@ -46,8 +46,7 @@ import com.fiatjaf.volare.ui.theme.VideoIcon
 import com.fiatjaf.volare.data.provider.TextItem
 import com.fiatjaf.volare.core.utils.BlurHash
 
-val TAG = "AnnotatedText"
-
+private const val TAG = "AnnotatedText"
 private const val previewRowHeight = 21
 
 @Composable
@@ -150,18 +149,20 @@ fun ImageRow(
 
     val smallBlurhashPainter = remember { paintBlurhash(previewRowHeight, previewRowHeight) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(preload) {
         // on startup only load image from cache, if it's not available we will fall back to
         // blurhash (this is done dynamically when after rendering because we must know the
         // width/height first)
         // well -- now we preload from the network too if `preload` is true
-        imageLoader.enqueue(
-            ImageRequest.Builder(context)
-                .data(item.value.text)
-                .networkCachePolicy(if (preload) CachePolicy.ENABLED else CachePolicy.DISABLED)
-                .target(onSuccess = { setCoilImage(it) })
-                .build()
-        )
+        if (coilImage == null) {
+            imageLoader.enqueue(
+                ImageRequest.Builder(context)
+                    .data(item.value.text)
+                    .networkCachePolicy(if (preload) CachePolicy.ENABLED else CachePolicy.DISABLED)
+                    .target(onSuccess = { setCoilImage(it) })
+                    .build()
+            )
+        }
     }
 
     // only when the user clicks we actually try to load from network

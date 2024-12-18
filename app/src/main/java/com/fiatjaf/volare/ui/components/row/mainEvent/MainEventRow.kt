@@ -55,11 +55,13 @@ import com.fiatjaf.volare.ui.views.nonMain.MoreRepliesTextButton
 fun MainEventRow(
     ctx: MainEventCtx,
     onUpdate: OnUpdate,
+    isFocused: Boolean = false,
 ) {
     when (ctx) {
         is FeedCtx -> MainEventMainRow(
             ctx = ctx,
-            onUpdate = onUpdate
+            onUpdate = onUpdate,
+            isFocused = isFocused
         )
 
         is ThreadRootCtx -> {
