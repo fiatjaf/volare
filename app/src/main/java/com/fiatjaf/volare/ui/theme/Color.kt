@@ -20,7 +20,7 @@ val Purple = Color(0xFFb5179e)
 val DenimBlue = Color(0xFF1565c0)
 
 val WotColor = Color(0xFFF8D97B)
-val FriendColor = Color(0xFFC1FA7F)
+val FriendColor = Color(0xFFE8E8E8)
 val MutedColor = Color(0xFFFA6D6D)
 val LockedColor = Color.Red
 
