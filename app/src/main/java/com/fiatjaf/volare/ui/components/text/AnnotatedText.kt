@@ -5,18 +5,16 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
@@ -47,8 +45,6 @@ import com.fiatjaf.volare.ui.components.video.VideoPlayer
 import com.fiatjaf.volare.ui.theme.VideoIcon
 import com.fiatjaf.volare.data.provider.TextItem
 import com.fiatjaf.volare.core.utils.BlurHash
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 
 val TAG = "AnnotatedText"
 
@@ -202,21 +198,16 @@ fun ImageRow(
                 .height(previewRowHeight.dp)
                 .background(gradientBrush, shape = RoundedCornerShape(4.dp))
         ) {
-            Box(
+            Image(
+                contentDescription = null,
+                painter = coilImage?.asPainter(context) ?: smallBlurhashPainter,
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(bottomStart = 4.dp, topStart = 4.dp))
-            ) {
-                Image(
-                    contentDescription = null,
-                    painter = coilImage?.asPainter(context) ?: smallBlurhashPainter,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(),
-                    contentScale = ContentScale.Crop
-                )
-            }
+                    .height(previewRowHeight.dp)
+                    .width(previewRowHeight.dp)
+                    .clip(RoundedCornerShape(bottomStart = 4.dp, topStart = 4.dp)),
+
+                contentScale = ContentScale.Crop
+            )
             Text(text = item.short, style = textStyle)
         }
     } else {
@@ -229,32 +220,27 @@ fun ImageRow(
                 .fillMaxWidth()
                 .background(gradientBrush, shape = RoundedCornerShape(4.dp))
         ) {
-            Box(
+            Image(
+                contentDescription = null,
+                painter = coilImage?.asPainter(context) ?: bigBlurhashPainter,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(4.dp))
-            ) {
-                Image(
-                    contentDescription = null,
-                    painter = coilImage?.asPainter(context) ?: bigBlurhashPainter,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onPlaced { coords ->
-                            if (onPlacedCalled) return@onPlaced
-                            setOnPlacedCalled(true)
+                    .onPlaced { coords ->
+                        if (onPlacedCalled) return@onPlaced
+                        setOnPlacedCalled(true)
 
-                            if (coilImage == null) {
-                                val width = coords.size.width
-                                val impliedHeight =
-                                    ((item.blurhash.dim?.let { (x, y) -> y.toDouble() / x.toDouble() }
-                                        ?: 0.78) * width).toInt()
-                                setBigBlurhashPainter(paintBlurhash(width, impliedHeight))
-                                addedHeight.value += impliedHeight
-                            }
+                        if (coilImage == null) {
+                            val width = coords.size.width
+                            val impliedHeight =
+                                ((item.blurhash.dim?.let { (x, y) -> y.toDouble() / x.toDouble() }
+                                    ?: 0.78) * width).toInt()
+                            setBigBlurhashPainter(paintBlurhash(width, impliedHeight))
+                            addedHeight.value += impliedHeight
                         }
-                        .clip(RoundedCornerShape(4.dp))
-                )
-            }
+                    }
+                    .clip(RoundedCornerShape(4.dp))
+            )
             Text(
                 text = item.value,
                 style = textStyle.copy(fontSize = 12.sp /* font is 20% smaller */),
