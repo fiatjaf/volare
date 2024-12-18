@@ -54,7 +54,7 @@ import com.fiatjaf.volare.ui.views.nonMain.MoreRepliesTextButton
 @Composable
 fun MainEventRow(
     ctx: MainEventCtx,
-    onUpdate: OnUpdate
+    onUpdate: OnUpdate,
 ) {
     when (ctx) {
         is FeedCtx -> MainEventMainRow(
@@ -66,13 +66,15 @@ fun MainEventRow(
             when (ctx.threadableMainEvent) {
                 is RootPost, is Poll -> MainEventMainRow(
                     ctx = ctx,
-                    onUpdate = onUpdate
+                    onUpdate = onUpdate,
+                    isFocused = true
                 )
 
                 is LegacyReply, is Comment -> RowWithDivider(level = 1) {
                     MainEventMainRow(
                         ctx = ctx,
-                        onUpdate = onUpdate
+                        onUpdate = onUpdate,
+                        isFocused = true
                     )
                 }
             }
@@ -82,7 +84,8 @@ fun MainEventRow(
             RowWithDivider(level = ctx.level) {
                 MainEventMainRow(
                     ctx = ctx,
-                    onUpdate = onUpdate
+                    onUpdate = onUpdate,
+                    isFocused = true
                 )
             }
         }
@@ -92,7 +95,8 @@ fun MainEventRow(
 @Composable
 private fun MainEventMainRow(
     ctx: MainEventCtx,
-    onUpdate: OnUpdate
+    onUpdate: OnUpdate,
+    isFocused: Boolean = false
 ) {
     val onClickRow = {
         when (ctx) {
@@ -103,7 +107,6 @@ private fun MainEventMainRow(
                     is CrossPost -> onUpdate(OpenThreadRaw(nevent = createNevent(hex = event.crossPostedId)))
                 }
             }
-
             is ThreadRootCtx -> {}
         }
     }
@@ -147,7 +150,8 @@ private fun MainEventMainRow(
                     maxLines = when (ctx) {
                         is ThreadReplyCtx, is ThreadRootCtx -> Int.MAX_VALUE
                         is FeedCtx -> MAX_CONTENT_LINES
-                    }
+                    },
+                    preload = isFocused
                 )
                 Spacer(modifier = Modifier.height(spacing.large))
             }

@@ -1,6 +1,7 @@
 package com.fiatjaf.volare.ui.components.text
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -35,7 +37,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil3.compose.asPainter
@@ -46,25 +47,30 @@ import com.fiatjaf.volare.ui.components.video.VideoPlayer
 import com.fiatjaf.volare.ui.theme.VideoIcon
 import com.fiatjaf.volare.data.provider.TextItem
 import com.fiatjaf.volare.core.utils.BlurHash
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 val TAG = "AnnotatedText"
+
+private const val previewRowHeight = 21
 
 @Composable
 fun AnnotatedText(
     items: List<TextItem>,
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
+    preload: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
 ) {
-    // TODO: handle maxlines somehow
-
     val gradientBrush = Brush.linearGradient(
         colors = listOf(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.background)
     )
     val textStyle = style.copy(color = MaterialTheme.colorScheme.onSurface)
+    val addedHeight = remember { mutableStateOf(0) }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.heightIn(max = (addedHeight.value + (maxLines * style.lineHeight.value)).dp)
     ) {
         items.forEach { item ->
             when (item) {
@@ -74,7 +80,6 @@ fun AnnotatedText(
                     Text(
                         modifier = modifier,
                         text = item.value,
-                        maxLines = maxLines,
                         overflow = TextOverflow.Ellipsis,
                         style = textStyle,
                     )
@@ -82,7 +87,9 @@ fun AnnotatedText(
                     ImageRow(
                         item = item,
                         gradientBrush = gradientBrush,
-                        textStyle = textStyle
+                        textStyle = textStyle,
+                        preload = preload,
+                        addedHeight = addedHeight,
                     )
                 is TextItem.VideoURL ->
                     VideoRow(
@@ -102,11 +109,12 @@ fun AnnotatedText(
     style: TextStyle = MaterialTheme.typography.bodyLarge,
     maxLines: Int = Int.MAX_VALUE,
 ) {
-    Column {
+    Column(
+        modifier = Modifier.heightIn(max = (maxLines * style.lineHeight.value).dp)
+    ) {
         Text(
             modifier = modifier,
             text = text,
-            maxLines = maxLines,
             overflow = TextOverflow.Ellipsis,
             style = style.copy(color = MaterialTheme.colorScheme.onSurface),
         )
@@ -118,15 +126,10 @@ fun ImageRow(
     item: TextItem.ImageURL,
     gradientBrush: Brush,
     textStyle: TextStyle,
+    preload: Boolean,
+    addedHeight: MutableState<Int>,
 ) {
     val (isSelected, setSelected) = remember { mutableStateOf(false) }
-    val (smallBlurhashPainter, setSmallBlurhashPainter) = remember {
-        mutableStateOf(
-            BitmapPainter(
-                Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888).asImageBitmap()
-            )
-        )
-    }
     val (bigBlurhashPainter, setBigBlurhashPainter) = remember {
         mutableStateOf(
             BitmapPainter(
@@ -135,18 +138,31 @@ fun ImageRow(
         )
     }
     val (coilImage, setCoilImage) = remember { mutableStateOf<coil3.Image?>(null) }
+    val (imageFailed, setImageFailed) = remember { mutableStateOf(false) }
+    val (onPlacedCalled, setOnPlacedCalled) = remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val imageLoader = context.imageLoader
+
+    fun paintBlurhash (x: Int, y: Int): BitmapPainter {
+        return BitmapPainter(
+            ( BlurHash.decode(item.blurhash.blurhash, x, y)
+                ?: Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888)
+            ).asImageBitmap()
+        )
+    }
+
+    val smallBlurhashPainter = remember { paintBlurhash(previewRowHeight, previewRowHeight) }
 
     LaunchedEffect(Unit) {
         // on startup only load image from cache, if it's not available we will fall back to
         // blurhash (this is done dynamically when after rendering because we must know the
         // width/height first)
+        // well -- now we preload from the network too if `preload` is true
         imageLoader.enqueue(
             ImageRequest.Builder(context)
                 .data(item.value.text)
-                .networkCachePolicy(CachePolicy.DISABLED)
+                .networkCachePolicy(if (preload) CachePolicy.ENABLED else CachePolicy.DISABLED)
                 .target(onSuccess = { setCoilImage(it) })
                 .build()
         )
@@ -154,21 +170,16 @@ fun ImageRow(
 
     // only when the user clicks we actually try to load from network
     fun actuallyLoadImage() {
+        // if this image was already loaded or failed we don't try again
+        if (coilImage != null || imageFailed) return
+
         imageLoader.enqueue(
             ImageRequest.Builder(context)
                 .data(item.value.text)
                 .memoryCachePolicy(CachePolicy.DISABLED)
                 .diskCachePolicy(CachePolicy.DISABLED)
-                .target(onSuccess = { setCoilImage(it) })
+                .target(onSuccess = { setCoilImage(it) }, onError = { setImageFailed(true) })
                 .build()
-        )
-    }
-
-    fun paintBlurhash (x: Int, y: Int): BitmapPainter {
-        return BitmapPainter(
-            ( BlurHash.decode(item.blurhash.blurhash, x, y)
-                ?: Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888)
-            ).asImageBitmap()
         )
     }
 
@@ -180,9 +191,15 @@ fun ImageRow(
                 .clickable {
                     actuallyLoadImage()
                     setSelected(true)
+
+                    if (coilImage != null) {
+                        addedHeight.value += coilImage.height
+                    } else if (onPlacedCalled) {
+                        addedHeight.value += bigBlurhashPainter.intrinsicSize.height.toInt()
+                    }
                 }
                 .fillMaxWidth()
-                .height(21.dp)
+                .height(previewRowHeight.dp)
                 .background(gradientBrush, shape = RoundedCornerShape(4.dp))
         ) {
             Box(
@@ -196,12 +213,7 @@ fun ImageRow(
                     painter = coilImage?.asPainter(context) ?: smallBlurhashPainter,
                     modifier = Modifier
                         .fillMaxHeight()
-                        .fillMaxWidth()
-                        .onPlaced { coords ->
-                            if (coilImage == null) {
-                                setSmallBlurhashPainter(paintBlurhash(coords.size.width, coords.size.height))
-                            }
-                        },
+                        .fillMaxWidth(),
                     contentScale = ContentScale.Crop
                 )
             }
@@ -210,14 +222,15 @@ fun ImageRow(
     } else {
         Column(
             modifier = Modifier
-                .clickable{ setSelected(false) }
+                .clickable {
+                    setSelected(false)
+                    addedHeight.value -= (coilImage?.height ?: bigBlurhashPainter.intrinsicSize.height.toInt())
+                }
                 .fillMaxWidth()
-                .padding(bottom = 8.dp)
-                .background(gradientBrush),
+                .background(gradientBrush, shape = RoundedCornerShape(4.dp))
         ) {
             Box(
                 modifier = Modifier
-                    .heightIn(max = (LocalConfiguration.current.screenHeightDp * 2).dp)
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(4.dp))
             ) {
@@ -227,12 +240,19 @@ fun ImageRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .onPlaced { coords ->
+                            if (onPlacedCalled) return@onPlaced
+                            setOnPlacedCalled(true)
+
                             if (coilImage == null) {
                                 val width = coords.size.width
-                                val impliedHeight = ((item.blurhash.dim?.let { (x, y) -> y.toDouble() / x.toDouble() } ?: 0.78) * width).toInt()
+                                val impliedHeight =
+                                    ((item.blurhash.dim?.let { (x, y) -> y.toDouble() / x.toDouble() }
+                                        ?: 0.78) * width).toInt()
                                 setBigBlurhashPainter(paintBlurhash(width, impliedHeight))
+                                addedHeight.value += impliedHeight
                             }
                         }
+                        .clip(RoundedCornerShape(4.dp))
                 )
             }
             Text(
@@ -259,7 +279,7 @@ fun VideoRow(
             modifier = Modifier
                 .clickable { setSelected(true) }
                 .fillMaxWidth()
-                .height(21.dp)
+                .height(previewRowHeight.dp)
                 .background(gradientBrush, shape = RoundedCornerShape(4.dp))
         ) {
             Icon(

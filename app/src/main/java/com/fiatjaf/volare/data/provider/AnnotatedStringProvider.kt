@@ -88,8 +88,6 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
             val tline = line.trim()
             if (tline.isEmpty()) continue
 
-            Log.d(TAG, "line: $line")
-
             var currIdx = 0
             mainLineLoop@ while (currIdx < tline.length) {
                 var media: TextItem? = null // media is reset to null
@@ -97,8 +95,6 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
                 val annotatedString = buildAnnotatedString {
                     internal@ while (currIdx < tline.length) {
                         val res = tline.findAnyOf(anyTarget, currIdx, true)
-
-                        Log.d(TAG, "  currIdx: $currIdx, res: $res")
 
                         if (res == null) {
                             // we are done for the rest of the line
