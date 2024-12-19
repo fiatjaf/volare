@@ -13,15 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.fiatjaf.volare.ui.theme.DenimBlue
-import com.fiatjaf.volare.ui.theme.TallPoppyRed
+import com.fiatjaf.volare.ui.theme.Sky600
+import com.fiatjaf.volare.ui.theme.Red600
 
 @Composable
 fun ComingSoon() {
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val animatedColor by infiniteTransition.animateColor(
-        initialValue = TallPoppyRed,
-        targetValue = DenimBlue,
+        initialValue = Red600,
+        targetValue = Sky600,
         animationSpec = infiniteRepeatable(tween(2000), RepeatMode.Reverse),
         label = "color"
     )

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material3.MaterialTheme
+import com.fiatjaf.volare.ui.theme.extendedColors
 import com.fiatjaf.volare.core.ComposableContent
 import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.model.Comment
@@ -20,7 +22,6 @@ import com.fiatjaf.volare.core.model.RootPost
 import com.fiatjaf.volare.ui.components.button.footer.BookmarkIconButton
 import com.fiatjaf.volare.ui.components.button.footer.CountedUpvoteButton
 import com.fiatjaf.volare.ui.components.button.footer.CrossPostIconButton
-import com.fiatjaf.volare.ui.theme.OPBlue
 import com.fiatjaf.volare.ui.theme.spacing
 
 @Composable
@@ -58,7 +59,7 @@ fun MainEventActions(
             }
             additionalEndAction()
             Spacer(modifier = Modifier.width(spacing.large))
-            OPBlue
+            MaterialTheme.extendedColors.opLabel
             CountedUpvoteButton(mainEvent = mainEvent, onUpdate = onUpdate)
         }
     }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import com.fiatjaf.volare.ui.theme.extendedColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -18,7 +19,7 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.model.Oneself
 import com.fiatjaf.volare.core.model.TrustType
-import com.fiatjaf.volare.ui.theme.OPBlue
+import com.fiatjaf.volare.ui.theme.Sky600
 import com.fiatjaf.volare.ui.theme.OnBgLight
 import com.fiatjaf.volare.ui.theme.spacing
 
@@ -48,7 +49,7 @@ fun ClickableTrustIcon(
                     text = stringResource(id = R.string.op),
                     maxLines = 1,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = OPBlue,
+                        color = MaterialTheme.extendedColors.opLabel,
                         fontWeight = FontWeight.Bold
                     )
                 )

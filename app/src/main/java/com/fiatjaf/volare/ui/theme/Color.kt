@@ -13,16 +13,6 @@ import com.fiatjaf.volare.core.model.Oneself
 import com.fiatjaf.volare.core.model.TrustType
 import com.fiatjaf.volare.core.model.WebTrust
 
-val TallPoppyRed = Color(0xFFB92B27)
-val Purple = Color(0xFFb5179e)
-val DenimBlue = Color(0xFF1565c0)
-
-val WotColor = Color(0xFFF8D97B)
-val FriendColor = Color(0xFFE8E8E8)
-val MutedColor = Color(0xFFFA6D6D)
-
-val HyperlinkBlue = Color(0xFF007AFF)
-
 val md_theme_light_primary = Color(0xFF3B4DD8)
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
 val md_theme_light_primaryContainer = Color(0xFFDFE0FF)
@@ -85,9 +75,20 @@ val md_theme_dark_scrim = Color(0xFF000000)
 
 fun Color.light(factor: Float = 0.5f) = this.copy(alpha = this.alpha * factor)
 
-val OPBlue: Color
-    @Composable
-    get() = if (isSystemInDarkTheme()) Color(0xFF388de2) else Color(0xFF244b99)
+val Red400 = Color(0xFFF87171)
+val Red600 = Color(0xFFDC2626)
+val Amber200 = Color(0XFFFDE68A)
+val Stone200 = Color(0XFFE7E5E4)
+val Stone400 = Color(0XFFA3A3A3)
+val Sky300 = Color(0XFF7DD3FC)
+val Sky400 = Color(0XFF38BDF8)
+val Sky500 = Color(0XFF0EA5E9)
+val Sky600 = Color(0XFF0284C7)
+val Pink300 = Color(0XFFF9A8D4)
+val Pink400 = Color(0XFFF472B6)
+val Pink500 = Color(0XFFEC4899)
+val Lime500 = Color(0XFF84CC16)
+val Lime600 = Color(0XFF65A30D)
 
 val OnBgLight: Color
     @Composable
@@ -97,10 +98,10 @@ val OnBgLight: Color
 @Composable
 fun getTrustColor(trustType: TrustType): Color {
     return when (trustType) {
-        Oneself -> FriendColor
-        FriendTrust, IsInListTrust -> FriendColor
-        WebTrust -> WotColor
-        Muted -> MutedColor
-        NoTrust -> MaterialTheme.colorScheme.onBackground.light(0.2f)
+        Oneself -> Stone400
+        FriendTrust, IsInListTrust -> Stone400
+        WebTrust -> Amber200
+        Muted -> Red400
+        NoTrust -> Stone200
     }
 }
