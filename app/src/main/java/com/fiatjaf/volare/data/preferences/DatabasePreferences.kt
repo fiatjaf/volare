@@ -8,7 +8,7 @@ import com.fiatjaf.volare.core.MIN_RETAIN_ROOT
 private const val SWEEP_THRESHOLD = "sweep_threshold"
 
 class DatabasePreferences(context: Context) {
-    private val preferences = context.getSharedPreferences(DATABASE_FILE, Context.MODE_PRIVATE)
+    private val preferences = context.getSharedPreferences("database", Context.MODE_PRIVATE)
 
     fun getSweepThreshold(): Int {
         val lowerBoundCheck = maxOf(

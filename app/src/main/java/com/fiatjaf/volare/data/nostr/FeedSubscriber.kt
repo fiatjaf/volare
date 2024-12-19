@@ -10,7 +10,7 @@ import com.fiatjaf.volare.core.utils.rootFeedableKindsNoKTag
 import com.fiatjaf.volare.core.utils.syncedPutOrAdd
 import com.fiatjaf.volare.core.utils.takeRandom
 import com.fiatjaf.volare.core.utils.threadableKinds
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.model.FriendPubkeysNoLock
 import com.fiatjaf.volare.data.model.Global
 import com.fiatjaf.volare.data.model.HomeFeedSetting
@@ -34,7 +34,7 @@ import rust.nostr.sdk.Timestamp
 class FeedSubscriber(
     private val relayProvider: RelayProvider,
     private val topicProvider: TopicProvider,
-    private val myPubkeyProvider: IMyPubkeyProvider,
+    private val accountManager: AccountManager,
     private val bookmarkDao: BookmarkDao,
     private val friendProvider: FriendProvider
 ) {
@@ -249,7 +249,7 @@ class FeedSubscriber(
 
         val mentionFilter = Filter()
             .kinds(kinds = threadableKinds)
-            .pubkey(pubkey = myPubkeyProvider.getPublicKey())
+            .pubkey(pubkey = accountManager.getPublicKey())
             .since(timestamp = Timestamp.fromSecs(since))
             .until(timestamp = Timestamp.fromSecs(until))
             .limitRestricted(limit = MAX_EVENTS_TO_SUB)

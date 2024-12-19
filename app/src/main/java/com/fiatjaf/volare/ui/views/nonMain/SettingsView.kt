@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHostState
@@ -28,8 +27,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.AddClientTag
 import com.fiatjaf.volare.core.ChangeUpvoteContent
@@ -38,29 +35,22 @@ import com.fiatjaf.volare.core.ComposableContent
 import com.fiatjaf.volare.core.DeleteAllPosts
 import com.fiatjaf.volare.core.ExportDatabase
 import com.fiatjaf.volare.core.LoadSecretKeyForDisplay
-import com.fiatjaf.volare.core.LockAccount
 import com.fiatjaf.volare.core.MAX_AUTOPILOT_RELAYS
 import com.fiatjaf.volare.core.MAX_RETAIN_ROOT
 import com.fiatjaf.volare.core.MIN_AUTOPILOT_RELAYS
 import com.fiatjaf.volare.core.MIN_RETAIN_ROOT
 import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenProfile
-import com.fiatjaf.volare.core.RebroadcastMyLockEvent
 import com.fiatjaf.volare.core.RequestExternalAccount
 import com.fiatjaf.volare.core.SendAuth
 import com.fiatjaf.volare.core.UpdateAutopilotRelays
 import com.fiatjaf.volare.core.UpdateRootPostThreshold
-import com.fiatjaf.volare.core.UseV2Replies
 import com.fiatjaf.volare.core.UsePlainKeyAccount
 import com.fiatjaf.volare.core.UseBunkerAccount
-import com.fiatjaf.volare.core.model.AccountType
-import com.fiatjaf.volare.core.model.PlainKeyAccount
-import com.fiatjaf.volare.core.model.BunkerAccount
-import com.fiatjaf.volare.core.model.ExternalAccount
-import com.fiatjaf.volare.core.model.Locked
 import com.fiatjaf.volare.core.utils.toShortenedNpub
 import com.fiatjaf.volare.core.utils.toTextFieldValue
 import com.fiatjaf.volare.core.viewModel.SettingsViewModel
+import com.fiatjaf.volare.data.account.AccountType
 import com.fiatjaf.volare.data.nostr.createNprofile
 import com.fiatjaf.volare.ui.components.bottomSheet.NsecBottomSheet
 import com.fiatjaf.volare.ui.components.dialog.BaseActionDialog
@@ -71,10 +61,9 @@ import com.fiatjaf.volare.ui.components.row.ClickableRow
 import com.fiatjaf.volare.ui.components.scaffold.SimpleGoBackScaffold
 import com.fiatjaf.volare.ui.components.text.AltSectionHeader
 import com.fiatjaf.volare.ui.theme.AccountIcon
-import com.fiatjaf.volare.ui.theme.WarningIcon
-import com.fiatjaf.volare.ui.theme.getTrustColor
 import com.fiatjaf.volare.ui.theme.spacing
 import kotlinx.coroutines.CoroutineScope
+import rust.nostr.sdk.PublicKey
 
 @Composable
 fun SettingsView(vm: SettingsViewModel, snackbar: SnackbarHostState, onUpdate: OnUpdate) {
@@ -96,7 +85,8 @@ private fun SettingsViewContent(vm: SettingsViewModel, onUpdate: OnUpdate) {
         if (vm.isLoadingAccount.value) item { FullLinearProgressIndicator() }
         item {
             AccountSection(
-                accountType = vm.accountType.value,
+                accountType = vm.accountType(),
+                pubkey = vm.publicKey(),
                 nsec = vm.nsec.value,
                 // isLocking = vm.isLocking.value,
                 // isLocked = vm.isLockedForced.value || isLocked.value,
@@ -119,6 +109,7 @@ private fun SettingsViewContent(vm: SettingsViewModel, onUpdate: OnUpdate) {
 @Composable
 private fun AccountSection(
     accountType: AccountType,
+    pubkey: PublicKey,
     nsec: String,
     // isLocking: Boolean,
     // isLocked: Boolean,
@@ -126,23 +117,23 @@ private fun AccountSection(
     onUpdate: OnUpdate
 ) {
     SettingsSection(header = stringResource(id = R.string.account)) {
-        val shortenedNpub = remember(accountType) { accountType.publicKey.toShortenedNpub() }
+        val shortenedNpub = remember(accountType) { pubkey.toShortenedNpub() }
         ClickableRow(
             header = when (accountType) {
-                is ExternalAccount -> stringResource(id = R.string.external_signer)
-                is PlainKeyAccount -> stringResource(id = R.string.plain_key_account)
-                is BunkerAccount -> stringResource(id = R.string.bunker_account)
+                AccountType.EXTERNAL -> stringResource(id = R.string.external_signer)
+                AccountType.PLAINKEY -> stringResource(id = R.string.plain_key_account)
+                AccountType.BUNKER -> stringResource(id = R.string.bunker_account)
             },
             text = shortenedNpub,
             leadingIcon = AccountIcon,
             onClick = {
-                onUpdate(OpenProfile(nprofile = createNprofile(pubkey = accountType.publicKey)))
+                onUpdate(OpenProfile(nprofile = createNprofile(pubkey = pubkey)))
             }
         ) {
             AccountRowButton(accountType = accountType, onUpdate = onUpdate)
         }
 
-        if (accountType is PlainKeyAccount) {
+        if (accountType == AccountType.PLAINKEY) {
             val showNsec = remember { mutableStateOf(false) }
             ClickableRow(
                 header = stringResource(id = R.string.recovery_phrase),
@@ -357,12 +348,12 @@ private fun AccountRowButton(
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         when (accountType) {
-            is ExternalAccount -> Row {
+            AccountType.EXTERNAL -> Row {
                 TextButton(onClick = { showKeyDialog.value = true }) {
                     Text(text = stringResource(id = R.string.use_another_account))
                 }
             }
-            is PlainKeyAccount, is BunkerAccount -> Row {
+            AccountType.PLAINKEY, AccountType.BUNKER -> Row {
                 TextButton(onClick = { showKeyDialog.value = true }) {
                     Text(text = stringResource(id = R.string.use_another_account))
                 }

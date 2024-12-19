@@ -8,7 +8,6 @@ import androidx.room.DeleteTable
 import androidx.room.RenameTable
 import androidx.room.RoomDatabase
 import androidx.room.migration.AutoMigrationSpec
-import com.fiatjaf.volare.data.room.dao.AccountDao
 import com.fiatjaf.volare.data.room.dao.BookmarkDao
 import com.fiatjaf.volare.data.room.dao.ContentSetDao
 import com.fiatjaf.volare.data.room.dao.EventRelayDao
@@ -132,7 +131,6 @@ import com.fiatjaf.volare.data.room.view.SimplePostView
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun accountDao(): AccountDao
     abstract fun voteDao(): VoteDao
     abstract fun feedDao(): FeedDao
     abstract fun homeFeedDao(): HomeFeedDao

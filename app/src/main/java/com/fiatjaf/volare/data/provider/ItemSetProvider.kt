@@ -10,7 +10,7 @@ import com.fiatjaf.volare.core.model.ItemSetProfile
 import com.fiatjaf.volare.core.model.ItemSetTopic
 import com.fiatjaf.volare.core.utils.createAdvancedProfile
 import com.fiatjaf.volare.core.utils.firstThenDistinctDebounce
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.model.ItemSetMeta
 import com.fiatjaf.volare.data.room.AppDatabase
 import com.fiatjaf.volare.data.room.entity.helper.TitleAndDescription
@@ -27,7 +27,7 @@ import rust.nostr.sdk.KindEnum
 
 class ItemSetProvider(
     private val room: AppDatabase,
-    private val myPubkeyProvider: IMyPubkeyProvider,
+    private val accountManager: AccountManager,
     private val friendProvider: FriendProvider,
     private val muteProvider: MuteProvider,
     private val annotatedStringProvider: AnnotatedStringProvider,
@@ -102,7 +102,7 @@ class ItemSetProvider(
         return Coordinate(
             kind = Kind.fromEnum(kind),
             identifier = identifier,
-            publicKey = myPubkeyProvider.getPublicKey(),
+            publicKey = accountManager.getPublicKey(),
             relays = relayProvider.getWriteRelays(limit = 2)
         ).toBech32()
     }
@@ -120,7 +120,7 @@ class ItemSetProvider(
                 forcedFollowState = friendPubkeys.contains(unknownPubkey),
                 forcedMuteState = mutedPubkeys.contains(unknownPubkey),
                 metadata = null,
-                myPubkey = myPubkeyProvider.getPubkeyHex(),
+                myPubkey = accountManager.getPublicKeyHex(),
                 friendProvider = friendProvider,
                 muteProvider = muteProvider,
                 itemSetProvider = this,

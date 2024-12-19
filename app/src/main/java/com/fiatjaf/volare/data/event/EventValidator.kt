@@ -12,7 +12,7 @@ import com.fiatjaf.volare.core.utils.getNormalizedTopics
 import com.fiatjaf.volare.core.utils.getTrimmedSubject
 import com.fiatjaf.volare.core.utils.takeRandom
 import com.fiatjaf.volare.core.utils.BlurHashDef
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.SubId
 import com.fiatjaf.volare.data.nostr.getEndsAt
@@ -55,7 +55,7 @@ val POLL_RESPONSE_U16: UShort = 1018u
 class EventValidator(
     private val syncedFilterCache: Map<SubId, List<Filter>>,
     private val syncedIdCache: MutableSet<EventId>,
-    private val myPubkeyProvider: IMyPubkeyProvider,
+    private val accountManager: AccountManager,
 ) {
 
     fun getValidatedEvent(
@@ -98,7 +98,7 @@ class EventValidator(
             TEXT_NOTE_U16 -> createValidatedTextNote(
                 event = event,
                 relayUrl = relayUrl,
-                myPubkey = myPubkeyProvider.getPublicKey()
+                myPubkey = accountManager.getPublicKey()
             )
 
             REPOST_U16, GENERIC_REPOST_U16 -> createValidatedCrosspost(
@@ -119,7 +119,7 @@ class EventValidator(
             COMMENT_U16 -> createValidatedComment(
                 event = event,
                 relayUrl = relayUrl,
-                myPubkey = myPubkeyProvider.getPublicKey()
+                myPubkey = accountManager.getPublicKey()
             )
 
             POLL_U16 -> {
@@ -137,7 +137,7 @@ class EventValidator(
                     createdAt = createdAt,
                     relayUrl = relayUrl,
                     json = event.asJson(),
-                    isMentioningMe = event.isMentioningMe(myPubkey = myPubkeyProvider.getPublicKey()),
+                    isMentioningMe = event.isMentioningMe(myPubkey = accountManager.getPublicKey()),
                     options = options,
                     topics = event.getNormalizedTopics(limit = MAX_TOPICS),
                     endsAt = endsAt,
@@ -190,18 +190,18 @@ class EventValidator(
             }
 
             FOLLOW_SET_U16 -> {
-                if (event.author().toHex() != myPubkeyProvider.getPubkeyHex()) return null
+                if (event.author().toHex() != accountManager.getPublicKeyHex()) return null
                 createValidatedProfileSet(event = event)
             }
 
             INTEREST_SET_U16 -> {
-                if (event.author().toHex() != myPubkeyProvider.getPubkeyHex()) return null
+                if (event.author().toHex() != accountManager.getPublicKeyHex()) return null
                 createValidatedTopicSet(event = event)
             }
 
             INTERESTS_U16 -> {
                 val authorHex = event.author().toHex()
-                if (authorHex != myPubkeyProvider.getPubkeyHex()) return null
+                if (authorHex != accountManager.getPublicKeyHex()) return null
                 ValidatedTopicList(
                     myPubkey = authorHex,
                     topics = event.getNormalizedTopics()
@@ -214,7 +214,7 @@ class EventValidator(
 
             BOOKMARKS_U16 -> {
                 val authorHex = event.author().toHex()
-                if (authorHex != myPubkeyProvider.getPubkeyHex()) return null
+                if (authorHex != accountManager.getPublicKeyHex()) return null
                 ValidatedBookmarkList(
                     myPubkey = authorHex,
                     eventIds = event.tags().eventIds()
@@ -228,7 +228,7 @@ class EventValidator(
 
             MUTE_LIST_U16 -> {
                 val authorHex = event.author().toHex()
-                if (authorHex != myPubkeyProvider.getPubkeyHex()) return null
+                if (authorHex != accountManager.getPublicKeyHex()) return null
                 ValidatedMuteList(
                     myPubkey = authorHex,
                     pubkeys = event.tags().publicKeys().map { it.toHex() }
@@ -276,13 +276,13 @@ class EventValidator(
                 TEXT_NOTE_U16 -> createValidatedTextNote(
                     event = it,
                     relayUrl = relayUrl,
-                    myPubkey = myPubkeyProvider.getPublicKey()
+                    myPubkey = accountManager.getPublicKey()
                 )
 
                 COMMENT_U16 -> createValidatedComment(
                     event = it,
                     relayUrl = relayUrl,
-                    myPubkey = myPubkeyProvider.getPublicKey()
+                    myPubkey = accountManager.getPublicKey()
                 )
 
                 else -> null

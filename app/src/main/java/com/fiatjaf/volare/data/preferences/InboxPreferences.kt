@@ -13,7 +13,7 @@ private const val WEB_OF_TRUST = "web_of_trust"
 private const val GLOBAL = "global"
 
 class InboxPreferences(context: Context) {
-    private val preferences = context.getSharedPreferences(INBOX_FILE, Context.MODE_PRIVATE)
+    private val preferences = context.getSharedPreferences("inbox", Context.MODE_PRIVATE)
 
     fun getInboxFeedSetting(): InboxFeedSetting {
         val pubkeys = when (preferences.getString(PUBKEYS, GLOBAL)) {

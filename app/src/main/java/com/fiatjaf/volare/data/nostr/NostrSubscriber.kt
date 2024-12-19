@@ -7,7 +7,7 @@ import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.RESUB_TIMEOUT
 import com.fiatjaf.volare.core.model.Poll
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.model.BookmarksFeedSetting
 import com.fiatjaf.volare.data.model.FeedSetting
 import com.fiatjaf.volare.data.model.HomeFeedSetting
@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class NostrSubscriber(
     topicProvider: TopicProvider,
-    myPubkeyProvider: IMyPubkeyProvider,
+    accountManager: AccountManager,
     friendProvider: FriendProvider,
     val subCreator: SubscriptionCreator,
     private val relayProvider: RelayProvider,
@@ -47,7 +47,7 @@ class NostrSubscriber(
     private val feedSubscriber = FeedSubscriber(
         relayProvider = relayProvider,
         topicProvider = topicProvider,
-        myPubkeyProvider = myPubkeyProvider,
+        accountManager = accountManager,
         bookmarkDao = room.bookmarkDao(),
         friendProvider = friendProvider,
     )

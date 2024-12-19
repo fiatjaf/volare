@@ -9,7 +9,7 @@ import com.fiatjaf.volare.core.MAX_KEYS_SQL
 import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.mergeRelayFilters
 import com.fiatjaf.volare.core.utils.takeRandom
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.event.LOCK_U16
 import com.fiatjaf.volare.data.model.CustomPubkeys
 import com.fiatjaf.volare.data.model.FriendPubkeysNoLock
@@ -47,7 +47,7 @@ class LazyNostrSubscriber(
     private val webOfTrustProvider: WebOfTrustProvider,
     private val friendProvider: FriendProvider,
     private val topicProvider: TopicProvider,
-    private val myPubkeyProvider: IMyPubkeyProvider,
+    private val accountManager: AccountManager,
     private val itemSetProvider: ItemSetProvider,
     private val pubkeyProvider: PubkeyProvider,
 ) {
@@ -63,7 +63,7 @@ class LazyNostrSubscriber(
     suspend fun lazySubMyAccount() {
         Log.d(TAG, "lazySubMyAccount")
 
-        val hex = myPubkeyProvider.getPubkeyHex()
+        val hex = accountManager.getPublicKeyHex()
 
         val contactSince = friendProvider.getCreatedAt()?.toULong() ?: 1uL
         val topicSince = topicProvider.getCreatedAt()?.toULong() ?: 1uL

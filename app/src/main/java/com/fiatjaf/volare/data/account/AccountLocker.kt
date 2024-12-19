@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.stateIn
 
 class AccountLocker(
     private val context: Context,
-    private val myPubkeyProvider: IMyPubkeyProvider,
+    private val accountManager: AccountManager,
     private val snackbar: SnackbarHostState,
     private val eventRebroadcaster: EventRebroadcaster,
     private val lockDao: LockDao,
@@ -73,6 +73,6 @@ class AccountLocker(
     }
 
     suspend fun rebroadcastMyLock(uiScope: CoroutineScope) {
-        rebroadcastLock(pubkey = myPubkeyProvider.getPubkeyHex(), uiScope = uiScope)
+        rebroadcastLock(pubkey = accountManager.getPublicKeyHex(), uiScope = uiScope)
     }
 }

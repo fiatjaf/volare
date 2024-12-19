@@ -3,11 +3,13 @@ module backend
 go 1.23.4
 
 require (
-	github.com/nbd-wtf/go-nostr v0.44.0
+	fiatjaf.com/leafdb v0.0.7
+	github.com/nbd-wtf/go-nostr v0.44.1
 	golang.org/x/mobile v0.0.0-20241213221354-a87c1cf6cf46
 )
 
 require (
+	github.com/PowerDNS/lmdb-go v1.9.2 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.4 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.3 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
@@ -38,3 +40,7 @@ require (
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
 )
+
+replace github.com/PowerDNS/lmdb-go => github.com/fiatjaf/lmdb-go v0.0.0-20241216175215-ce7e8c333ddb
+
+replace fiatjaf.com/leafdb => fiatjaf.com/leafdb v0.0.0-20241219032121-5f027f319f97

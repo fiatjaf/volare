@@ -5,7 +5,7 @@ import com.fiatjaf.volare.core.MAX_EVENTS_TO_SUB
 import com.fiatjaf.volare.core.utils.limitRestricted
 import com.fiatjaf.volare.core.utils.replyKinds
 import com.fiatjaf.volare.core.utils.threadableKinds
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.event.LOCK_U16
 import com.fiatjaf.volare.data.event.POLL_RESPONSE_U16
 import com.fiatjaf.volare.data.provider.LockProvider
@@ -21,7 +21,7 @@ import rust.nostr.sdk.Timestamp
 
 class FilterCreator(
     private val room: AppDatabase,
-    private val myPubkeyProvider: IMyPubkeyProvider,
+    private val accountManager: AccountManager,
     private val lockProvider: LockProvider,
     private val relayProvider: RelayProvider,
 ) {
@@ -42,7 +42,7 @@ class FilterCreator(
     fun getMyKindFilter(kindAndSince: Collection<Pair<UShort, ULong>>): List<Filter> {
         if (kindAndSince.isEmpty()) return emptyList()
 
-        val myPubkey = myPubkeyProvider.getPublicKey()
+        val myPubkey = accountManager.getPublicKey()
         val now = Timestamp.now()
 
         return kindAndSince.map { (kind, since) ->
@@ -134,7 +134,7 @@ class FilterCreator(
         val profileSetsSince = room.contentSetDao().getProfileSetMaxCreatedAt()?.toULong() ?: 1uL
 
         return Filter().kind(kind = Kind.fromEnum(KindEnum.FollowSet))
-            .author(author = myPubkeyProvider.getPublicKey())
+            .author(author = accountManager.getPublicKey())
             .until(timestamp = Timestamp.now())
             .since(timestamp = Timestamp.fromSecs(secs = profileSetsSince + 1u))
             .limitRestricted(limit = MAX_EVENTS_TO_SUB)
@@ -144,7 +144,7 @@ class FilterCreator(
         val topicSetsSince = room.contentSetDao().getTopicSetMaxCreatedAt()?.toULong() ?: 1uL
 
         return Filter().kind(kind = Kind.fromEnum(KindEnum.InterestSet))
-            .author(author = myPubkeyProvider.getPublicKey())
+            .author(author = accountManager.getPublicKey())
             .until(timestamp = Timestamp.now())
             .since(timestamp = Timestamp.fromSecs(secs = topicSetsSince + 1u))
             .limitRestricted(limit = MAX_EVENTS_TO_SUB)

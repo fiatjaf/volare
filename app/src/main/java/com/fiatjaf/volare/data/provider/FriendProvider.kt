@@ -2,7 +2,7 @@ package com.fiatjaf.volare.data.provider
 
 import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.takeRandom
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.room.dao.FriendDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 
 class FriendProvider(
     private val friendDao: FriendDao,
-    private val myPubkeyProvider: IMyPubkeyProvider,
+    private val accountManager: AccountManager,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val friendsNoLock = friendDao.getFriendsNoLockFlow()
@@ -20,11 +20,11 @@ class FriendProvider(
         .stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     fun getFriendPubkeysNoLock(max: Int = Int.MAX_VALUE): List<PubkeyHex> {
-        return (friendsNoLock.value - myPubkeyProvider.getPubkeyHex()).takeRandom(max)
+        return (friendsNoLock.value - accountManager.getPublicKeyHex()).takeRandom(max)
     }
 
     fun getFriendPubkeysIncludingLocked(max: Int = Int.MAX_VALUE): List<PubkeyHex> {
-        return (friendsIncludingLocked.value - myPubkeyProvider.getPubkeyHex()).takeRandom(max)
+        return (friendsIncludingLocked.value - accountManager.getPublicKeyHex()).takeRandom(max)
     }
 
     suspend fun getFriendsWithMissingContactList() = friendDao.getFriendsWithMissingContactList()

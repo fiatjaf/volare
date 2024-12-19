@@ -1,6 +1,5 @@
 package com.fiatjaf.volare.data.account
 
-import android.util.Log
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
@@ -8,12 +7,8 @@ import rust.nostr.sdk.Keys
 import rust.nostr.sdk.Event
 import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.UnsignedEvent
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
 
-private const val PLAINKEY = "plainkey"
-private const val FILENAME = "volare_encrypted_key"
-
-class PlainKeySigner(context: Context) : IMyPubkeyProvider {
+class PlainKeySigner(context: Context, withKey: String? = null): Signer {
     private val masterKey = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
@@ -21,7 +16,7 @@ class PlainKeySigner(context: Context) : IMyPubkeyProvider {
     // Initialize EncryptedSharedPreferences
     private val sharedPreferences = EncryptedSharedPreferences.create(
         context,
-        FILENAME,
+        "volare_encrypted_key",
         masterKey,
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
@@ -30,37 +25,36 @@ class PlainKeySigner(context: Context) : IMyPubkeyProvider {
     private var pk: PublicKey
 
     init {
-        var keys = getKey()
-        if (keys == null) {
-            keys = Keys.generate()
+        if (withKey != null) {
+            val keys = Keys.parse(withKey)
             sharedPreferences.edit()
-                .putString(PLAINKEY, keys.secretKey().toHex())
+                .putString("plainkey", keys.secretKey().toHex())
                 .apply()
+            pk = keys.publicKey()
+        } else {
+            var keys = getKey()
+            if (keys == null) {
+                keys = Keys.generate()
+                sharedPreferences.edit()
+                    .putString("plainkey", keys.secretKey().toHex())
+                    .apply()
+            }
+            pk = keys.publicKey()
         }
-        pk = keys.publicKey()
     }
 
-    override fun getPublicKey(): PublicKey = pk
+    override suspend fun getPublicKey(): PublicKey = pk
 
-    suspend fun sign(unsignedEvent: UnsignedEvent): Result<Event> {
+    override suspend fun signEvent(unsignedEvent: UnsignedEvent): Result<Event> {
         return runCatching {
             unsignedEvent.signWithKeys(getKey()!!)
         }
     }
 
-    fun getKey(): Keys? {
-        val hex = sharedPreferences.getString(PLAINKEY, null)
-        return if (hex == null) null else runCatching { Keys.parse(hex) }.getOrNull()
-    }
+    override var isReadOnly = false
 
-    fun setKey(key: String): Result<Unit> {
-        return runCatching {
-            val keys = Keys.parse(key)
-            sharedPreferences.edit()
-                .putString(PLAINKEY, keys.secretKey().toHex())
-                .apply()
-            pk = keys.publicKey()
-            Unit
-        }
+    fun getKey(): Keys? {
+        val hex = sharedPreferences.getString("plainkey", null)
+        return if (hex == null) null else runCatching { Keys.parse(hex) }.getOrNull()
     }
 }

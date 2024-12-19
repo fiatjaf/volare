@@ -3,7 +3,7 @@ build: gomobile
 
 gomobile:
     #!/usr/bin/env fish
-    set gofile (ls -t (ag -l --go backend) | head -n 1)
+    set gofile (ls -t (ag -l --go backend) backend/go.mod | head -n 1)
     if test "$gofile" -nt app/libs/backend.aar
         echo "binding gomobile..."
         cd backend

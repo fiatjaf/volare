@@ -160,7 +160,7 @@ class EventMaker(
             reaction = content,
         ).build(publicKey = accountManager.getPublicKey())
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     suspend fun buildPollResponse(pollId: EventId, optionId: OptionId): Result<Event> {
@@ -176,14 +176,14 @@ class EventMaker(
             )
             .build(publicKey = accountManager.getPublicKey())
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     suspend fun buildDelete(eventId: EventId): Result<Event> {
         val unsignedEvent = EventBuilder.delete(ids = listOf(eventId))
             .build(accountManager.getPublicKey())
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     suspend fun buildListDelete(identifier: String): Result<Event> {
@@ -194,7 +194,7 @@ class EventMaker(
         )
         val unsignedEvent = EventBuilder.delete(coordinates = coordinates).build(pubkey)
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     suspend fun buildTopicList(topics: List<Topic>): Result<Event> {
@@ -202,7 +202,7 @@ class EventMaker(
         val unsignedEvent = EventBuilder.interests(list = interests)
             .build(accountManager.getPublicKey())
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     suspend fun buildBookmarkList(postIds: List<EventIdHex>): Result<Event> {
@@ -210,7 +210,7 @@ class EventMaker(
         val unsignedEvent = EventBuilder.bookmarks(list = bookmarks)
             .build(accountManager.getPublicKey())
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     suspend fun buildMuteList(
@@ -226,7 +226,7 @@ class EventMaker(
         val unsignedEvent = EventBuilder.muteList(list = mutes)
             .build(accountManager.getPublicKey())
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     suspend fun buildContactList(pubkeys: List<PubkeyHex>): Result<Event> {
@@ -234,7 +234,7 @@ class EventMaker(
         val unsignedEvent = EventBuilder.contactList(list = contacts)
             .build(accountManager.getPublicKey())
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     suspend fun buildNip65(relays: List<Nip65Relay>): Result<Event> {
@@ -249,14 +249,14 @@ class EventMaker(
         val unsignedEvent = EventBuilder.relayList(map = metadata)
             .build(accountManager.getPublicKey())
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     suspend fun buildProfile(metadata: Metadata): Result<Event> {
         val unsignedEvent = EventBuilder.metadata(metadata)
             .build(publicKey = accountManager.getPublicKey())
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     suspend fun buildAuth(relayUrl: RelayUrl, challenge: String): Result<Event> {
@@ -267,7 +267,7 @@ class EventMaker(
         }
 
         return if (unsignedEvent.isSuccess) {
-            accountManager.sign(unsignedEvent = unsignedEvent.getOrThrow())
+            accountManager.signEvent(unsignedEvent.getOrThrow())
         } else {
             Log.w(TAG, "EventBuilder.auth for $relayUrl failed")
             Result.failure(
@@ -352,7 +352,7 @@ class EventMaker(
             .tags(tags = additionalTags)
             .build(publicKey = accountManager.getPublicKey())
 
-        return accountManager.sign(unsignedEvent = unsignedEvent)
+        return accountManager.signEvent(unsignedEvent)
     }
 
     private suspend fun signEvent(eventBuilder: EventBuilder, isAnon: Boolean): Result<Event> {
@@ -360,7 +360,7 @@ class EventMaker(
             Result.success(eventBuilder.signWithKeys(Keys.generate()))
         } else {
             val unsignedEvent = eventBuilder.build(accountManager.getPublicKey())
-            accountManager.sign(unsignedEvent = unsignedEvent)
+            accountManager.signEvent(unsignedEvent)
         }
     }
 

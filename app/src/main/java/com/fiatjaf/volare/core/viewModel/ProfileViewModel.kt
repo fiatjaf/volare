@@ -21,7 +21,7 @@ import com.fiatjaf.volare.core.model.Paginator
 import com.fiatjaf.volare.core.navigator.ProfileNavView
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.data.account.AccountLocker
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.model.FullProfileUI
 import com.fiatjaf.volare.data.model.ItemSetMeta
 import com.fiatjaf.volare.data.model.PostDetails
@@ -62,8 +62,8 @@ class ProfileViewModel(
     private val nip65Dao: Nip65Dao,
     private val eventRelayDao: EventRelayDao,
     private val itemSetProvider: ItemSetProvider,
-    private val myPubkeyProvider: IMyPubkeyProvider,
     private val accountLocker: AccountLocker,
+    private val accountManager: AccountManager,
 ) : ViewModel() {
     val tabIndex = mutableIntStateOf(0)
     val addableLists = mutableStateOf(emptyList<ItemSetMeta>())
@@ -104,7 +104,7 @@ class ProfileViewModel(
         tabIndex.intValue = 0
         viewModelScope.launch {
             pagerState.scrollToPage(0)
-            trustedBy.value = if (pubkeyHex != myPubkeyProvider.getPubkeyHex()) {
+            trustedBy.value = if (pubkeyHex != accountManager.getPublicKeyHex()) {
                 profileProvider.getTrustedByFlow(pubkey = pubkeyHex)
                     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
             } else {

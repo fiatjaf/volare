@@ -1,10 +1,11 @@
 package com.fiatjaf.volare.core.viewModel
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -17,7 +18,6 @@ import com.fiatjaf.volare.core.DELAY_1SEC
 import com.fiatjaf.volare.core.DeleteAllPosts
 import com.fiatjaf.volare.core.ExportDatabase
 import com.fiatjaf.volare.core.LoadSecretKeyForDisplay
-import com.fiatjaf.volare.core.ExternalSignerHandler
 import com.fiatjaf.volare.core.LockAccount
 import com.fiatjaf.volare.core.ProcessExternalAccount
 import com.fiatjaf.volare.core.REBROADCAST_DELAY
@@ -30,15 +30,14 @@ import com.fiatjaf.volare.core.UpdateRootPostThreshold
 import com.fiatjaf.volare.core.UsePlainKeyAccount
 import com.fiatjaf.volare.core.UseBunkerAccount
 import com.fiatjaf.volare.core.UseV2Replies
-import com.fiatjaf.volare.core.model.AccountType
-import com.fiatjaf.volare.core.model.PlainKeyAccount
-import com.fiatjaf.volare.core.model.ExternalAccount
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
 import com.fiatjaf.volare.data.account.AccountLocker
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.account.AccountSwitcher
+import com.fiatjaf.volare.data.account.AccountType
+import com.fiatjaf.volare.data.account.ExternalSignerHandler
 import com.fiatjaf.volare.data.account.PlainKeySigner
-import com.fiatjaf.volare.data.preferences.AppPreferences
 import com.fiatjaf.volare.data.preferences.DatabasePreferences
 import com.fiatjaf.volare.data.preferences.EventPreferences
 import com.fiatjaf.volare.data.preferences.RelayPreferences
@@ -53,18 +52,16 @@ import java.util.concurrent.atomic.AtomicBoolean
 private const val TAG = "SettingsViewModel"
 
 class SettingsViewModel(
+    private val accountManager: AccountManager,
     private val accountSwitcher: AccountSwitcher,
     private val snackbar: SnackbarHostState,
     private val databasePreferences: DatabasePreferences,
     private val relayPreferences: RelayPreferences,
     private val eventPreferences: EventPreferences,
-    private val appPreferences: AppPreferences,
     private val databaseInteractor: DatabaseInteractor,
     private val externalSignerHandler: ExternalSignerHandler,
-    private val plainKeySigner: PlainKeySigner,
     private val accountLocker: AccountLocker,
 ) : ViewModel() {
-    val accountType: State<AccountType> = accountSwitcher.accountType
     val rootPostThreshold = mutableIntStateOf(databasePreferences.getSweepThreshold())
     val currentRootPostCount = databaseInteractor.getRootPostCountFlow()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
@@ -80,8 +77,10 @@ class SettingsViewModel(
     val isLocking = mutableStateOf(false)
     val isLocked = accountLocker.isLocked
     val isLockedForced = mutableStateOf(false)
-
     val isLoadingAccount = mutableStateOf(false)
+
+    fun accountType(): AccountType = accountManager.accountType
+    fun publicKey(): PublicKey = accountManager.getPublicKey()
 
     fun handle(action: SettingsViewAction) {
         when (action) {
@@ -106,7 +105,7 @@ class SettingsViewModel(
             }
 
             is LoadSecretKeyForDisplay -> {
-                nsec.value = plainKeySigner.getKey()!!.secretKey().toBech32()
+                nsec.value = accountManager.getPlainSecretKey()!!.toBech32()
             }
 
             is SendAuth -> {
@@ -166,10 +165,16 @@ class SettingsViewModel(
     }
 
     private fun requestExternalAccountData(action: RequestExternalAccount) {
-        if (accountType.value is ExternalAccount || isLoadingAccount.value) return
+        if (accountManager.accountType == AccountType.EXTERNAL || isLoadingAccount.value) return
         isLoadingAccount.value = true
 
-        if (!accountSwitcher.isExternalSignerInstalled(context = action.context)) {
+        val isInstalled = {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("nostrsigner:"))
+            val result = runCatching { action.context.packageManager.queryIntentActivities(intent, 0) }
+            !result.getOrNull().isNullOrEmpty()
+        }()
+
+        if (!isInstalled) {
             snackbar.showToast(
                 scope = viewModelScope,
                 msg = action.context.getString(R.string.no_external_signer_installed)
@@ -206,7 +211,11 @@ class SettingsViewModel(
         }
 
         viewModelScope.launchIO {
-            accountSwitcher.useExternalAccount(publicKey = publicKey, packageName = packageName)
+            accountSwitcher.useExternalAccount(
+                handler = externalSignerHandler,
+                publicKey = publicKey,
+                packageName = packageName
+            )
         }.invokeOnCompletion {
             isLoadingAccount.value = false
         }

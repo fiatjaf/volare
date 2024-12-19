@@ -9,7 +9,7 @@ private const val SEND_AUTH = "send_auth"
 private const val AUTOPILOT_RELAYS = "autopilot_relays"
 
 class RelayPreferences(context: Context) {
-    private val preferences = context.getSharedPreferences(RELAY_FILE, Context.MODE_PRIVATE)
+    private val preferences = context.getSharedPreferences("relay", Context.MODE_PRIVATE)
 
     fun getSendAuth(): Boolean {
         return preferences.getBoolean(SEND_AUTH, false)

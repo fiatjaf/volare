@@ -4,7 +4,7 @@ import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.createAdvancedProfile
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.toShortenedBech32
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.inMemory.MetadataInMemory
 import com.fiatjaf.volare.data.model.CustomPubkeys
 import com.fiatjaf.volare.data.model.FullProfileUI
@@ -24,7 +24,7 @@ import rust.nostr.sdk.Nip19Profile
 class ProfileProvider(
     private val forcedFollowFlow: Flow<Map<PubkeyHex, Boolean>>,
     private val forcedMuteFlow: Flow<Map<PubkeyHex, Boolean>>,
-    private val myPubkeyProvider: IMyPubkeyProvider,
+    private val accountManager: AccountManager,
     private val metadataInMemory: MetadataInMemory,
     private val room: AppDatabase,
     private val friendProvider: FriendProvider,
@@ -40,7 +40,7 @@ class ProfileProvider(
         val hex = nprofile.publicKey().toHex()
         scope.launchIO {
             var isNotInMemory = metadataInMemory.getMetadata(pubkey = hex) == null
-            if (isNotInMemory && hex == myPubkeyProvider.getPubkeyHex()) {
+            if (isNotInMemory && hex == accountManager.getPublicKeyHex()) {
                 val dbMeta = room.fullProfileDao().getFullProfile()?.toRelevantMetadata()
                 if (dbMeta != null) {
                     metadataInMemory.submit(pubkey = hex, metadata = dbMeta)
@@ -82,7 +82,7 @@ class ProfileProvider(
                 forcedFollowState = true, // Return null if not followed
                 forcedMuteState = forcedMute[dbProfile?.pubkey],
                 metadata = metadataInMemory.getMetadata(pubkey = dbProfile?.pubkey ?: trustedBy),
-                myPubkey = myPubkeyProvider.getPubkeyHex(),
+                myPubkey = accountManager.getPublicKeyHex(),
                 friendProvider = friendProvider,
                 muteProvider = muteProvider,
                 itemSetProvider = itemSetProvider,
@@ -106,7 +106,7 @@ class ProfileProvider(
     }
 
     fun getDefaultProfile(): ProfileEntity {
-        val hex = myPubkeyProvider.getPubkeyHex()
+        val hex = accountManager.getPublicKeyHex()
         return ProfileEntity(
             pubkey = hex,
             name = hex.toShortenedBech32(),
@@ -127,7 +127,7 @@ class ProfileProvider(
             .ifEmpty {
                 val default = defaultPubkeys.toMutableSet()
                 default.removeAll(friendProvider.getFriendPubkeysNoLock().toSet())
-                default.remove(myPubkeyProvider.getPubkeyHex())
+                default.remove(accountManager.getPublicKeyHex())
                 default.removeAll(lockProvider.getLockedPubkeys().toSet())
                 default
             }
@@ -158,7 +158,7 @@ class ProfileProvider(
                     forcedFollowState = forcedFollows[pubkey],
                     forcedMuteState = forcedMutes[pubkey],
                     metadata = null,
-                    myPubkey = myPubkeyProvider.getPubkeyHex(),
+                    myPubkey = accountManager.getPublicKeyHex(),
                     friendProvider = friendProvider,
                     muteProvider = muteProvider,
                     itemSetProvider = itemSetProvider,
@@ -186,7 +186,7 @@ class ProfileProvider(
                     forcedFollowState = forcedFollows[pubkey],
                     forcedMuteState = forcedMutes[pubkey],
                     metadata = null,
-                    myPubkey = myPubkeyProvider.getPubkeyHex(),
+                    myPubkey = accountManager.getPublicKeyHex(),
                     friendProvider = friendProvider,
                     muteProvider = muteProvider,
                     itemSetProvider = itemSetProvider,
@@ -211,7 +211,7 @@ class ProfileProvider(
                     forcedFollowState = forcedFollows[dbProfile.pubkey],
                     forcedMuteState = forcedMutes[dbProfile.pubkey],
                     metadata = null,
-                    myPubkey = myPubkeyProvider.getPubkeyHex(),
+                    myPubkey = accountManager.getPublicKeyHex(),
                     friendProvider = friendProvider,
                     muteProvider = muteProvider,
                     itemSetProvider = itemSetProvider,
@@ -234,7 +234,7 @@ class ProfileProvider(
             forcedFollowState = forcedFollowState,
             forcedMuteState = forcedMuteState,
             metadata = metadata,
-            myPubkey = myPubkeyProvider.getPubkeyHex(),
+            myPubkey = accountManager.getPublicKeyHex(),
             friendProvider = friendProvider,
             muteProvider = muteProvider,
             itemSetProvider = itemSetProvider,

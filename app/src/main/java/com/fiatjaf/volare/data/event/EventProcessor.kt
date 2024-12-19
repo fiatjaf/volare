@@ -4,7 +4,7 @@ import android.util.Log
 import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.toRelevantMetadata
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.inMemory.MetadataInMemory
 import com.fiatjaf.volare.data.room.AppDatabase
 import com.fiatjaf.volare.data.room.entity.FullProfileEntity
@@ -15,18 +15,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 private const val TAG = "EventProcessor"
 
 class EventProcessor(
     private val room: AppDatabase,
     private val metadataInMemory: MetadataInMemory,
-    private val myPubkeyProvider: IMyPubkeyProvider,
+    private val accountManager: AccountManager,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val listEventProcessor = ListEventProcessor(
         scope = scope,
-        myPubkeyProvider = myPubkeyProvider,
+        accountManager = accountManager,
         room = room
     )
 
@@ -168,7 +167,7 @@ class EventProcessor(
         if (sets.isEmpty()) return
 
         val myNewestSets = filterNewestSets(sets = sets)
-            .filter { it.myPubkey == myPubkeyProvider.getPubkeyHex() }
+            .filter { it.myPubkey == accountManager.getPublicKeyHex() }
         if (myNewestSets.isEmpty()) return
 
         scope.launch {
@@ -183,7 +182,7 @@ class EventProcessor(
         if (sets.isEmpty()) return
 
         val myNewestSets = filterNewestSets(sets = sets)
-            .filter { it.myPubkey == myPubkeyProvider.getPubkeyHex() }
+            .filter { it.myPubkey == accountManager.getPublicKeyHex() }
         if (myNewestSets.isEmpty()) return
 
         scope.launch {
@@ -230,7 +229,7 @@ class EventProcessor(
             if (ex != null) Log.w(TAG, "Failed to process profile ${entities.size}", ex)
         }
 
-        val myPubkey = myPubkeyProvider.getPubkeyHex()
+        val myPubkey = accountManager.getPublicKeyHex()
         val myProfile = uniqueProfiles.find { it.pubkey == myPubkey } ?: return
         val myProfileEntity = FullProfileEntity.from(profile = myProfile)
 

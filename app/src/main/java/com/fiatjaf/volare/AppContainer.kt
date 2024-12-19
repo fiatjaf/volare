@@ -5,15 +5,12 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.mutableStateOf
 import androidx.room.Room
 import com.anggrayudi.storage.SimpleStorageHelper
-import com.fiatjaf.volare.core.ExternalSignerHandler
 import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.model.ConnectionStatus
 import com.fiatjaf.volare.data.account.AccountLocker
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.account.AccountSwitcher
-import com.fiatjaf.volare.data.account.ExternalSigner
-import com.fiatjaf.volare.data.account.PlainKeySigner
-import com.fiatjaf.volare.data.account.BunkerSigner
+import com.fiatjaf.volare.data.account.ExternalSignerHandler
 import com.fiatjaf.volare.data.event.EventCounter
 import com.fiatjaf.volare.data.event.EventDeletor
 import com.fiatjaf.volare.data.event.EventMaker
@@ -44,7 +41,6 @@ import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.SubBatcher
 import com.fiatjaf.volare.data.nostr.SubId
 import com.fiatjaf.volare.data.nostr.SubscriptionCreator
-import com.fiatjaf.volare.data.preferences.AppPreferences
 import com.fiatjaf.volare.data.preferences.DatabasePreferences
 import com.fiatjaf.volare.data.preferences.EventPreferences
 import com.fiatjaf.volare.data.preferences.HomePreferences
@@ -87,10 +83,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
 
     val snackbar = SnackbarHostState()
     private val nostrClient = NostrClient()
-    val plainKeySigner = PlainKeySigner(context)
-    val bunkerSigner = BunkerSigner(context)
     val externalSignerHandler = ExternalSignerHandler()
-    private val externalSigner = ExternalSigner(handler = externalSignerHandler)
 
     private val idCacheClearer = IdCacheClearer(
         syncedIdCache = syncedIdCache,
@@ -106,18 +99,15 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     val databasePreferences = DatabasePreferences(context = context)
     val relayPreferences = RelayPreferences(context = context)
     val eventPreferences = EventPreferences(context = context)
-    val appPreferences = AppPreferences(context = context)
 
     val accountManager = AccountManager(
-        plainKeySigner = plainKeySigner,
-        externalSigner = externalSigner,
-        bunkerSigner = bunkerSigner,
-        accountDao = roomDb.accountDao(),
+        context = context,
+        externalSignerHandler = externalSignerHandler,
     )
 
     private val friendProvider = FriendProvider(
         friendDao = roomDb.friendDao(),
-        myPubkeyProvider = accountManager,
+        accountManager = accountManager,
     )
 
     val muteProvider = MuteProvider(muteDao = roomDb.muteDao())
@@ -155,7 +145,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
 
     val itemSetProvider = ItemSetProvider(
         room = roomDb,
-        myPubkeyProvider = accountManager,
+        accountManager = accountManager,
         friendProvider = friendProvider,
         muteProvider = muteProvider,
         annotatedStringProvider = annotatedStringProvider,
@@ -182,7 +172,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
 
     private val filterCreator = FilterCreator(
         room = roomDb,
-        myPubkeyProvider = accountManager,
+        accountManager = accountManager,
         lockProvider = lockProvider,
         relayProvider = relayProvider,
     )
@@ -195,7 +185,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         webOfTrustProvider = webOfTrustProvider,
         friendProvider = friendProvider,
         topicProvider = topicProvider,
-        myPubkeyProvider = accountManager,
+        accountManager = accountManager,
         itemSetProvider = itemSetProvider,
         pubkeyProvider = pubkeyProvider,
     )
@@ -204,7 +194,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
 
     val nostrSubscriber = NostrSubscriber(
         topicProvider = topicProvider,
-        myPubkeyProvider = accountManager,
+        accountManager = accountManager,
         friendProvider = friendProvider,
         subCreator = subCreator,
         relayProvider = relayProvider,
@@ -215,7 +205,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
 
     val accountSwitcher = AccountSwitcher(
         accountManager = accountManager,
-        accountDao = roomDb.accountDao(),
         mainEventDao = roomDb.mainEventDao(),
         idCacheClearer = idCacheClearer,
         lazyNostrSubscriber = lazyNostrSubscriber,
@@ -226,12 +215,12 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     private val eventValidator = EventValidator(
         syncedFilterCache = syncedFilterCache,
         syncedIdCache = syncedIdCache,
-        myPubkeyProvider = accountManager
+        accountManager = accountManager
     )
     private val eventProcessor = EventProcessor(
         room = roomDb,
         metadataInMemory = metadataInMemory,
-        myPubkeyProvider = accountManager
+        accountManager = accountManager
     )
     private val eventQueue = EventQueue(
         eventValidator = eventValidator,
@@ -287,7 +276,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
 
     val accountLocker = AccountLocker(
         context = context,
-        myPubkeyProvider = accountManager,
+        accountManager = accountManager,
         snackbar = snackbar,
         eventRebroadcaster = eventRebroadcaster,
         lockDao = roomDb.lockDao(),
@@ -387,7 +376,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     val profileProvider = ProfileProvider(
         forcedFollowFlow = profileFollower.forcedFollowsFlow,
         forcedMuteFlow = muter.forcedProfileMuteFlow,
-        myPubkeyProvider = accountManager,
+        accountManager = accountManager,
         metadataInMemory = metadataInMemory,
         room = roomDb,
         friendProvider = friendProvider,
@@ -414,8 +403,8 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         relayProvider = relayProvider,
         mainEventInsertDao = roomDb.mainEventInsertDao(),
         mainEventDao = roomDb.mainEventDao(),
-        myPubkeyProvider = accountManager,
         eventPreferences = eventPreferences,
+        accountManager = accountManager,
     )
 
     val eventSweeper = EventSweeper(

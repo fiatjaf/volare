@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var appContainer: AppContainer
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Backend.start()
+        Backend.start(applicationInfo.dataDir)
 
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -137,15 +137,14 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
         },
         settingsVM = viewModel {
             SettingsViewModel(
+                accountManager = appContainer.accountManager,
                 accountSwitcher = appContainer.accountSwitcher,
                 snackbar = appContainer.snackbar,
                 databasePreferences = appContainer.databasePreferences,
                 relayPreferences = appContainer.relayPreferences,
                 eventPreferences = appContainer.eventPreferences,
-                appPreferences = appContainer.appPreferences,
                 databaseInteractor = appContainer.databaseInteractor,
                 externalSignerHandler = appContainer.externalSignerHandler,
-                plainKeySigner = appContainer.plainKeySigner,
                 accountLocker = appContainer.accountLocker
             )
         },
@@ -171,8 +170,8 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
                 nip65Dao = appContainer.roomDb.nip65Dao(),
                 eventRelayDao = appContainer.roomDb.eventRelayDao(),
                 itemSetProvider = appContainer.itemSetProvider,
-                myPubkeyProvider = appContainer.accountManager,
                 accountLocker = appContainer.accountLocker,
+                accountManager = appContainer.accountManager,
             )
         },
         threadVM = viewModel {

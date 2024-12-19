@@ -20,7 +20,7 @@ private const val WEB_OF_TRUST = "web_of_trust"
 private const val GLOBAL = "global"
 
 class HomePreferences(context: Context) {
-    private val preferences = context.getSharedPreferences(HOME_FILE, Context.MODE_PRIVATE)
+    private val preferences = context.getSharedPreferences("home", Context.MODE_PRIVATE)
 
     fun getHomeFeedSetting(): HomeFeedSetting {
         val topics = when (preferences.getString(TOPICS, MY_TOPICS)) {

@@ -12,7 +12,7 @@ import com.fiatjaf.volare.core.model.LabledGitIssue
 import com.fiatjaf.volare.core.utils.extractCleanHashtags
 import com.fiatjaf.volare.core.utils.getNormalizedPollOptions
 import com.fiatjaf.volare.core.utils.getNormalizedTopics
-import com.fiatjaf.volare.data.account.IMyPubkeyProvider
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.event.COMMENT_U16
 import com.fiatjaf.volare.data.event.EventValidator
 import com.fiatjaf.volare.data.event.TEXT_NOTE_U16
@@ -50,7 +50,7 @@ class PostSender(
     private val relayProvider: RelayProvider,
     private val mainEventInsertDao: MainEventInsertDao,
     private val mainEventDao: MainEventDao,
-    private val myPubkeyProvider: IMyPubkeyProvider,
+    private val accountManager: AccountManager,
     private val eventPreferences: EventPreferences
 ) {
     suspend fun sendPost(
@@ -85,7 +85,7 @@ class PostSender(
                 createdAt = event.createdAt().secs(),
                 relayUrl = "", // We don't know which relay accepted this note
                 json = event.asJson(),
-                isMentioningMe = mentions.contains(myPubkeyProvider.getPubkeyHex()),
+                isMentioningMe = mentions.contains(accountManager.getPublicKeyHex()),
             )
             mainEventInsertDao.insertRootPosts(roots = listOf(validatedPost))
         }.onFailure {
@@ -131,7 +131,7 @@ class PostSender(
                 createdAt = event.createdAt().secs(),
                 relayUrl = "", // We don't know which relay accepted this note
                 json = event.asJson(),
-                isMentioningMe = mentions.contains(myPubkeyProvider.getPubkeyHex()),
+                isMentioningMe = mentions.contains(accountManager.getPublicKeyHex()),
                 options = event.getNormalizedPollOptions(),
                 endsAt = event.getEndsAt(),
                 relays = event.getPollRelays()
@@ -155,7 +155,7 @@ class PostSender(
             mainEventDao.getParentAuthor(id = parent.id().toHex())?.let { grandparentAuthor ->
                 add(grandparentAuthor)
             }
-            if (!isAnon) removeIf { it == myPubkeyProvider.getPubkeyHex() }
+            if (!isAnon) removeIf { it == accountManager.getPublicKeyHex() }
         }.minus(parent.tags().publicKeys().map { it.toHex() }) // rust-nostr uses p-tags of parent
             .distinct()
 
@@ -207,7 +207,7 @@ class PostSender(
                 createdAt = event.createdAt().secs(),
                 relayUrl = "", // We don't know which relay accepted this note
                 json = event.asJson(),
-                isMentioningMe = mentions.contains(myPubkeyProvider.getPubkeyHex())
+                isMentioningMe = mentions.contains(accountManager.getPublicKeyHex())
             )
             mainEventInsertDao.insertLegacyReplies(replies = listOf(validatedReply))
 
@@ -241,7 +241,7 @@ class PostSender(
                 relayUrl = "", // We don't know which relay accepted this note
                 content = event.content(),
                 json = event.asJson(),
-                isMentioningMe = mentions.contains(myPubkeyProvider.getPubkeyHex()),
+                isMentioningMe = mentions.contains(accountManager.getPublicKeyHex()),
                 parentId = parent.id().toHex(),
                 parentKind = parent.kind().asU16(),
             )
@@ -269,13 +269,13 @@ class PostSender(
             TEXT_NOTE_U16 -> EventValidator.createValidatedTextNote(
                 event = crossPostedEvent,
                 relayUrl = post.relayUrl,
-                myPubkey = myPubkeyProvider.getPublicKey()
+                myPubkey = accountManager.getPublicKey()
             )
 
             COMMENT_U16 -> EventValidator.createValidatedComment(
                 event = crossPostedEvent,
                 relayUrl = post.relayUrl,
-                myPubkey = myPubkeyProvider.getPublicKey()
+                myPubkey = accountManager.getPublicKey()
             )
 
             else -> {
@@ -349,7 +349,7 @@ class PostSender(
 
     private fun extractMentionsFromString(content: String, isAnon: Boolean): List<PubkeyHex> {
         return extractMentionPubkeys(content = content).let { pubkeys ->
-            if (!isAnon) pubkeys.filter { it != myPubkeyProvider.getPubkeyHex() }
+            if (!isAnon) pubkeys.filter { it != accountManager.getPublicKeyHex() }
             else pubkeys
         }
     }
