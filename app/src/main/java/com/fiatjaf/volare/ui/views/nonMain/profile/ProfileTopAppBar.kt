@@ -20,6 +20,7 @@ import com.fiatjaf.volare.ui.components.button.ProfileOrTopicOptionButton
 
 @Composable
 fun ProfileTopAppBar(
+    ourPubKey: String,
     profile: FullProfileUI,
     addableLists: List<ItemSetMeta>,
     nonAddableLists: List<ItemSetMeta>,
@@ -28,7 +29,7 @@ fun ProfileTopAppBar(
     SimpleGoBackTopAppBar(
         title = profile.inner.name,
         actions = {
-            if (!profile.inner.isMe) {
+            if (profile.inner.pubkey != ourPubKey) {
                 ProfileOrTopicOptionButton(
                     item = ItemSetProfile(pubkey = profile.inner.pubkey),
                     isMuted = profile.inner.isMuted,
@@ -39,7 +40,7 @@ fun ProfileTopAppBar(
                 )
                 if (!profile.inner.isMuted || profile.inner.isFriend) FollowButton(
                     isFollowed = profile.inner.isFriend,
-                    isEnabled = profile.inner.isFriend || !profile.inner.isLocked,
+                    isEnabled = profile.inner.isFriend,
                     onFollow = {
                         onUpdate(FollowProfile(pubkey = profile.inner.pubkey))
                     },

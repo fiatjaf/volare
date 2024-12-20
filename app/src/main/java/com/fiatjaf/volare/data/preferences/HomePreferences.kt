@@ -1,7 +1,7 @@
 package com.fiatjaf.volare.data.preferences
 
 import android.content.Context
-import com.fiatjaf.volare.data.model.FriendPubkeysNoLock
+import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
 import com.fiatjaf.volare.data.model.HomeFeedSetting
 import com.fiatjaf.volare.data.model.MyTopics
@@ -30,10 +30,10 @@ class HomePreferences(context: Context) {
         }
         val pubkeys = when (preferences.getString(PUBKEYS, FRIENDS)) {
             NO_PUBKEYS -> NoPubkeys
-            FRIENDS -> FriendPubkeysNoLock
+            FRIENDS -> FriendPubkeys
             WEB_OF_TRUST -> WebOfTrustPubkeys
             GLOBAL -> Global
-            else -> FriendPubkeysNoLock
+            else -> FriendPubkeys
         }
         return HomeFeedSetting(topicSelection = topics, pubkeySelection = pubkeys)
     }
@@ -45,7 +45,7 @@ class HomePreferences(context: Context) {
         }
         val pubkeys = when (setting.pubkeySelection) {
             NoPubkeys -> NO_PUBKEYS
-            FriendPubkeysNoLock -> FRIENDS
+            FriendPubkeys -> FRIENDS
             WebOfTrustPubkeys -> WEB_OF_TRUST
             Global -> GLOBAL
         }

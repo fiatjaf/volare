@@ -18,7 +18,6 @@ import com.fiatjaf.volare.data.room.dao.HashtagDao
 import com.fiatjaf.volare.data.room.dao.HomeFeedDao
 import com.fiatjaf.volare.data.room.dao.InboxDao
 import com.fiatjaf.volare.data.room.dao.ItemSetDao
-import com.fiatjaf.volare.data.room.dao.LockDao
 import com.fiatjaf.volare.data.room.dao.MainEventDao
 import com.fiatjaf.volare.data.room.dao.MuteDao
 import com.fiatjaf.volare.data.room.dao.Nip65Dao
@@ -29,7 +28,6 @@ import com.fiatjaf.volare.data.room.dao.RootPostDao
 import com.fiatjaf.volare.data.room.dao.TopicDao
 import com.fiatjaf.volare.data.room.dao.VoteDao
 import com.fiatjaf.volare.data.room.dao.WebOfTrustDao
-import com.fiatjaf.volare.data.room.dao.insert.LockInsertDao
 import com.fiatjaf.volare.data.room.dao.insert.MainEventInsertDao
 import com.fiatjaf.volare.data.room.dao.reply.CommentDao
 import com.fiatjaf.volare.data.room.dao.reply.LegacyReplyDao
@@ -47,9 +45,7 @@ import com.fiatjaf.volare.data.room.dao.upsert.WebOfTrustUpsertDao
 import com.fiatjaf.volare.data.room.dao.util.CountDao
 import com.fiatjaf.volare.data.room.dao.util.DeleteDao
 import com.fiatjaf.volare.data.room.dao.util.ExistsDao
-import com.fiatjaf.volare.data.room.entity.AccountEntity
 import com.fiatjaf.volare.data.room.entity.FullProfileEntity
-import com.fiatjaf.volare.data.room.entity.LockEntity
 import com.fiatjaf.volare.data.room.entity.ProfileEntity
 import com.fiatjaf.volare.data.room.entity.lists.BookmarkEntity
 import com.fiatjaf.volare.data.room.entity.lists.FriendEntity
@@ -112,10 +108,8 @@ import com.fiatjaf.volare.data.room.view.SimplePostView
         TopicSetItemEntity::class,
 
         // Other
-        AccountEntity::class,
         ProfileEntity::class,
         FullProfileEntity::class,
-        LockEntity::class,
     ],
     views = [
         SimplePostView::class,
@@ -150,7 +144,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun contentSetDao(): ContentSetDao
     abstract fun itemSetDao(): ItemSetDao
     abstract fun muteDao(): MuteDao
-    abstract fun lockDao(): LockDao
     abstract fun hashtagDao(): HashtagDao
     abstract fun someReplyDao(): SomeReplyDao
     abstract fun pollResponseDao(): PollResponseDao
@@ -163,7 +156,6 @@ abstract class AppDatabase : RoomDatabase() {
 
     // Insert
     abstract fun mainEventInsertDao(): MainEventInsertDao
-    abstract fun lockInsertDao(): LockInsertDao
 
     // Upsert
     abstract fun friendUpsertDao(): FriendUpsertDao

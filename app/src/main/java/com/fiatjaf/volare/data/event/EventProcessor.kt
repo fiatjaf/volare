@@ -48,7 +48,6 @@ class EventProcessor(
         val profileSets = mutableListOf<ValidatedProfileSet>()
         val topicSets = mutableListOf<ValidatedTopicSet>()
         val lists = mutableListOf<ValidatedList>()
-        val locks = mutableListOf<ValidatedLock>()
 
         allEvents.forEach { event ->
             when (event) {
@@ -63,7 +62,6 @@ class EventProcessor(
                 is ValidatedProfileSet -> profileSets.add(event)
                 is ValidatedTopicSet -> topicSets.add(event)
                 is ValidatedList -> lists.add(event)
-                is ValidatedLock -> locks.add(event)
             }
         }
         processRootPosts(roots = rootPosts)
@@ -76,7 +74,6 @@ class EventProcessor(
         processProfiles(profiles = profiles)
         processProfileSets(sets = profileSets)
         processTopicSets(sets = topicSets)
-        processLocks(locks = locks)
         listEventProcessor.processLists(lists = lists)
     }
 
@@ -190,15 +187,6 @@ class EventProcessor(
                 Log.d(TAG, "Upsert set with ${it.topics.size} topics")
                 room.topicSetUpsertDao().upsertSet(set = it)
             }
-        }
-    }
-
-    private fun processLocks(locks: Collection<ValidatedLock>) {
-        if (locks.isEmpty()) return
-
-        scope.launch {
-            Log.i(TAG, "Insert ${locks.size} locks")
-            room.lockInsertDao().insertLocksTx(locks = locks)
         }
     }
 

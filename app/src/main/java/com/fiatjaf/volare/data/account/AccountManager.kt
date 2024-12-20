@@ -3,6 +3,7 @@ package com.fiatjaf.volare.data.account
 import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.MutableStateFlow
 import rust.nostr.sdk.Event
 import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.SecretKey
@@ -39,10 +40,11 @@ class AccountManager(
     val externalSignerHandler: ExternalSignerHandler,
 )  {
     var accountType: AccountType
+    val pubkeyHexFlow = MutableStateFlow<String>("") // in practice this will never be ""
+
     private var signer: Signer
     private val store = context.getSharedPreferences("account", Context.MODE_PRIVATE)
-    private var cachedPublicKey: PublicKey? = null
-    private var cachedPublicKeyHex: String? = null
+    private var cachedPublicKey: PublicKey
 
     init {
         when (AccountType.from(store.getInt("active", -1))) {
@@ -64,7 +66,7 @@ class AccountManager(
                 )
             }
             else -> {
-                Log.i(TAG, "No account pubkey found in database, initialize new")
+                Log.i(TAG, "no account pubkey found in database, initialize new")
                 store.edit()
                     .putInt("active", AccountType.PLAINKEY.toInt())
                     .apply()
@@ -76,16 +78,21 @@ class AccountManager(
         runBlocking {
             val pk = signer.getPublicKey()
             this@AccountManager.cachedPublicKey = pk
-            this@AccountManager.cachedPublicKeyHex = pk.toHex()
+            this@AccountManager.pubkeyHexFlow.value = pk.toHex()
         }
     }
 
-    fun getPublicKey(): PublicKey = this.cachedPublicKey!!
-    fun getPublicKeyHex(): String = this.cachedPublicKeyHex!!
+    fun getPublicKey(): PublicKey = this.cachedPublicKey
+    fun getPublicKeyHex(): String = this.pubkeyHexFlow.value
     suspend fun signEvent(unsignedEvent: UnsignedEvent): Result<Event> = signer.signEvent(unsignedEvent)
 
     fun setSigner(set: (context: Context) -> Signer) {
         this.signer = set(context)
+        runBlocking {
+            val pk = signer.getPublicKey()
+            this@AccountManager.cachedPublicKey = pk
+            this@AccountManager.pubkeyHexFlow.value = pk.toHex()
+        }
     }
 
     fun getPlainSecretKey(): SecretKey? {

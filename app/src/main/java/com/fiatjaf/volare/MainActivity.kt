@@ -132,7 +132,8 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
             DiscoverViewModel(
                 topicProvider = appContainer.topicProvider,
                 profileProvider = appContainer.profileProvider,
-                lazyNostrSubscriber = appContainer.lazyNostrSubscriber
+                lazyNostrSubscriber = appContainer.lazyNostrSubscriber,
+                accountManager = appContainer.accountManager
             )
         },
         settingsVM = viewModel {
@@ -145,7 +146,6 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
                 eventPreferences = appContainer.eventPreferences,
                 databaseInteractor = appContainer.databaseInteractor,
                 externalSignerHandler = appContainer.externalSignerHandler,
-                accountLocker = appContainer.accountLocker
             )
         },
         searchVM = viewModel {
@@ -153,6 +153,7 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
                 searchProvider = appContainer.searchProvider,
                 lazyNostrSubscriber = appContainer.lazyNostrSubscriber,
                 snackbar = appContainer.snackbar,
+                accountManager = appContainer.accountManager
             )
         },
         profileVM = viewModel {
@@ -170,7 +171,6 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
                 nip65Dao = appContainer.roomDb.nip65Dao(),
                 eventRelayDao = appContainer.roomDb.eventRelayDao(),
                 itemSetProvider = appContainer.itemSetProvider,
-                accountLocker = appContainer.accountLocker,
                 accountManager = appContainer.accountManager,
             )
         },
@@ -216,7 +216,8 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
                 relayProvider = appContainer.relayProvider,
                 fullProfileDao = appContainer.roomDb.fullProfileDao(),
                 metadataInMemory = appContainer.metadataInMemory,
-                profileUpsertDao = appContainer.roomDb.profileUpsertDao()
+                profileUpsertDao = appContainer.roomDb.profileUpsertDao(),
+                accountManager = appContainer.accountManager,
             )
         },
         relayEditorVM = viewModel {

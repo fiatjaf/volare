@@ -13,7 +13,6 @@ import com.fiatjaf.volare.data.nostr.NostrSubscriber
 import com.fiatjaf.volare.data.nostr.getCurrentSecs
 import com.fiatjaf.volare.data.preferences.HomePreferences
 import com.fiatjaf.volare.data.room.dao.MainEventDao
-import com.fiatjaf.volare.data.room.entity.AccountEntity
 import kotlinx.coroutines.delay
 import rust.nostr.sdk.PublicKey
 

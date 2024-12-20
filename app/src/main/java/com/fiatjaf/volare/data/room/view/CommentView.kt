@@ -21,13 +21,10 @@ import com.fiatjaf.volare.ui.components.row.mainEvent.ThreadReplyCtx
             "mainEvent.isMentioningMe, " +
             "mainEvent.blurhashes, " +
             "(SELECT name FROM profile WHERE profile.pubkey = mainEvent.pubkey) AS authorName, " +
-            "(SELECT EXISTS(SELECT * FROM account WHERE account.pubkey = mainEvent.pubkey)) AS authorIsOneself, " +
             "(SELECT EXISTS(SELECT * FROM friend WHERE friend.friendPubkey = mainEvent.pubkey)) AS authorIsFriend, " +
             "(SELECT EXISTS(SELECT * FROM weboftrust WHERE weboftrust.webOfTrustPubkey = mainEvent.pubkey)) AS authorIsTrusted, " +
             "(SELECT EXISTS(SELECT * FROM mute WHERE mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p')) AS authorIsMuted, " +
             "(SELECT EXISTS(SELECT * FROM profileSetItem WHERE profileSetItem.pubkey = mainEvent.pubkey)) AS authorIsInList, " +
-            "(SELECT EXISTS(SELECT * FROM lock WHERE lock.pubkey = mainEvent.pubkey)) AS authorIsLocked, " +
-            "(SELECT EXISTS(SELECT* FROM vote WHERE vote.eventId = mainEvent.id AND vote.pubkey = (SELECT pubkey FROM account LIMIT 1))) AS isUpvoted, " +
             "(SELECT COUNT(*) FROM vote WHERE vote.eventId = mainEvent.id) AS upvoteCount, " +
             "(SELECT COUNT(*) FROM comment AS comment2 WHERE comment2.parentId = mainEvent.id) AS replyCount, " +
             "(SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked " +
@@ -42,13 +39,10 @@ data class CommentView(
     val authorName: String?,
     val content: String,
     val createdAt: Long,
-    val authorIsOneself: Boolean,
     val authorIsFriend: Boolean,
     val authorIsTrusted: Boolean,
     val authorIsMuted: Boolean,
     val authorIsInList: Boolean,
-    val authorIsLocked: Boolean,
-    val isUpvoted: Boolean,
     val upvoteCount: Int,
     val replyCount: Int,
     val relayUrl: RelayUrl,
@@ -64,6 +58,7 @@ data class CommentView(
         forcedBookmarks: Map<EventIdHex, Boolean>,
         collapsedIds: Set<EventIdHex>,
         parentIds: Set<EventIdHex>,
+        ourPubKey: String,
         annotatedStringProvider: AnnotatedStringProvider,
     ): ThreadReplyCtx {
         return ThreadReplyCtx(
@@ -71,6 +66,7 @@ data class CommentView(
                 forcedVotes = forcedVotes,
                 forcedFollows = forcedFollows,
                 forcedBookmarks = forcedBookmarks,
+                ourPubKey = ourPubKey,
                 annotatedStringProvider = annotatedStringProvider
             ),
             isOp = isOp,
@@ -84,10 +80,12 @@ data class CommentView(
         forcedVotes: Map<EventIdHex, Boolean>,
         forcedFollows: Map<PubkeyHex, Boolean>,
         forcedBookmarks: Map<EventIdHex, Boolean>,
+        ourPubKey: String,
         annotatedStringProvider: AnnotatedStringProvider
     ): Comment {
         val comment = Comment.from(
             commentView = this,
+            ourPubKey = ourPubKey,
             annotatedStringProvider = annotatedStringProvider
         )
         val vote = forcedVotes.getOrDefault(this.id, null)
@@ -95,7 +93,7 @@ data class CommentView(
         val bookmark = forcedBookmarks.getOrDefault(this.id, null)
         return if (vote != null || follow != null || bookmark != null) comment.copy(
             isUpvoted = vote ?: comment.isUpvoted,
-            trustType = TrustType.from(commentView = this, isFriend = follow),
+            trustType = TrustType.from(commentView = this, ourPubKey = ourPubKey, isFriend = follow),
             isBookmarked = bookmark ?: comment.isBookmarked
         ) else comment
     }

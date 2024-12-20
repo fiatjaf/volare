@@ -6,18 +6,10 @@ import androidx.room.Index
 import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedBookmarkList
-import com.fiatjaf.volare.data.room.entity.AccountEntity
 
 @Entity(
     tableName = "bookmark",
     primaryKeys = ["eventId"],
-    foreignKeys = [ForeignKey(
-        entity = AccountEntity::class,
-        parentColumns = ["pubkey"],
-        childColumns = ["myPubkey"],
-        onDelete = ForeignKey.CASCADE,
-        onUpdate = ForeignKey.NO_ACTION
-    )],
     indices = [Index(value = ["myPubkey"], unique = false)], // ksp suggestion: "Highly advised"
 )
 data class BookmarkEntity(

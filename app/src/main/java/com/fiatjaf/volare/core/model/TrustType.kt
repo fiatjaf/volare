@@ -18,11 +18,8 @@ sealed class TrustType {
             isWebOfTrust: Boolean,
             isMuted: Boolean,
             isInList: Boolean,
-            isLocked: Boolean,
         ): TrustType {
-            return if (isOneself && isLocked) LockedOneself
-            else if (isOneself) Oneself
-            else if (isLocked) Locked
+            return if (isOneself) Oneself
             else if (isMuted) Muted
             else if (isFriend) FriendTrust
             else if (isInList) IsInListTrust
@@ -33,15 +30,15 @@ sealed class TrustType {
         @Stable
         fun from(
             rootPostView: RootPostView,
+            ourPubKey: String,
             isFriend: Boolean? = rootPostView.authorIsFriend
         ): TrustType {
             return from(
-                isOneself = rootPostView.authorIsOneself,
+                isOneself = rootPostView.pubkey == ourPubKey,
                 isFriend = isFriend ?: rootPostView.authorIsFriend,
                 isWebOfTrust = rootPostView.authorIsTrusted,
                 isMuted = rootPostView.authorIsMuted,
                 isInList = rootPostView.authorIsInList,
-                isLocked = rootPostView.authorIsLocked,
             )
         }
 
@@ -49,85 +46,83 @@ sealed class TrustType {
         @Stable
         fun from(
             pollView: PollView,
+            ourPubKey: String,
             isFriend: Boolean? = pollView.authorIsFriend
         ): TrustType {
             return from(
-                isOneself = pollView.authorIsOneself,
+                isOneself = pollView.pubkey == ourPubKey,
                 isFriend = isFriend ?: pollView.authorIsFriend,
                 isWebOfTrust = pollView.authorIsTrusted,
                 isMuted = pollView.authorIsMuted,
                 isInList = pollView.authorIsInList,
-                isLocked = pollView.authorIsLocked,
             )
         }
 
         @Stable
         fun from(
             legacyReplyView: LegacyReplyView,
+            ourPubKey: String,
             isFriend: Boolean? = legacyReplyView.authorIsFriend
         ): TrustType {
             return from(
-                isOneself = legacyReplyView.authorIsOneself,
+                isOneself = legacyReplyView.pubkey == ourPubKey,
                 isFriend = isFriend ?: legacyReplyView.authorIsFriend,
                 isWebOfTrust = legacyReplyView.authorIsTrusted,
                 isMuted = legacyReplyView.authorIsMuted,
                 isInList = legacyReplyView.authorIsInList,
-                isLocked = legacyReplyView.authorIsLocked,
             )
         }
 
         @Stable
         fun from(
             commentView: CommentView,
+            ourPubKey: String,
             isFriend: Boolean? = commentView.authorIsFriend
         ): TrustType {
             return from(
-                isOneself = commentView.authorIsOneself,
+                isOneself = commentView.pubkey == ourPubKey,
                 isFriend = isFriend ?: commentView.authorIsFriend,
                 isWebOfTrust = commentView.authorIsTrusted,
                 isMuted = commentView.authorIsMuted,
                 isInList = commentView.authorIsInList,
-                isLocked = commentView.authorIsLocked,
             )
         }
 
         @Stable
         fun fromCrossPostAuthor(
             crossPostView: CrossPostView,
+            ourPubKey: String,
             isFriend: Boolean? = crossPostView.authorIsFriend
         ): TrustType {
             return from(
-                isOneself = crossPostView.authorIsOneself,
+                isOneself = crossPostView.pubkey == ourPubKey,
                 isFriend = isFriend ?: crossPostView.authorIsFriend,
                 isWebOfTrust = crossPostView.authorIsTrusted,
                 isMuted = crossPostView.authorIsMuted,
                 isInList = crossPostView.authorIsInList,
-                isLocked = crossPostView.authorIsLocked,
             )
         }
 
         @Stable
         fun fromCrossPostedAuthor(
             crossPostView: CrossPostView,
+            ourPubKey: String,
             isFriend: Boolean? = crossPostView.crossPostedAuthorIsFriend
         ): TrustType {
             return from(
-                isOneself = crossPostView.crossPostedAuthorIsOneself,
+                isOneself = crossPostView.pubkey == ourPubKey,
                 isFriend = isFriend ?: crossPostView.crossPostedAuthorIsFriend,
                 isWebOfTrust = crossPostView.crossPostedAuthorIsTrusted,
                 isMuted = crossPostView.crossPostedAuthorIsMuted,
                 isInList = crossPostView.crossPostedAuthorIsInList,
-                isLocked = crossPostView.crossPostedAuthorIsLocked,
             )
         }
     }
 }
 
-data object LockedOneself : TrustType()
 data object Oneself : TrustType()
 data object FriendTrust : TrustType()
 data object IsInListTrust : TrustType()
 data object WebTrust : TrustType()
 data object Muted : TrustType()
 data object NoTrust : TrustType()
-data object Locked : TrustType()

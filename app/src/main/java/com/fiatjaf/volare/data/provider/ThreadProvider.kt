@@ -11,6 +11,7 @@ import com.fiatjaf.volare.core.model.Comment
 import com.fiatjaf.volare.core.utils.containsNoneIgnoreCase
 import com.fiatjaf.volare.core.utils.firstThenDistinctDebounce
 import com.fiatjaf.volare.core.utils.launchIO
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.event.COMMENT_U16
 import com.fiatjaf.volare.data.event.OldestUsedEvent
 import com.fiatjaf.volare.data.event.POLL_U16
@@ -26,6 +27,7 @@ import com.fiatjaf.volare.ui.components.row.mainEvent.ThreadRootCtx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
@@ -35,6 +37,7 @@ import java.util.LinkedList
 private const val TAG = "ThreadProvider"
 
 class ThreadProvider(
+    private val accountManager: AccountManager,
     private val nostrSubscriber: NostrSubscriber,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
     private val room: AppDatabase,
@@ -46,7 +49,6 @@ class ThreadProvider(
     private val forcedBookmarks: Flow<Map<EventIdHex, Boolean>>,
     private val muteProvider: MuteProvider,
 ) {
-
     fun getLocalRoot(
         scope: CoroutineScope,
         nevent: Nip19Event,
@@ -102,16 +104,19 @@ class ThreadProvider(
                 forcedFollows = forced.follows,
                 forcedVotes = forced.votes,
                 forcedBookmarks = forced.bookmarks,
+                ourPubKey = accountManager.getPublicKeyHex(),
                 annotatedStringProvider = annotatedStringProvider
             ) ?: reply?.mapToLegacyReplyUI(
                 forcedFollows = forced.follows,
                 forcedVotes = forced.votes,
                 forcedBookmarks = forced.bookmarks,
+                ourPubKey = accountManager.getPublicKeyHex(),
                 annotatedStringProvider = annotatedStringProvider
             ) ?: comment?.mapToCommentUI(
                 forcedFollows = forced.follows,
                 forcedVotes = forced.votes,
                 forcedBookmarks = forced.bookmarks,
+                ourPubKey = accountManager.getPublicKeyHex(),
                 annotatedStringProvider = annotatedStringProvider
             ) ?: pollPair?.let { (poll, options) ->
                 poll.mapToPollUI(
@@ -119,6 +124,7 @@ class ThreadProvider(
                     forcedFollows = forced.follows,
                     forcedVotes = forced.votes,
                     forcedBookmarks = forced.bookmarks,
+                    ourPubKey = accountManager.getPublicKeyHex(),
                     annotatedStringProvider = annotatedStringProvider
                 )
             }
@@ -172,7 +178,7 @@ class ThreadProvider(
             val hasMutedWords = { str: String -> !str.containsNoneIgnoreCase(strs = mutedWords) }
 
             for (reply in replies) {
-                if (!reply.authorIsOneself && hasMutedWords(reply.content)) continue
+                if (reply.pubkey != accountManager.getPublicKeyHex() && hasMutedWords(reply.content)) continue
                 val parent = result.find { it.reply.id == reply.parentId }
 
                 if (parent?.isCollapsed == true) continue
@@ -187,6 +193,7 @@ class ThreadProvider(
                     collapsedIds = collapsed,
                     parentIds = parentIds,
                     forcedBookmarks = forced.bookmarks,
+                    ourPubKey = accountManager.getPublicKeyHex(),
                     annotatedStringProvider = annotatedStringProvider
                 )
 
@@ -199,7 +206,7 @@ class ThreadProvider(
 
             // Comments after replies because they can reference replies, not the other way around
             for (comment in comments) {
-                if (!comment.authorIsOneself && hasMutedWords(comment.content)) continue
+                if (comment.pubkey != accountManager.getPublicKeyHex() && hasMutedWords(comment.content)) continue
                 val parent = result.find { it.reply.id == comment.parentId }
 
                 if (parent?.isCollapsed == true) continue
@@ -213,6 +220,7 @@ class ThreadProvider(
                     collapsedIds = collapsed,
                     parentIds = parentIds,
                     forcedBookmarks = forced.bookmarks,
+                    ourPubKey = accountManager.getPublicKeyHex(),
                     annotatedStringProvider = annotatedStringProvider
                 )
 

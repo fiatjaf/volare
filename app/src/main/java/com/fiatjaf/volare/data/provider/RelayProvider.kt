@@ -13,8 +13,9 @@ import com.fiatjaf.volare.core.model.Disconnected
 import com.fiatjaf.volare.core.model.Spam
 import com.fiatjaf.volare.core.utils.putOrAdd
 import com.fiatjaf.volare.core.utils.takeRandom
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.model.CustomPubkeys
-import com.fiatjaf.volare.data.model.FriendPubkeysNoLock
+import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
 import com.fiatjaf.volare.data.model.ListPubkeys
 import com.fiatjaf.volare.data.model.NoPubkeys
@@ -30,7 +31,9 @@ import com.fiatjaf.volare.data.room.dao.EventRelayDao
 import com.fiatjaf.volare.data.room.dao.Nip65Dao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import rust.nostr.sdk.Nip19Event
 import rust.nostr.sdk.Nip19Profile
@@ -39,6 +42,8 @@ import rust.nostr.sdk.Nip19Profile
 private const val TAG = "RelayProvider"
 
 class RelayProvider(
+    accountManager: AccountManager,
+
     private val nip65Dao: Nip65Dao,
     private val eventRelayDao: EventRelayDao,
     private val nostrClient: NostrClient,
@@ -48,8 +53,11 @@ class RelayProvider(
     private val webOfTrustProvider: WebOfTrustProvider,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
-    private val myNip65 =
-        nip65Dao.getMyNip65Flow().stateIn(scope, SharingStarted.Eagerly, emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val myNip65 = accountManager.pubkeyHexFlow.flatMapLatest { pubkeyHex ->
+        nip65Dao.getNip65EntityFlow(pubkeyHex)
+    }.stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     fun getReadRelays(
         limit: Int = MAX_RELAYS,
@@ -145,7 +153,7 @@ class RelayProvider(
 
     suspend fun getObserveRelays(selection: PubkeySelection): Map<RelayUrl, Set<PubkeyHex>> {
         when (selection) {
-            FriendPubkeysNoLock, is ListPubkeys -> {}
+            FriendPubkeys, is ListPubkeys -> {}
             is SingularPubkey -> {
                 return getObserveRelays(pubkey = selection.pubkey)
                     .associateWith { setOf(selection.pubkey) }
@@ -175,7 +183,7 @@ class RelayProvider(
         val connectedRelays = nostrClient.getAllConnectedUrls().toSet()
 
         val eventRelaysView = when (selection) {
-            is FriendPubkeysNoLock -> eventRelayDao.getFriendsEventRelayAuthorView()
+            is FriendPubkeys -> eventRelayDao.getFriendsEventRelayAuthorView()
             is CustomPubkeys -> eventRelayDao.getEventRelayAuthorView(
                 authors = selection.pubkeys.takeRandom(MAX_KEYS_SQL)
             )
@@ -196,7 +204,7 @@ class RelayProvider(
             .toSet()
 
         val writeRelays = when (selection) {
-            is FriendPubkeysNoLock -> nip65Dao.getFriendsWriteRelays()
+            is FriendPubkeys -> nip65Dao.getFriendsWriteRelays()
             is CustomPubkeys -> nip65Dao.getWriteRelays(
                 pubkeys = selection.pubkeys.takeRandom(MAX_KEYS_SQL)
             )
@@ -324,9 +332,8 @@ class RelayProvider(
     }
 
     private val defaultRelays = listOf(
-        "wss://nos.lol",
+        "wss://nostr.mom",
         "wss://nostr.einundzwanzig.space",
-        "wss://relay.mutinywallet.com",
         "wss://nostr.fmt.wiz.biz",
         "wss://relay.nostr.wirednet.jp",
     )

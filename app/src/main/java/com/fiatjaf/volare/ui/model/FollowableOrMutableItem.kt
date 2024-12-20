@@ -52,7 +52,7 @@ data class FollowableProfileItem(
     button = {
         FollowButton(
             isFollowed = profile.isFriend,
-            isEnabled = profile.isFriend || !profile.isLocked,
+            isEnabled = profile.isFriend,
             onFollow = { onUpdate(FollowProfile(pubkey = profile.pubkey)) },
             onUnfollow = { onUpdate(UnfollowProfile(pubkey = profile.pubkey)) },
         )

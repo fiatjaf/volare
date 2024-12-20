@@ -30,7 +30,6 @@ import com.fiatjaf.volare.data.nostr.getSubject
 import com.fiatjaf.volare.data.provider.AnnotatedStringProvider
 import com.fiatjaf.volare.data.provider.FriendProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
-import com.fiatjaf.volare.data.provider.LockProvider
 import com.fiatjaf.volare.data.provider.MuteProvider
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.data.room.view.CommentView
@@ -294,6 +293,7 @@ fun mergeToMainEventUIList(
     comments: Collection<CommentView>,
     forcedData: ForcedData,
     size: Int,
+    ourPubKey: String,
     annotatedStringProvider: AnnotatedStringProvider,
 ): List<MainEvent> {
     return mergeToMainEventUIList(
@@ -307,6 +307,7 @@ fun mergeToMainEventUIList(
         follows = forcedData.follows,
         bookmarks = forcedData.bookmarks,
         size = size,
+        ourPubKey = ourPubKey,
         annotatedStringProvider = annotatedStringProvider
     )
 }
@@ -322,6 +323,7 @@ fun mergeToMainEventUIList(
     follows: Map<PubkeyHex, Boolean>,
     bookmarks: Map<EventIdHex, Boolean>,
     size: Int,
+    ourPubKey: String,
     annotatedStringProvider: AnnotatedStringProvider,
 ): List<MainEvent> {
     val applicableTimestamps = roots.asSequence()
@@ -338,6 +340,7 @@ fun mergeToMainEventUIList(
     for (post in roots) {
         if (!applicableTimestamps.contains(post.createdAt)) continue
         val mapped = post.mapToRootPostUI(
+            ourPubKey = ourPubKey,
             forcedVotes = votes,
             forcedFollows = follows,
             forcedBookmarks = bookmarks,
@@ -351,6 +354,7 @@ fun mergeToMainEventUIList(
             forcedVotes = votes,
             forcedFollows = follows,
             forcedBookmarks = bookmarks,
+            ourPubKey = ourPubKey,
             annotatedStringProvider = annotatedStringProvider
         )
         result.add(mapped)
@@ -362,6 +366,7 @@ fun mergeToMainEventUIList(
             forcedVotes = votes,
             forcedFollows = follows,
             forcedBookmarks = bookmarks,
+            ourPubKey = ourPubKey,
             annotatedStringProvider = annotatedStringProvider
         )
         result.add(mapped)
@@ -372,6 +377,7 @@ fun mergeToMainEventUIList(
             forcedVotes = votes,
             forcedFollows = follows,
             forcedBookmarks = bookmarks,
+            ourPubKey = ourPubKey,
             annotatedStringProvider = annotatedStringProvider
         )
         result.add(mapped)
@@ -382,6 +388,7 @@ fun mergeToMainEventUIList(
             forcedVotes = votes,
             forcedFollows = follows,
             forcedBookmarks = bookmarks,
+            ourPubKey = ourPubKey,
             annotatedStringProvider = annotatedStringProvider
         )
         result.add(mapped)
@@ -397,6 +404,7 @@ fun mergeToSomeReplyUIList(
     follows: Map<PubkeyHex, Boolean>,
     bookmarks: Map<EventIdHex, Boolean>,
     size: Int,
+    ourPubKey: String,
     annotatedStringProvider: AnnotatedStringProvider,
 ): List<SomeReply> {
     val result = mutableListOf<SomeReply>()
@@ -412,6 +420,7 @@ fun mergeToSomeReplyUIList(
         follows = follows,
         bookmarks = bookmarks,
         size = size,
+        ourPubKey = ourPubKey,
         annotatedStringProvider = annotatedStringProvider
     ).forEach { if (it is SomeReply) result.add(it) }
 
@@ -424,24 +433,20 @@ fun createAdvancedProfile(
     forcedFollowState: Boolean?,
     forcedMuteState: Boolean?,
     metadata: RelevantMetadata?,
-    myPubkey: PubkeyHex,
     friendProvider: FriendProvider,
     muteProvider: MuteProvider,
     itemSetProvider: ItemSetProvider,
-    lockProvider: LockProvider,
 ): AdvancedProfileView {
     val name = normalizeName(metadata?.name.orEmpty().ifEmpty { dbProfile?.name.orEmpty() })
         .ifEmpty { pubkey.toShortenedBech32() }
     return AdvancedProfileView(
         pubkey = pubkey,
         name = name,
-        isMe = dbProfile?.isMe ?: (myPubkey == pubkey),
         isFriend = forcedFollowState ?: dbProfile?.isFriend
         ?: friendProvider.isFriend(pubkey = pubkey),
         isWebOfTrust = dbProfile?.isWebOfTrust ?: false,
         isMuted = forcedMuteState ?: dbProfile?.isMuted ?: muteProvider.isMuted(pubkey = pubkey),
         isInList = dbProfile?.isInList ?: itemSetProvider.isInAnySet(pubkey = pubkey),
-        isLocked = dbProfile?.isLocked ?: lockProvider.isLocked(pubkey = pubkey)
     )
 }
 

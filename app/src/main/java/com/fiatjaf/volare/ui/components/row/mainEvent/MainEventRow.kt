@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -227,15 +228,14 @@ private fun RowWithDivider(level: Int, content: ComposableContent) {
 
 @Composable
 private fun PollColumn(poll: Poll, onUpdate: OnUpdate, onClickRow: Fn) {
+    val myVote: String? = null // TODO: somehow figure this out
     val isExpired = remember(poll.endsAt) {
         poll.endsAt != null && poll.endsAt <= getCurrentSecs()
     }
     val clickedId = remember {
         mutableStateOf<String?>(null)
     }
-    val alreadyVoted = remember(poll) {
-        poll.options.any { it.isMyVote }
-    }
+    val alreadyVoted = myVote != null
     val isRevealed = remember(isExpired, alreadyVoted) {
         alreadyVoted || isExpired
     }
@@ -249,7 +249,7 @@ private fun PollColumn(poll: Poll, onUpdate: OnUpdate, onClickRow: Fn) {
         for (option in poll.options) {
             PollOptionRow(
                 label = option.label,
-                isSelected = if (clickedId.value != null) clickedId.value == option.optionId else option.isMyVote,
+                isSelected = if (clickedId.value != null) clickedId.value == option.optionId else option.optionId == myVote,
                 isRevealed = isRevealed,
                 percentage = remember(option.voteCount, totalVotes) {
                     if (totalVotes == 0) 0

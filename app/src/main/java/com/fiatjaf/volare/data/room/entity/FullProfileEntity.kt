@@ -14,13 +14,6 @@ import rust.nostr.sdk.PublicKey
 @Entity(
     tableName = "fullProfile",
     primaryKeys = ["pubkey"],
-    foreignKeys = [ForeignKey(
-        entity = AccountEntity::class,
-        parentColumns = ["pubkey"],
-        childColumns = ["pubkey"],
-        onDelete = ForeignKey.CASCADE,
-        onUpdate = ForeignKey.NO_ACTION
-    )]
 )
 data class FullProfileEntity(
     val pubkey: PubkeyHex,

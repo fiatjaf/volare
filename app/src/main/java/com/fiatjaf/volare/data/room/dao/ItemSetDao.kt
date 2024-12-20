@@ -19,20 +19,20 @@ interface ItemSetDao {
     @Query(
         "SELECT identifier, title " +
                 "FROM profileSet " +
-                "WHERE myPubkey = (SELECT pubkey FROM account) " +
+                "WHERE myPubkey = :ourPubkey " +
                 "AND deleted = 0 " +
                 "AND identifier IN (SELECT identifier FROM profileSetItem)"
     )
-    fun getMyProfileSetMetasFlow(): Flow<List<ItemSetMeta>>
+    fun getMyProfileSetMetasFlow(ourPubkey: String): Flow<List<ItemSetMeta>>
 
     @Query(
         "SELECT identifier, title " +
                 "FROM topicSet " +
-                "WHERE myPubkey = (SELECT pubkey FROM account) " +
+                "WHERE myPubkey = :ourPubkey " +
                 "AND deleted = 0 " +
                 "AND identifier IN (SELECT identifier FROM topicSetItem)"
     )
-    fun getMyTopicSetMetasFlow(): Flow<List<ItemSetMeta>>
+    fun getMyTopicSetMetasFlow(ourPubkey: String): Flow<List<ItemSetMeta>>
 
     @Query(
         "SELECT identifier, title " +
@@ -86,8 +86,7 @@ interface ItemSetDao {
         "SELECT pubkey " +
                 "FROM profileSetItem " +
                 "WHERE identifier = :identifier " +
-                "AND pubkey NOT IN (SELECT pubkey FROM nip65) " +
-                "AND pubkey NOT IN (SELECT pubkey FROM lock)"
+                "AND pubkey NOT IN (SELECT pubkey FROM nip65) "
     )
     suspend fun getPubkeysWithMissingNip65(identifier: String): List<PubkeyHex>
 }

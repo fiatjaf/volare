@@ -40,6 +40,7 @@ fun SearchView(vm: SearchViewModel, onUpdate: OnUpdate) {
     }
 
     SearchViewContent(
+        ourPubkey = vm.ourPubkey,
         topics = topics,
         profiles = profiles,
         posts = posts,
@@ -49,6 +50,7 @@ fun SearchView(vm: SearchViewModel, onUpdate: OnUpdate) {
 
 @Composable
 private fun SearchViewContent(
+    ourPubkey: String,
     topics: List<Topic>,
     profiles: List<AdvancedProfileView>,
     posts: List<SimplePostView>,
@@ -89,12 +91,11 @@ private fun SearchViewContent(
             items(posts) { post ->
                 ClickableTrustIconRow(
                     trustType = TrustType.from(
-                        isOneself = post.authorIsOneself,
+                        isOneself = post.pubkey == ourPubkey,
                         isFriend = post.authorIsFriend,
                         isWebOfTrust = post.authorIsTrusted,
                         isMuted = post.authorIsMuted,
                         isInList = post.authorIsInList,
-                        isLocked = post.authorIsLocked,
                     ),
                     header = post.subject,
                     content = post.content,

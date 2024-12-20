@@ -13,6 +13,7 @@ import com.fiatjaf.volare.core.SaveProfile
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
 import com.fiatjaf.volare.core.utils.toRelevantMetadata
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.inMemory.MetadataInMemory
 import com.fiatjaf.volare.data.nostr.NostrService
 import com.fiatjaf.volare.data.nostr.getMetadata
@@ -36,6 +37,7 @@ class EditProfileViewModel(
     private val fullProfileDao: FullProfileDao,
     private val metadataInMemory: MetadataInMemory,
     private val profileUpsertDao: ProfileUpsertDao,
+    private val accountManager: AccountManager
 ) : ViewModel() {
     val isSaving = mutableStateOf(false)
     val fullProfile = mutableStateOf<FullProfileEntity?>(null)
@@ -49,7 +51,7 @@ class EditProfileViewModel(
 
     private fun loadProfile() {
         viewModelScope.launchIO {
-            fullProfile.value = fullProfileDao.getFullProfile()
+            fullProfile.value = fullProfileDao.getFullProfile(accountManager.getPublicKeyHex())
         }
     }
 

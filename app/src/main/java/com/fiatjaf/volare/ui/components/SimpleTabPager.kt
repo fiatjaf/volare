@@ -28,7 +28,6 @@ fun SimpleTabPager(
     index: MutableIntState,
     pagerState: PagerState,
     isLoading: Boolean = false,
-    redHeader: String? = null,
     scope: CoroutineScope = rememberCoroutineScope(),
     onScrollUp: (Int) -> Unit,
     pageContent: @Composable PagerScope.(page: Int) -> Unit
@@ -42,7 +41,6 @@ fun SimpleTabPager(
         PagerTabRow(
             headers = headers,
             index = index,
-            redHeader = redHeader,
             onClickTab = { i ->
                 scope.launch { pagerState.animateScrollToPage(i) }
                 if (pagerState.currentPage == i) onScrollUp(i)
@@ -63,7 +61,6 @@ fun SimpleTabPager(
 @Composable
 private fun PagerTabRow(
     headers: List<String>,
-    redHeader: String?,
     index: MutableIntState,
     onClickTab: (Int) -> Unit
 ) {
@@ -76,8 +73,8 @@ private fun PagerTabRow(
                     index.intValue = i
                     onClickTab(i)
                 },
-                selectedContentColor = if (header == redHeader) Color.Red else LocalContentColor.current,
-                unselectedContentColor = if (header == redHeader) Color.Red else LocalContentColor.current,
+                selectedContentColor = LocalContentColor.current,
+                unselectedContentColor = LocalContentColor.current,
                 text = { Text(text = header, maxLines = 1, overflow = TextOverflow.Ellipsis) }
             )
         }

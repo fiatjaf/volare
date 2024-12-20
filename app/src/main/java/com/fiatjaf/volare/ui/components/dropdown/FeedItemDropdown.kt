@@ -24,8 +24,6 @@ import com.fiatjaf.volare.core.model.CrossPost
 import com.fiatjaf.volare.core.model.FriendTrust
 import com.fiatjaf.volare.core.model.IsInListTrust
 import com.fiatjaf.volare.core.model.LegacyReply
-import com.fiatjaf.volare.core.model.Locked
-import com.fiatjaf.volare.core.model.LockedOneself
 import com.fiatjaf.volare.core.model.MainEvent
 import com.fiatjaf.volare.core.model.Muted
 import com.fiatjaf.volare.core.model.NoTrust
@@ -184,7 +182,7 @@ private fun FollowItem(
     onUpdate: OnUpdate
 ) {
     when (mainEvent.trustType) {
-        Oneself, Muted, Locked, LockedOneself -> {}
+        Oneself, Muted -> {}
         FriendTrust -> {
             SimpleDropdownItem(
                 text = stringResource(id = R.string.unfollow),
@@ -215,7 +213,7 @@ private fun FollowCrossPostedItem(
 ) {
     if (mainEvent is CrossPost) {
         when (mainEvent.crossPostedTrustType) {
-            Oneself, Muted, Locked, LockedOneself -> {}
+            Oneself, Muted -> {}
             FriendTrust -> {
                 SimpleDropdownItem(
                     text = stringResource(id = R.string.unfollow_cross_posted_author),

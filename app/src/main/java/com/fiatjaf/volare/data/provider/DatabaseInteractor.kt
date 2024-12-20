@@ -10,6 +10,7 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.room.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,8 @@ class DatabaseInteractor(
     private val room: AppDatabase,
     private val context: Context,
     private val storageHelper: SimpleStorageHelper,
-    private val snackbar: SnackbarHostState
+    private val snackbar: SnackbarHostState,
+    private val accountManager: AccountManager
 ) {
     val scope = CoroutineScope(Dispatchers.IO)
 
@@ -36,7 +38,7 @@ class DatabaseInteractor(
         onFinishExport: Fn,
     ) {
         storageHelper.openFolderPicker()
-        val ids = room.mainEventDao().getBookmarkedAndMyPostIds()
+        val ids = room.mainEventDao().getBookmarkedAndMyPostIds(accountManager.getPublicKeyHex())
         val name = "volare_export.jsonl"
         var somethingWentWrong = false
 

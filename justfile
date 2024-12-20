@@ -7,7 +7,7 @@ gomobile:
     if test "$gofile" -nt app/libs/backend.aar
         echo "binding gomobile..."
         cd backend
-        gomobile bind -androidapi 26 -target=android -o ../app/libs/backend.aar
+        gomobile bind -tags=debug -androidapi 26 -target=android -o ../app/libs/backend.aar
     end
 
 build_release: gomobile

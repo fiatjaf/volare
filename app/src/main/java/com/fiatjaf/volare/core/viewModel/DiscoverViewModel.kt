@@ -9,13 +9,16 @@ import com.fiatjaf.volare.core.DiscoverViewInit
 import com.fiatjaf.volare.core.DiscoverViewRefresh
 import com.fiatjaf.volare.core.model.TopicFollowState
 import com.fiatjaf.volare.core.utils.launchIO
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.provider.ProfileProvider
 import com.fiatjaf.volare.data.provider.TopicProvider
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.joinAll
@@ -26,6 +29,7 @@ class DiscoverViewModel(
     private val topicProvider: TopicProvider,
     private val profileProvider: ProfileProvider,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
+    private val accountManager: AccountManager,
 ) : ViewModel() {
     private val maxCount = 75
     val isRefreshing = mutableStateOf(false)
@@ -78,8 +82,11 @@ class DiscoverViewModel(
             )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun getProfileFlow(): StateFlow<List<AdvancedProfileView>> {
-        return profileProvider.getPopularUnfollowedProfiles(limit = maxCount)
+        return accountManager.pubkeyHexFlow.flatMapLatest { pubkeyHex ->
+            profileProvider.getPopularUnfollowedProfiles(pubkeyHex, limit = maxCount)
+        }
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,

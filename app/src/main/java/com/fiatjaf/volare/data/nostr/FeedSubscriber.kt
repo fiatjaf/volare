@@ -11,7 +11,7 @@ import com.fiatjaf.volare.core.utils.syncedPutOrAdd
 import com.fiatjaf.volare.core.utils.takeRandom
 import com.fiatjaf.volare.core.utils.threadableKinds
 import com.fiatjaf.volare.data.account.AccountManager
-import com.fiatjaf.volare.data.model.FriendPubkeysNoLock
+import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
 import com.fiatjaf.volare.data.model.HomeFeedSetting
 import com.fiatjaf.volare.data.model.InboxFeedSetting
@@ -241,7 +241,7 @@ class FeedSubscriber(
         if (limit <= 0u || since >= until) return emptyMap()
 
         val pubkeys = when (setting.pubkeySelection) {
-            FriendPubkeysNoLock -> friendProvider.getFriendPubkeysNoLock()
+            FriendPubkeys -> friendProvider.getFriendPubkeys()
             Global -> null
             WebOfTrustPubkeys -> null
             NoPubkeys -> return emptyMap()

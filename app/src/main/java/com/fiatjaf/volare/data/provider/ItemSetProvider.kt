@@ -17,9 +17,11 @@ import com.fiatjaf.volare.data.room.entity.helper.TitleAndDescription
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import rust.nostr.sdk.Coordinate
 import rust.nostr.sdk.Kind
@@ -32,7 +34,6 @@ class ItemSetProvider(
     private val muteProvider: MuteProvider,
     private val annotatedStringProvider: AnnotatedStringProvider,
     private val relayProvider: RelayProvider,
-    private val lockProvider: LockProvider,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val allPubkeys = room.itemSetDao().getAllPubkeysFlow()
@@ -66,12 +67,17 @@ class ItemSetProvider(
         topics.value = getTopicsFromList(identifier = identifier)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun getMySetsFlow(): Flow<List<ItemSetMeta>> {
-        return combine(
-            room.itemSetDao().getMyProfileSetMetasFlow().firstThenDistinctDebounce(SHORT_DEBOUNCE),
-            room.itemSetDao().getMyTopicSetMetasFlow().firstThenDistinctDebounce(SHORT_DEBOUNCE)
-        ) { profileSets, topicSets ->
-            profileSets.plus(topicSets).distinctBy { it.identifier }.sortedBy { it.title }
+        return accountManager.pubkeyHexFlow.flatMapLatest { pubkeyHex ->
+            combine(
+                room.itemSetDao().getMyProfileSetMetasFlow(pubkeyHex)
+                    .firstThenDistinctDebounce(SHORT_DEBOUNCE),
+                room.itemSetDao().getMyTopicSetMetasFlow(pubkeyHex)
+                    .firstThenDistinctDebounce(SHORT_DEBOUNCE)
+            ) { profileSets, topicSets ->
+                profileSets.plus(topicSets).distinctBy { it.identifier }.sortedBy { it.title }
+            }
         }
     }
 
@@ -110,7 +116,7 @@ class ItemSetProvider(
     private suspend fun getProfilesFromList(identifier: String): List<AdvancedProfileView> {
         val known = room.profileDao().getAdvancedProfilesOfList(identifier = identifier)
         val unknown = room.profileDao().getUnknownPubkeysFromList(identifier = identifier)
-        val friendPubkeys = friendProvider.getFriendPubkeysNoLock()
+        val friendPubkeys = friendProvider.getFriendPubkeys()
         val mutedPubkeys = room.muteDao().getMyProfileMutes()
 
         return known + unknown.map { unknownPubkey ->
@@ -120,11 +126,9 @@ class ItemSetProvider(
                 forcedFollowState = friendPubkeys.contains(unknownPubkey),
                 forcedMuteState = mutedPubkeys.contains(unknownPubkey),
                 metadata = null,
-                myPubkey = accountManager.getPublicKeyHex(),
                 friendProvider = friendProvider,
                 muteProvider = muteProvider,
                 itemSetProvider = this,
-                lockProvider = lockProvider,
             )
         }
     }

@@ -47,7 +47,6 @@ import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenLightningWallet
 import com.fiatjaf.volare.core.OpenProfile
 import com.fiatjaf.volare.core.OpenRelayProfile
-import com.fiatjaf.volare.core.ProfileViewRebroadcastLock
 import com.fiatjaf.volare.core.ProfileViewRefresh
 import com.fiatjaf.volare.core.ProfileViewReplyAppend
 import com.fiatjaf.volare.core.ProfileViewRootAppend
@@ -82,6 +81,7 @@ import kotlinx.coroutines.launch
 fun ProfileView(vm: ProfileViewModel, snackbar: SnackbarHostState, onUpdate: OnUpdate) {
     val profile by vm.profile.value.collectAsState()
     val nip65Relays by vm.nip65Relays.value.collectAsState()
+    val ourPubKey by vm.ourPubKey.collectAsState()
     val headers = listOf(
         stringResource(id = R.string.posts),
         stringResource(id = R.string.replies),
@@ -91,6 +91,7 @@ fun ProfileView(vm: ProfileViewModel, snackbar: SnackbarHostState, onUpdate: OnU
     val scope = rememberCoroutineScope()
 
     ProfileScaffold(
+        ourPubKey = ourPubKey,
         profile = profile,
         addableLists = vm.addableLists.value,
         nonAddableLists = vm.nonAddableLists.value,
@@ -99,7 +100,6 @@ fun ProfileView(vm: ProfileViewModel, snackbar: SnackbarHostState, onUpdate: OnU
     ) {
         SimpleTabPager(
             headers = headers,
-            redHeader = if (profile.inner.isLocked) stringResource(id = R.string.about) else null,
             index = vm.tabIndex,
             pagerState = vm.pagerState,
             onScrollUp = {
@@ -145,13 +145,12 @@ fun ProfileView(vm: ProfileViewModel, snackbar: SnackbarHostState, onUpdate: OnU
                         ).toBech32()
                     },
                     lightning = profile.lightning,
-                    trustedBy = if (profile.inner.showTrustedBy()) {
+                    trustedBy = if (profile.inner.showTrustedBy(ourPubKey)) {
                         vm.trustedBy.value.collectAsState().value
                     } else {
                         null
                     },
                     about = profile.about,
-                    isLocked = profile.inner.isLocked,
                     isRefreshing = vm.rootPaginator.isRefreshing.value,
                     state = vm.profileAboutState,
                     scope = scope,
@@ -194,7 +193,6 @@ private fun AboutPage(
     lightning: String?,
     trustedBy: AdvancedProfileView?,
     about: AnnotatedString?,
-    isLocked: Boolean,
     isRefreshing: Boolean,
     state: LazyListState,
     scope: CoroutineScope,
@@ -203,9 +201,6 @@ private fun AboutPage(
 ) {
     ProfileViewPage(isRefreshing = isRefreshing, onUpdate = onUpdate) {
         LazyColumn(modifier = modifier, state = state) {
-            if (isLocked) item {
-                LockHint(scope = scope, onUpdate = onUpdate)
-            }
             item {
                 AboutPageTextRow(
                     modifier = Modifier
@@ -274,40 +269,6 @@ private fun AboutPage(
                     header = stringResource(id = R.string.about),
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun LockHint(scope: CoroutineScope, onUpdate: OnUpdate) {
-    Column(
-        modifier = Modifier
-            .padding(top = spacing.large)
-            .background(
-                color = MaterialTheme.colorScheme.errorContainer,
-                shape = CardDefaults.outlinedShape
-            )
-            .border(
-                width = spacing.small,
-                color = MaterialTheme.colorScheme.error,
-                shape = CardDefaults.outlinedShape
-            )
-            .padding(horizontal = spacing.screenEdge)
-            .padding(top = spacing.screenEdge)
-            .padding(bottom = spacing.small)
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            textAlign = TextAlign.Center,
-            text = stringResource(id = R.string.this_user_is_locked_and_should_not_be_trusted)
-        )
-        TextButton(onClick = { onUpdate(ProfileViewRebroadcastLock(uiScope = scope)) }) {
-            Text(
-                text = stringResource(id = R.string.rebroadcast_lock_event),
-                color = MaterialTheme.colorScheme.onErrorContainer
-            )
         }
     }
 }

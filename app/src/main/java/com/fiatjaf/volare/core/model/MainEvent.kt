@@ -116,20 +116,21 @@ data class RootPost(
     companion object {
         fun from(
             rootPostView: RootPostView,
+            ourPubKey: String,
             annotatedStringProvider: AnnotatedStringProvider
         ): RootPost {
             return RootPost(
                 id = rootPostView.id,
                 pubkey = rootPostView.pubkey,
                 authorName = rootPostView.authorName,
-                trustType = TrustType.from(rootPostView = rootPostView),
+                trustType = TrustType.from(rootPostView = rootPostView, ourPubKey = ourPubKey),
                 myTopic = rootPostView.myTopic,
                 createdAt = rootPostView.createdAt,
                 subject = annotatedStringProvider.annotate(rootPostView.subject),
                 content = annotatedStringProvider.annotateWithMedia(rootPostView.content, rootPostView.blurhashes),
                 upvoteCount = rootPostView.upvoteCount,
                 relayUrl = rootPostView.relayUrl,
-                isUpvoted = rootPostView.isUpvoted,
+                isUpvoted = false, // TODO this should fetch from votes
                 isBookmarked = rootPostView.isBookmarked,
                 legacyReplyCount = rootPostView.legacyReplyCount,
                 commentCount = rootPostView.commentCount,
@@ -172,19 +173,20 @@ data class Poll(
         fun from(
             pollView: PollView,
             pollOptions: List<PollOptionView>,
+            ourPubKey: String,
             annotatedStringProvider: AnnotatedStringProvider
         ): Poll {
             return Poll(
                 id = pollView.id,
                 pubkey = pollView.pubkey,
                 authorName = pollView.authorName,
-                trustType = TrustType.from(pollView = pollView),
+                trustType = TrustType.from(pollView = pollView, ourPubKey = ourPubKey),
                 myTopic = pollView.myTopic,
                 createdAt = pollView.createdAt,
                 content = annotatedStringProvider.annotateWithMedia(pollView.content, pollView.blurhashes),
                 upvoteCount = pollView.upvoteCount,
                 relayUrl = pollView.relayUrl,
-                isUpvoted = pollView.isUpvoted,
+                isUpvoted = false, // TODO same here
                 isBookmarked = pollView.isBookmarked,
                 commentCount = pollView.commentCount,
                 options = pollOptions,
@@ -252,6 +254,7 @@ data class LegacyReply(
     companion object {
         fun from(
             legacyReplyView: LegacyReplyView,
+            ourPubKey: String,
             annotatedStringProvider: AnnotatedStringProvider
         ): LegacyReply {
             return LegacyReply(
@@ -259,10 +262,10 @@ data class LegacyReply(
                 parentId = legacyReplyView.parentId,
                 pubkey = legacyReplyView.pubkey,
                 authorName = legacyReplyView.authorName,
-                trustType = TrustType.from(legacyReplyView = legacyReplyView),
+                trustType = TrustType.from(legacyReplyView = legacyReplyView, ourPubKey = ourPubKey),
                 createdAt = legacyReplyView.createdAt,
                 content = annotatedStringProvider.annotateWithMedia(legacyReplyView.content, legacyReplyView.blurhashes),
-                isUpvoted = legacyReplyView.isUpvoted,
+                isUpvoted = false, // TODO same
                 upvoteCount = legacyReplyView.upvoteCount,
                 relayUrl = legacyReplyView.relayUrl,
                 isBookmarked = legacyReplyView.isBookmarked,
@@ -308,6 +311,7 @@ data class Comment(
     companion object {
         fun from(
             commentView: CommentView,
+            ourPubKey: String,
             annotatedStringProvider: AnnotatedStringProvider
         ): Comment {
             return Comment(
@@ -316,10 +320,10 @@ data class Comment(
                 parentKind = commentView.parentKind,
                 pubkey = commentView.pubkey,
                 authorName = commentView.authorName,
-                trustType = TrustType.from(commentView = commentView),
+                trustType = TrustType.from(commentView = commentView, ourPubKey = ourPubKey),
                 createdAt = commentView.createdAt,
                 content = annotatedStringProvider.annotateWithMedia(commentView.content, commentView.blurhashes),
-                isUpvoted = commentView.isUpvoted,
+                isUpvoted = false, // TODO: idem
                 upvoteCount = commentView.upvoteCount,
                 replyCount = commentView.replyCount,
                 relayUrl = commentView.relayUrl,
@@ -365,18 +369,19 @@ data class CrossPost(
     companion object {
         fun from(
             crossPostView: CrossPostView,
+            ourPubKey: String,
             annotatedStringProvider: AnnotatedStringProvider
         ): CrossPost {
             return CrossPost(
                 id = crossPostView.id,
                 pubkey = crossPostView.pubkey,
                 authorName = crossPostView.authorName,
-                trustType = TrustType.fromCrossPostAuthor(crossPostView = crossPostView),
+                trustType = TrustType.fromCrossPostAuthor(crossPostView = crossPostView, ourPubKey = ourPubKey),
                 myTopic = crossPostView.myTopic,
                 createdAt = crossPostView.createdAt,
                 crossPostedSubject = annotatedStringProvider.annotate(crossPostView.crossPostedSubject.orEmpty()),
                 crossPostedContent = annotatedStringProvider.annotateWithMedia(crossPostView.crossPostedContent, crossPostView.blurhashes),
-                crossPostedIsUpvoted = crossPostView.crossPostedIsUpvoted,
+                crossPostedIsUpvoted = false, // TODO: idem
                 crossPostedUpvoteCount = crossPostView.crossPostedUpvoteCount,
                 crossPostedLegacyReplyCount = crossPostView.crossPostedLegacyReplyCount,
                 crossPostedCommentCount = crossPostView.crossPostedCommentCount,
@@ -384,7 +389,7 @@ data class CrossPost(
                 crossPostedId = crossPostView.crossPostedId,
                 crossPostedPubkey = crossPostView.crossPostedPubkey,
                 crossPostedAuthorName = crossPostView.crossPostedAuthorName,
-                crossPostedTrustType = TrustType.fromCrossPostedAuthor(crossPostView = crossPostView),
+                crossPostedTrustType = TrustType.fromCrossPostedAuthor(crossPostView = crossPostView, ourPubKey = ourPubKey),
                 crossPostedIsBookmarked = crossPostView.crossPostedIsBookmarked,
             )
         }

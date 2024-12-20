@@ -4,12 +4,14 @@ import android.util.Log
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.data.preferences.DatabasePreferences
 import com.fiatjaf.volare.data.room.dao.util.DeleteDao
+import com.fiatjaf.volare.data.account.AccountManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 private const val TAG = "EventSweeper"
 
 class EventSweeper(
+    private val accountManager: AccountManager,
     private val databasePreferences: DatabasePreferences,
     private val idCacheClearer: IdCacheClearer,
     private val deleteDao: DeleteDao,
@@ -22,6 +24,7 @@ class EventSweeper(
 
         scope.launchIO {
             deleteDao.sweepDb(
+                ourPubkey = accountManager.getPublicKeyHex(),
                 threshold = databasePreferences.getSweepThreshold(),
                 oldestCreatedAtInUse = oldestUsedEvent.getOldestCreatedAt()
             )

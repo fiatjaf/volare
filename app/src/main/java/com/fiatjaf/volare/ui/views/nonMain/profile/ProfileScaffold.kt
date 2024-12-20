@@ -10,6 +10,7 @@ import com.fiatjaf.volare.ui.components.scaffold.VolareScaffold
 
 @Composable
 fun ProfileScaffold(
+    ourPubKey: String,
     profile: FullProfileUI,
     addableLists: List<ItemSetMeta>,
     nonAddableLists: List<ItemSetMeta>,
@@ -21,6 +22,7 @@ fun ProfileScaffold(
         snackbar = snackbar,
         topBar = {
             ProfileTopAppBar(
+                ourPubKey = ourPubKey,
                 profile = profile,
                 addableLists = addableLists,
                 nonAddableLists = nonAddableLists,

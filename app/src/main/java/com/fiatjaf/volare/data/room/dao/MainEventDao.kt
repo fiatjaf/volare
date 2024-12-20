@@ -46,12 +46,12 @@ interface MainEventDao {
     @Query(
         "SELECT id " +
                 "FROM mainEvent " +
-                "WHERE (pubkey IN (SELECT pubkey FROM account) " +
+                "WHERE (pubkey = :ourPubKey " +
                 "OR id IN (SELECT eventId FROM bookmark)) " +
                 "AND json IS NOT NULL " +
                 "ORDER BY createdAt ASC"
     )
-    suspend fun getBookmarkedAndMyPostIds(): List<EventIdHex>
+    suspend fun getBookmarkedAndMyPostIds(ourPubKey: String): List<EventIdHex>
 
     @Transaction
     suspend fun reindexMentions(newPubkey: PublicKey) {

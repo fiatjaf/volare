@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface Nip65Dao {
-    @Query("SELECT * FROM nip65 WHERE pubkey = (SELECT pubkey FROM account LIMIT 1)")
-    fun getMyNip65Flow(): Flow<List<Nip65Entity>>
+    @Query("SELECT * FROM nip65 WHERE pubkey = :pubkey")
+    fun getNip65EntityFlow(pubkey: PubkeyHex): Flow<List<Nip65Entity>>
 
     @Query(
         "SELECT url, isRead, isWrite " +
@@ -31,16 +31,14 @@ interface Nip65Dao {
                 "FROM nip65 " +
                 "WHERE pubkey " +
                 "IN (SELECT pubkey FROM profilesetitem WHERE identifier = :identifier) " +
-                "AND isWrite = 1 " +
-                "AND pubkey NOT IN (SELECT pubkey FROM lock)"
+                "AND isWrite = 1"
     )
     suspend fun getWriteRelaysFromList(identifier: String): List<Nip65Entity>
 
     @Query(
         "SELECT DISTINCT * FROM nip65 " +
                 "WHERE pubkey IN (SELECT friendPubkey FROM friend) " +
-                "AND isWrite = 1 " +
-                "AND pubkey NOT IN (SELECT pubkey FROM lock)"
+                "AND isWrite = 1"
     )
     suspend fun getFriendsWriteRelays(): List<Nip65Entity>
 

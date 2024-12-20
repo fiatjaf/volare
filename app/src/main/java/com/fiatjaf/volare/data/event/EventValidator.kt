@@ -48,7 +48,6 @@ private val INTERESTS_U16 = Kind.fromEnum(KindEnum.Interests).asU16()
 private val BOOKMARKS_U16 = Kind.fromEnum(KindEnum.Bookmarks).asU16()
 private val MUTE_LIST_U16 = Kind.fromEnum(KindEnum.MuteList).asU16()
 val COMMENT_U16: UShort = Kind.fromEnum(KindEnum.Comment).asU16()
-val LOCK_U16: UShort = 398u
 val POLL_U16: UShort = 1068u
 val POLL_RESPONSE_U16: UShort = 1018u
 
@@ -239,12 +238,6 @@ class EventValidator(
                     words = event.getNormalizedMuteWords(limit = MAX_KEYS_SQL).toSet(),
                     createdAt = event.createdAt().secs()
                 )
-            }
-
-            LOCK_U16 -> {
-                if (!event.tags().isEmpty() || event.content().isNotEmpty()) return null
-
-                ValidatedLock(pubkey = event.author().toHex(), json = event.asJson())
             }
 
             else -> {

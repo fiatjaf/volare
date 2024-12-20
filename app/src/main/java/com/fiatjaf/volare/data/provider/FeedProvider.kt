@@ -1,6 +1,7 @@
 package com.fiatjaf.volare.data.provider
 
 import androidx.compose.runtime.State
+import androidx.lifecycle.flowWithLifecycle
 import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.SHORT_DEBOUNCE
@@ -12,6 +13,7 @@ import com.fiatjaf.volare.core.utils.containsAnyIgnoreCase
 import com.fiatjaf.volare.core.utils.firstThenDistinctDebounce
 import com.fiatjaf.volare.core.utils.mergeToMainEventUIList
 import com.fiatjaf.volare.core.utils.mergeToSomeReplyUIList
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.event.OldestUsedEvent
 import com.fiatjaf.volare.data.model.BookmarksFeedSetting
 import com.fiatjaf.volare.data.model.FeedSetting
@@ -42,10 +44,12 @@ class FeedProvider(
     private val forcedFollows: Flow<Map<PubkeyHex, Boolean>>,
     private val forcedBookmarks: Flow<Map<EventIdHex, Boolean>>,
     private val muteProvider: MuteProvider,
+    private val accountManager: AccountManager,
 ) {
     private val staticFeedProvider = StaticFeedProvider(
         room = room,
-        annotatedStringProvider = annotatedStringProvider
+        annotatedStringProvider = annotatedStringProvider,
+        ourPubKeyFlow = accountManager.pubkeyHexFlow,
     )
 
     suspend fun getStaticFeed(
@@ -163,6 +167,7 @@ class FeedProvider(
                 comments = emptyList(),
                 forcedData = forced,
                 size = size,
+                ourPubKey = accountManager.getPublicKeyHex(),
                 annotatedStringProvider = annotatedStringProvider
             )
         }
@@ -319,6 +324,7 @@ class FeedProvider(
                 follows = follows,
                 bookmarks = bookmarks,
                 size = size,
+                ourPubKey = accountManager.getPublicKeyHex(),
                 annotatedStringProvider = annotatedStringProvider
             )
         }
@@ -358,6 +364,7 @@ class FeedProvider(
                 comments = comments,
                 forcedData = forced,
                 size = size,
+                ourPubKey = accountManager.getPublicKeyHex(),
                 annotatedStringProvider = annotatedStringProvider
             )
         }
@@ -391,6 +398,7 @@ class FeedProvider(
                 comments = comments,
                 forcedData = forced,
                 size = size,
+                ourPubKey = accountManager.getPublicKeyHex(),
                 annotatedStringProvider = annotatedStringProvider
             )
         }

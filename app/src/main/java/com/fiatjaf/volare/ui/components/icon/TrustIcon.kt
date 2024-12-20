@@ -17,8 +17,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.Dp
 import com.fiatjaf.volare.core.model.FriendTrust
 import com.fiatjaf.volare.core.model.IsInListTrust
-import com.fiatjaf.volare.core.model.Locked
-import com.fiatjaf.volare.core.model.LockedOneself
 import com.fiatjaf.volare.core.model.Muted
 import com.fiatjaf.volare.core.model.NoTrust
 import com.fiatjaf.volare.core.model.Oneself
@@ -35,18 +33,10 @@ private const val X_RATIO = 0.45f
 fun TrustIcon(trustType: TrustType, size: Dp = sizing.trustIndicator) {
     val color = getTrustColor(trustType = trustType)
     when (trustType) {
-        FriendTrust,
-        WebTrust,
-        NoTrust,
-        Muted,
-        -> TrustBox(size = size, color = color)
-
+        FriendTrust, WebTrust, NoTrust, Muted -> TrustBox(size = size, color = color)
         IsInListTrust -> ListTrustBox(size = size, color = color)
-
-        Locked -> MuteTriangle(size = size, color = color)
-
-        LockedOneself, Oneself -> {
-            /* Nothing for oneself */
+        Oneself -> {
+            /* nothing for oneself */
         }
     }
 }
@@ -56,12 +46,11 @@ fun TrustIcon(trustType: TrustType, size: Dp = sizing.trustIndicator) {
 fun TrustIcon(profile: AdvancedProfileView) {
     TrustIcon(
         trustType = TrustType.from(
-            isOneself = profile.isMe,
+            isOneself = false, // TODO: get this to work again
             isFriend = profile.isFriend,
             isWebOfTrust = profile.isWebOfTrust,
             isMuted = profile.isMuted,
             isInList = profile.isInList,
-            isLocked = profile.isLocked,
         )
     )
 }

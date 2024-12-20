@@ -12,6 +12,7 @@ import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.VoteEvent
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.event.EventDeletor
 import com.fiatjaf.volare.data.event.EventRebroadcaster
 import com.fiatjaf.volare.data.nostr.NostrService
@@ -42,7 +43,7 @@ class PostVoter(
     private val context: Context,
     private val voteDao: VoteDao,
     private val eventDeletor: EventDeletor,
-    private val rebroadcaster: EventRebroadcaster,
+    private val accountManager: AccountManager,
     private val eventPreferences: EventPreferences,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -81,7 +82,7 @@ class PostVoter(
         jobs[postId]?.cancel(null) // CancellationException doesn't compile
         jobs[postId] = scope.launch {
             delay(DEBOUNCE)
-            val currentVote = voteDao.getMyVote(postId = postId)
+            val currentVote = voteDao.getVote(accountManager.getPublicKeyHex(), postId = postId)
             if (isUpvote) {
                 upvote(
                     currentVote = currentVote,

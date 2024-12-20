@@ -18,7 +18,7 @@ import com.fiatjaf.volare.core.HomeViewRefresh
 import com.fiatjaf.volare.core.HomeViewSubAccountAndTrustData
 import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.viewModel.HomeViewModel
-import com.fiatjaf.volare.data.model.FriendPubkeysNoLock
+import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
 import com.fiatjaf.volare.data.model.HomeFeedSetting
 import com.fiatjaf.volare.data.model.MyTopics
@@ -86,8 +86,8 @@ private fun Filter(setting: MutableState<HomeFeedSetting>) {
             onClick = { setting.value = setting.value.copy(pubkeySelection = NoPubkeys) })
         FeedPubkeySelectionRadio(
             current = setting.value.pubkeySelection,
-            target = FriendPubkeysNoLock,
-            onClick = { setting.value = setting.value.copy(pubkeySelection = FriendPubkeysNoLock) })
+            target = FriendPubkeys,
+            onClick = { setting.value = setting.value.copy(pubkeySelection = FriendPubkeys) })
         FeedPubkeySelectionRadio(
             current = setting.value.pubkeySelection,
             target = WebOfTrustPubkeys,

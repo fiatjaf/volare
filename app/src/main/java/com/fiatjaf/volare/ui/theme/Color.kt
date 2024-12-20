@@ -7,8 +7,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import com.fiatjaf.volare.core.model.FriendTrust
 import com.fiatjaf.volare.core.model.IsInListTrust
-import com.fiatjaf.volare.core.model.Locked
-import com.fiatjaf.volare.core.model.LockedOneself
 import com.fiatjaf.volare.core.model.Muted
 import com.fiatjaf.volare.core.model.NoTrust
 import com.fiatjaf.volare.core.model.Oneself
@@ -22,7 +20,6 @@ val DenimBlue = Color(0xFF1565c0)
 val WotColor = Color(0xFFF8D97B)
 val FriendColor = Color(0xFFE8E8E8)
 val MutedColor = Color(0xFFFA6D6D)
-val LockedColor = Color.Red
 
 val HyperlinkBlue = Color(0xFF007AFF)
 
@@ -104,7 +101,6 @@ fun getTrustColor(trustType: TrustType): Color {
         FriendTrust, IsInListTrust -> FriendColor
         WebTrust -> WotColor
         Muted -> MutedColor
-        Locked, LockedOneself -> LockedColor
         NoTrust -> MaterialTheme.colorScheme.onBackground.light(0.2f)
     }
 }

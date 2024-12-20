@@ -18,10 +18,8 @@ import com.fiatjaf.volare.core.DELAY_1SEC
 import com.fiatjaf.volare.core.DeleteAllPosts
 import com.fiatjaf.volare.core.ExportDatabase
 import com.fiatjaf.volare.core.LoadSecretKeyForDisplay
-import com.fiatjaf.volare.core.LockAccount
 import com.fiatjaf.volare.core.ProcessExternalAccount
 import com.fiatjaf.volare.core.REBROADCAST_DELAY
-import com.fiatjaf.volare.core.RebroadcastMyLockEvent
 import com.fiatjaf.volare.core.RequestExternalAccount
 import com.fiatjaf.volare.core.SendAuth
 import com.fiatjaf.volare.core.SettingsViewAction
@@ -32,7 +30,6 @@ import com.fiatjaf.volare.core.UseBunkerAccount
 import com.fiatjaf.volare.core.UseV2Replies
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
-import com.fiatjaf.volare.data.account.AccountLocker
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.account.AccountSwitcher
 import com.fiatjaf.volare.data.account.AccountType
@@ -60,7 +57,6 @@ class SettingsViewModel(
     private val eventPreferences: EventPreferences,
     private val databaseInteractor: DatabaseInteractor,
     private val externalSignerHandler: ExternalSignerHandler,
-    private val accountLocker: AccountLocker,
 ) : ViewModel() {
     val rootPostThreshold = mutableIntStateOf(databasePreferences.getSweepThreshold())
     val currentRootPostCount = databaseInteractor.getRootPostCountFlow()
@@ -74,9 +70,6 @@ class SettingsViewModel(
     val currentUpvote = mutableStateOf(eventPreferences.getUpvoteContent())
     val isAddingClientTag = mutableStateOf(eventPreferences.isAddingClientTag())
     val useV2Replies = mutableStateOf(eventPreferences.isUsingV2Replies())
-    val isLocking = mutableStateOf(false)
-    val isLocked = accountLocker.isLocked
-    val isLockedForced = mutableStateOf(false)
     val isLoadingAccount = mutableStateOf(false)
 
     fun accountType(): AccountType = accountManager.accountType
@@ -131,10 +124,6 @@ class SettingsViewModel(
             is ExportDatabase -> exportDatabase(uiScope = action.uiScope)
 
             is DeleteAllPosts -> deleteAllPosts(uiScope = action.uiScope)
-
-            is LockAccount -> lockAccount(uiScope = action.uiScope)
-
-            is RebroadcastMyLockEvent -> rebroadcastMyLock(uiScope = action.uiScope)
         }
     }
 
@@ -247,30 +236,6 @@ class SettingsViewModel(
             databaseInteractor.deleteAllPosts(uiScope = uiScope)
         }.invokeOnCompletion {
             isDeleting.value = false
-        }
-    }
-
-    private fun lockAccount(uiScope: CoroutineScope) {
-        if (isLocking.value) return
-        isLocking.value = true
-
-        viewModelScope.launchIO {
-            isLockedForced.value = accountLocker.lockMyAccount(uiScope = uiScope)
-            delay(DELAY_1SEC)
-        }.invokeOnCompletion {
-            isLocking.value = false
-        }
-    }
-
-    private val isRebroadcasting = AtomicBoolean(false)
-    private fun rebroadcastMyLock(uiScope: CoroutineScope) {
-        if (!isRebroadcasting.compareAndSet(false, true)) return
-
-        viewModelScope.launchIO {
-            accountLocker.rebroadcastMyLock(uiScope = uiScope)
-            delay(REBROADCAST_DELAY)
-        }.invokeOnCompletion {
-            isRebroadcasting.set(false)
         }
     }
 }

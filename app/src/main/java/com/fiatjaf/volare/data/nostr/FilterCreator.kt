@@ -6,9 +6,7 @@ import com.fiatjaf.volare.core.utils.limitRestricted
 import com.fiatjaf.volare.core.utils.replyKinds
 import com.fiatjaf.volare.core.utils.threadableKinds
 import com.fiatjaf.volare.data.account.AccountManager
-import com.fiatjaf.volare.data.event.LOCK_U16
 import com.fiatjaf.volare.data.event.POLL_RESPONSE_U16
-import com.fiatjaf.volare.data.provider.LockProvider
 import com.fiatjaf.volare.data.provider.RelayProvider
 import com.fiatjaf.volare.data.room.AppDatabase
 import com.fiatjaf.volare.data.room.entity.main.poll.PollEntity
@@ -22,7 +20,6 @@ import rust.nostr.sdk.Timestamp
 class FilterCreator(
     private val room: AppDatabase,
     private val accountManager: AccountManager,
-    private val lockProvider: LockProvider,
     private val relayProvider: RelayProvider,
 ) {
     companion object {
@@ -76,22 +73,6 @@ class FilterCreator(
             .authors(authors = pubkeys)
             .since(timestamp = since)
             .until(timestamp = until)
-            .limitRestricted(limit = pubkeys.size.toULong())
-    }
-
-    fun getLazyLockFilter(pubkey: PublicKey): Filter? {
-        if (lockProvider.isLocked(pubkey = pubkey.toHex())) return null
-
-        return getLockFilter(pubkeys = listOf(pubkey))
-    }
-
-    fun getLockFilter(pubkeys: List<PublicKey>): Filter? {
-        if (pubkeys.isEmpty()) return null
-
-        return Filter()
-            .kind(kind = Kind(LOCK_U16))
-            .authors(authors = pubkeys)
-            .until(timestamp = Timestamp.now())
             .limitRestricted(limit = pubkeys.size.toULong())
     }
 

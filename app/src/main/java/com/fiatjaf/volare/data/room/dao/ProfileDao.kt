@@ -19,14 +19,13 @@ interface ProfileDao {
     )
     fun getAdvancedProfileTrustedByFlow(pubkey: PubkeyHex): Flow<AdvancedProfileView?>
 
-    // From account table in case we switch the account during a session
     @Query(
-        "SELECT account.pubkey, IFNULL(profile.name, '') name, IFNULL(profile.createdAt, 0) createdAt " +
-                "FROM account " +
-                "LEFT JOIN profile ON account.pubkey = profile.pubkey " +
+        "SELECT pubkey, IFNULL(name, '') name, IFNULL(createdAt, 0) createdAt " +
+                "FROM profile " +
+                "WHERE pubkey = :ourPubkey " +
                 "LIMIT 1"
     )
-    fun getPersonalProfileFlow(): Flow<ProfileEntity?>
+    fun getPersonalProfile(ourPubkey: String): ProfileEntity
 
     @Query("SELECT * FROM AdvancedProfileView WHERE pubkey IN (:pubkeys)")
     fun getAdvancedProfilesFlow(pubkeys: Collection<PubkeyHex>): Flow<List<AdvancedProfileView>>
@@ -68,16 +67,15 @@ interface ProfileDao {
         "SELECT DISTINCT pubkey AS pk " +
                 "FROM mainEvent " +
                 "WHERE pk NOT IN (SELECT friendPubkey FROM friend) " +
-                "AND pk NOT IN (SELECT pubkey FROM account) " +
+                "AND pk != :ourPubkey " +
                 "AND pk IN (SELECT webOfTrustPubkey FROM weboftrust) " +
                 "AND pk NOT IN (SELECT mutedItem FROM mute WHERE tag = 'p') " +
                 "AND pk NOT IN (SELECT pubkey FROM profileSetItem) " +
-                "AND pk NOT IN (SELECT pubkey FROM lock) " +
                 "GROUP BY pk " +
                 "ORDER BY COUNT(pk) DESC " +
                 "LIMIT :limit"
     )
-    suspend fun getPopularUnfollowedPubkeys(limit: Int): List<PubkeyHex>
+    suspend fun getPopularUnfollowedPubkeys(ourPubkey: String, limit: Int): List<PubkeyHex>
 
     @Query(
         "SELECT DISTINCT pubkey " +

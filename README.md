@@ -4,7 +4,6 @@ Volare is a lightweight nostr client for Android.
 
 ### Where is the issue section?
 
-The issue section on this GitHub repository is disabled.
 Issues can be submitted within the Volare app (Settings -> Give us feedback) or with any other nip34
 compliant nostr client like
 [gitworkshop.dev](https://gitworkshop.dev/r/naddr1qqr8vmmev9nk2qgdwaehxw309ahx7uewd3hkcq3quseke4f9maul5nf67dj0m9sq6jcsmnjzzk4ycvldwl4qss35fvgqxpqqqpmejktjr8t/issues).
@@ -28,7 +27,6 @@ I don't plan to publish this app in the Google Play Store.
   relay connections to a minimum, fetch events only from their respective outbox and not refetch
   locally cached events.
 - Trust indicator: Each profile has a colored badge which indicates their trust level.
-  - Red triangle: This profile is locked.
   - Red rectangle: This profile is in your mute list.
   - Green rectangle: You follow this profile (friend).
   - 3 stacked green rectangles: This profile is in one of your lists but not your friend.
@@ -56,7 +54,6 @@ I don't plan to publish this app in the Google Play Store.
 - [NIP-55: Android Signer Application](https://github.com/nostr-protocol/nips/blob/master/55.md)
 - [NIP-65: Relay List Metadata](https://github.com/nostr-protocol/nips/blob/master/65.md)
 - [Pull request: NIP-88: Polls](https://github.com/nostr-protocol/nips/pull/1507)
-- [Pull request: Lock users](https://github.com/nostr-protocol/nips/pull/1411)
 
 ## Screenshots
 

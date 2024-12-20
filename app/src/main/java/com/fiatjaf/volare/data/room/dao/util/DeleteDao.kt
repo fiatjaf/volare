@@ -26,12 +26,12 @@ interface DeleteDao {
     }
 
     // No tx bc we don't care if it's atomic
-    suspend fun sweepDb(threshold: Int, oldestCreatedAtInUse: Long) {
+    suspend fun sweepDb(ourPubkey: String, threshold: Int, oldestCreatedAtInUse: Long) {
         val createdAtWithOffset = internalOldestCreatedAt(threshold = threshold) ?: return
         val oldestCreatedAt = minOf(createdAtWithOffset, oldestCreatedAtInUse)
 
         // Delete cross posts first, bc they reference roots and replies
-        internalDeleteOldestMainEvents(oldestCreatedAt = oldestCreatedAt)
+        internalDeleteOldestMainEvents(ourPubkey, oldestCreatedAt = oldestCreatedAt)
     }
 
     @Query(
@@ -46,13 +46,13 @@ interface DeleteDao {
 
     @Query(
         """
-            DELETE FROM mainEvent 
-            WHERE createdAt < :oldestCreatedAt 
-            AND pubkey NOT IN (SELECT pubkey FROM account) 
+            DELETE FROM mainEvent
+            WHERE createdAt < :oldestCreatedAt
+            AND pubkey != :ourPubkey
             AND id NOT IN (SELECT eventId FROM bookmark)
         """
     )
-    suspend fun internalDeleteOldestMainEvents(oldestCreatedAt: Long)
+    suspend fun internalDeleteOldestMainEvents(ourPubkey: String, oldestCreatedAt: Long)
 
     @Query("DELETE FROM profileSetItem WHERE identifier = :identifier")
     suspend fun internalEmptyProfileList(identifier: String)

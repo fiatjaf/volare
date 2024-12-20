@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.data.model.FeedPubkeySelection
-import com.fiatjaf.volare.data.model.FriendPubkeysNoLock
+import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
 import com.fiatjaf.volare.data.model.NoPubkeys
 import com.fiatjaf.volare.data.model.WebOfTrustPubkeys
@@ -20,7 +20,7 @@ fun FeedPubkeySelectionRadio(
         isSelected = current == target,
         name = when (target) {
             NoPubkeys -> stringResource(id = R.string.none)
-            FriendPubkeysNoLock -> stringResource(id = R.string.my_friends)
+            FriendPubkeys -> stringResource(id = R.string.my_friends)
             WebOfTrustPubkeys -> stringResource(id = R.string.web_of_trust)
             Global -> stringResource(id = R.string.global)
         },

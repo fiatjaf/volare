@@ -4,6 +4,7 @@ import com.fiatjaf.volare.core.model.MainEvent
 import com.fiatjaf.volare.core.model.SomeReply
 import com.fiatjaf.volare.core.utils.mergeToMainEventUIList
 import com.fiatjaf.volare.core.utils.mergeToSomeReplyUIList
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.model.BookmarksFeedSetting
 import com.fiatjaf.volare.data.model.FeedSetting
 import com.fiatjaf.volare.data.model.HomeFeedSetting
@@ -17,10 +18,12 @@ import com.fiatjaf.volare.data.room.AppDatabase
 import com.fiatjaf.volare.data.room.view.CrossPostView
 import com.fiatjaf.volare.data.room.view.PollView
 import com.fiatjaf.volare.data.room.view.RootPostView
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class StaticFeedProvider(
     private val room: AppDatabase,
-    private val annotatedStringProvider: AnnotatedStringProvider
+    private val annotatedStringProvider: AnnotatedStringProvider,
+    private val ourPubKeyFlow: MutableStateFlow<String>,
 ) {
     suspend fun getStaticFeed(
         until: Long,
@@ -54,6 +57,7 @@ class StaticFeedProvider(
             follows = emptyMap(),
             bookmarks = emptyMap(),
             size = size,
+            ourPubKey = ourPubKeyFlow.value,
             annotatedStringProvider = annotatedStringProvider
         )
     }
@@ -174,6 +178,7 @@ class StaticFeedProvider(
             follows = emptyMap(),
             bookmarks = emptyMap(),
             size = size,
+            ourPubKey = ourPubKeyFlow.value,
             annotatedStringProvider = annotatedStringProvider
         )
     }
@@ -210,6 +215,7 @@ class StaticFeedProvider(
             follows = emptyMap(),
             bookmarks = emptyMap(),
             size = size,
+            ourPubKey = ourPubKeyFlow.value,
             annotatedStringProvider = annotatedStringProvider
         )
     }
@@ -226,6 +232,7 @@ class StaticFeedProvider(
             follows = emptyMap(),
             bookmarks = emptyMap(),
             size = size,
+            ourPubKey = ourPubKeyFlow.value,
             annotatedStringProvider = annotatedStringProvider
         )
     }

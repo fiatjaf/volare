@@ -19,85 +19,77 @@ private const val POLL_OPTION = "FROM PollOptionView "
 
 private const val ORDER_AND_LIMIT = "ORDER BY createdAt DESC LIMIT :size"
 
-private const val TOPIC_ROOT_COND = "AND authorIsMuted = 0 " +
-        "AND authorIsLocked = 0 " +
+private const val TOPIC_ROOT_COND = "authorIsMuted = 0 " +
         "AND id IN (SELECT eventId FROM hashtag WHERE hashtag = :topic) " +
         "AND NOT EXISTS (SELECT * FROM hashtag WHERE eventId = id AND hashtag IN (SELECT mutedItem FROM mute WHERE tag IS 't' AND mutedItem IS NOT :topic)) " +
         ORDER_AND_LIMIT
 
-private const val TOPIC_CROSS_COND = "AND crossPostedAuthorIsOneself = 0 " +
-        "AND crossPostedAuthorIsMuted = 0 " +
-        TOPIC_ROOT_COND
-
+private const val TOPIC_CROSS_COND = "crossPostedAuthorIsMuted = 0 AND $TOPIC_ROOT_COND"
 private const val TOPIC_POLL_COND = TOPIC_ROOT_COND
 
-private const val TOPIC_ROOT_QUERY = "SELECT * $ROOT $TOPIC_ROOT_COND"
-private const val TOPIC_CREATED_AT_ROOT_QUERY = "SELECT createdAt $ROOT $TOPIC_ROOT_COND"
+private const val TOPIC_ROOT_QUERY = "SELECT * $ROOT AND $TOPIC_ROOT_COND"
+private const val TOPIC_CREATED_AT_ROOT_QUERY = "SELECT createdAt $ROOT AND $TOPIC_ROOT_COND"
 private const val TOPIC_EXISTS_ROOT_QUERY = "SELECT EXISTS($TOPIC_ROOT_QUERY)"
 
-private const val TOPIC_CROSS_QUERY = "SELECT * $CROSS $TOPIC_CROSS_COND"
-private const val TOPIC_CREATED_AT_CROSS_QUERY = "SELECT createdAt $CROSS $TOPIC_CROSS_COND"
+private const val TOPIC_CROSS_QUERY = "SELECT * $CROSS AND $TOPIC_CROSS_COND"
+private const val TOPIC_CREATED_AT_CROSS_QUERY = "SELECT createdAt $CROSS AND $TOPIC_CROSS_COND"
 private const val TOPIC_EXISTS_CROSS_QUERY = "SELECT EXISTS($TOPIC_CROSS_QUERY)"
 
-private const val TOPIC_POLL_QUERY = "SELECT * $POLL $TOPIC_POLL_COND"
-private const val TOPIC_CREATED_AT_POLL_QUERY = "SELECT createdAt $POLL $TOPIC_POLL_COND"
+private const val TOPIC_POLL_QUERY = "SELECT * $POLL AND $TOPIC_POLL_COND"
+private const val TOPIC_CREATED_AT_POLL_QUERY = "SELECT createdAt $POLL AND $TOPIC_POLL_COND"
 private const val TOPIC_EXISTS_POLL_QUERY = "SELECT EXISTS($TOPIC_POLL_QUERY)"
 
 private const val TOPIC_POLL_OPTION_QUERY =
-    "SELECT * $POLL_OPTION WHERE pollId IN (SELECT id $POLL $TOPIC_POLL_COND)"
+    "SELECT * $POLL_OPTION WHERE pollId IN (SELECT id $POLL AND $TOPIC_POLL_COND)"
 
-private const val PROFILE_COND = "AND pubkey = :pubkey $ORDER_AND_LIMIT"
+private const val PROFILE_COND = "pubkey = :pubkey $ORDER_AND_LIMIT"
 
-private const val PROFILE_ROOT_QUERY = "SELECT * $ROOT $PROFILE_COND"
-private const val PROFILE_CREATED_AT_ROOT_QUERY = "SELECT createdAt $ROOT $PROFILE_COND"
+private const val PROFILE_ROOT_QUERY = "SELECT * $ROOT AND $PROFILE_COND"
+private const val PROFILE_CREATED_AT_ROOT_QUERY = "SELECT createdAt $ROOT AND $PROFILE_COND"
 private const val PROFILE_EXISTS_ROOT_QUERY = "SELECT EXISTS($PROFILE_ROOT_QUERY)"
 
-private const val PROFILE_CROSS_QUERY = "SELECT * $CROSS $PROFILE_COND"
-private const val PROFILE_CREATED_AT_CROSS_QUERY = "SELECT createdAt $CROSS $PROFILE_COND"
+private const val PROFILE_CROSS_QUERY = "SELECT * $CROSS AND $PROFILE_COND"
+private const val PROFILE_CREATED_AT_CROSS_QUERY = "SELECT createdAt $CROSS AND $PROFILE_COND"
 private const val PROFILE_EXISTS_CROSS_QUERY = "SELECT EXISTS($PROFILE_CROSS_QUERY)"
 
-private const val PROFILE_POLL_QUERY = "SELECT * $POLL $PROFILE_COND"
-private const val PROFILE_CREATED_AT_POLL_QUERY = "SELECT createdAt $POLL $PROFILE_COND"
+private const val PROFILE_POLL_QUERY = "SELECT * $POLL AND $PROFILE_COND"
+private const val PROFILE_CREATED_AT_POLL_QUERY = "SELECT createdAt $POLL AND $PROFILE_COND"
 private const val PROFILE_EXISTS_POLL_QUERY = "SELECT EXISTS($PROFILE_POLL_QUERY)"
 
 private const val PROFILE_POLL_OPTION_QUERY =
-    "SELECT * $POLL_OPTION WHERE pollId IN (SELECT id $POLL $PROFILE_COND)"
+    "SELECT * $POLL_OPTION WHERE pollId IN (SELECT id $POLL AND $PROFILE_COND)"
 
 
 private const val LIST_ROOT = """
-    AND (
+    (
         pubkey IN (SELECT pubkey FROM profileSetItem WHERE identifier = :identifier)
         OR id IN (SELECT eventId FROM hashtag WHERE hashtag IN (SELECT topic FROM topicSetItem WHERE identifier = :identifier))
     )
-    AND authorIsMuted = 0 
-    AND authorIsLocked = 0 
+    AND authorIsMuted = 0
     AND NOT EXISTS (SELECT * FROM hashtag WHERE eventId = id AND hashtag IN (SELECT mutedItem FROM mute WHERE tag IS 't'))
 """ + ORDER_AND_LIMIT
 
-private const val LIST_CROSS = "AND crossPostedAuthorIsOneself = 0 " +
-        "AND crossPostedAuthorIsMuted = 0 " +
-        LIST_ROOT
+private const val LIST_CROSS = "crossPostedAuthorIsMuted = 0 AND $LIST_ROOT"
 
 private const val LIST_POLL = LIST_ROOT
 
-private const val LIST_ROOT_QUERY = "SELECT * $ROOT $LIST_ROOT"
-private const val LIST_CREATED_AT_ROOT_QUERY = "SELECT createdAt $ROOT $LIST_ROOT"
+private const val LIST_ROOT_QUERY = "SELECT * $ROOT AND $LIST_ROOT"
+private const val LIST_CREATED_AT_ROOT_QUERY = "SELECT createdAt $ROOT AND $LIST_ROOT"
 private const val LIST_EXISTS_ROOT_QUERY = "SELECT EXISTS($LIST_ROOT_QUERY)"
 
-private const val LIST_CROSS_QUERY = "SELECT * $CROSS $LIST_CROSS"
-private const val LIST_CREATED_AT_CROSS_QUERY = "SELECT createdAt $CROSS $LIST_CROSS"
+private const val LIST_CROSS_QUERY = "SELECT * $CROSS AND $LIST_CROSS"
+private const val LIST_CREATED_AT_CROSS_QUERY = "SELECT createdAt $CROSS AND $LIST_CROSS"
 private const val LIST_EXISTS_CROSS_QUERY = "SELECT EXISTS($LIST_CROSS_QUERY)"
 
-private const val LIST_POLL_QUERY = "SELECT * $POLL $LIST_POLL"
-private const val LIST_CREATED_AT_POLL_QUERY = "SELECT createdAt $POLL $LIST_POLL"
+private const val LIST_POLL_QUERY = "SELECT * $POLL AND $LIST_POLL"
+private const val LIST_CREATED_AT_POLL_QUERY = "SELECT createdAt $POLL AND $LIST_POLL"
 private const val LIST_EXISTS_POLL_QUERY = "SELECT EXISTS($LIST_POLL_QUERY)"
 
 private const val LIST_POLL_OPTION_QUERY =
-    "SELECT * $POLL_OPTION WHERE pollId IN (SELECT id $POLL $LIST_POLL)"
+    "SELECT * $POLL_OPTION WHERE pollId IN (SELECT id $POLL AND $LIST_POLL)"
 
 @Dao
 interface FeedDao {
-
     @Query(TOPIC_ROOT_QUERY)
     fun getTopicRootPostFlow(topic: Topic, until: Long, size: Int): Flow<List<RootPostView>>
 
@@ -158,7 +150,7 @@ interface FeedDao {
 
     @Query(PROFILE_POLL_OPTION_QUERY)
     fun getProfilePollOptionFlow(
-        pubkey: PubkeyHex,
+        pubkey: String,
         until: Long,
         size: Int
     ): Flow<List<PollOptionView>>

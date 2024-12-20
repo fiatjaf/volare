@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiatjaf.volare.core.ProfileViewAction
 import com.fiatjaf.volare.core.ProfileViewLoadLists
-import com.fiatjaf.volare.core.ProfileViewRebroadcastLock
 import com.fiatjaf.volare.core.ProfileViewRefresh
 import com.fiatjaf.volare.core.ProfileViewReplyAppend
 import com.fiatjaf.volare.core.ProfileViewRootAppend
@@ -20,7 +19,6 @@ import com.fiatjaf.volare.core.model.ItemSetProfile
 import com.fiatjaf.volare.core.model.Paginator
 import com.fiatjaf.volare.core.navigator.ProfileNavView
 import com.fiatjaf.volare.core.utils.launchIO
-import com.fiatjaf.volare.data.account.AccountLocker
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.model.FullProfileUI
 import com.fiatjaf.volare.data.model.ItemSetMeta
@@ -62,9 +60,9 @@ class ProfileViewModel(
     private val nip65Dao: Nip65Dao,
     private val eventRelayDao: EventRelayDao,
     private val itemSetProvider: ItemSetProvider,
-    private val accountLocker: AccountLocker,
     private val accountManager: AccountManager,
 ) : ViewModel() {
+    val ourPubKey = accountManager.pubkeyHexFlow
     val tabIndex = mutableIntStateOf(0)
     val addableLists = mutableStateOf(emptyList<ItemSetMeta>())
     val nonAddableLists = mutableStateOf(emptyList<ItemSetMeta>())
@@ -126,7 +124,6 @@ class ProfileViewModel(
             ProfileViewRootAppend -> rootPaginator.append()
             ProfileViewReplyAppend -> replyPaginator.append()
             ProfileViewLoadLists -> updateLists(pubkey = profile.value.value.inner.pubkey)
-            is ProfileViewRebroadcastLock -> rebroadcastLock(uiScope = action.uiScope)
         }
     }
 
@@ -157,22 +154,6 @@ class ProfileViewModel(
                 .getAddableSets(item = ItemSetProfile(pubkey = pubkey))
             nonAddableLists.value = itemSetProvider
                 .getNonAddableSets(item = ItemSetProfile(pubkey = pubkey))
-        }
-    }
-
-    private val isRebroadcasting = AtomicBoolean(false)
-    private fun rebroadcastLock(uiScope: CoroutineScope) {
-        if (!profile.value.value.inner.isLocked) return
-        if (!isRebroadcasting.compareAndSet(false, true)) return
-
-        viewModelScope.launchIO {
-            accountLocker.rebroadcastLock(
-                uiScope = uiScope,
-                pubkey = profile.value.value.inner.pubkey
-            )
-            delay(REBROADCAST_DELAY)
-        }.invokeOnCompletion {
-            isRebroadcasting.set(false)
         }
     }
 }

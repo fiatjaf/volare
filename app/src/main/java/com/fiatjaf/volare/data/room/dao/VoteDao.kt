@@ -9,8 +9,8 @@ import com.fiatjaf.volare.data.room.entity.main.VoteEntity
 
 @Dao
 interface VoteDao {
-    @Query("SELECT * FROM vote WHERE eventId = :postId AND pubkey = (SELECT pubkey FROM account LIMIT 1)")
-    suspend fun getMyVote(postId: EventIdHex): VoteEntity?
+    @Query("SELECT * FROM vote WHERE eventId = :postId AND pubkey = :pubkey")
+    suspend fun getVote(pubkey: String, postId: EventIdHex): VoteEntity?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertOrIgnoreVotes(voteEntities: Collection<VoteEntity>)

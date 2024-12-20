@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4daa457a258aec9411760f4f37eaaa63",
+    "identityHash": "c3b57dd32a96d7065cf4d2774c9471ea",
     "entities": [
       {
         "tableName": "mainEvent",
@@ -520,7 +520,7 @@
       },
       {
         "tableName": "friend",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myPubkey` TEXT NOT NULL, `friendPubkey` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`friendPubkey`), FOREIGN KEY(`myPubkey`) REFERENCES `account`(`pubkey`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myPubkey` TEXT NOT NULL, `friendPubkey` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`friendPubkey`))",
         "fields": [
           {
             "fieldPath": "myPubkey",
@@ -558,19 +558,7 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_friend_myPubkey` ON `${TABLE_NAME}` (`myPubkey`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "account",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "myPubkey"
-            ],
-            "referencedColumns": [
-              "pubkey"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "weboftrust",
@@ -628,7 +616,7 @@
       },
       {
         "tableName": "topic",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myPubkey` TEXT NOT NULL, `topic` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`topic`), FOREIGN KEY(`myPubkey`) REFERENCES `account`(`pubkey`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myPubkey` TEXT NOT NULL, `topic` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`topic`))",
         "fields": [
           {
             "fieldPath": "myPubkey",
@@ -666,19 +654,7 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_topic_myPubkey` ON `${TABLE_NAME}` (`myPubkey`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "account",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "myPubkey"
-            ],
-            "referencedColumns": [
-              "pubkey"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "nip65",
@@ -727,7 +703,7 @@
       },
       {
         "tableName": "bookmark",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myPubkey` TEXT NOT NULL, `eventId` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`eventId`), FOREIGN KEY(`myPubkey`) REFERENCES `account`(`pubkey`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myPubkey` TEXT NOT NULL, `eventId` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`eventId`))",
         "fields": [
           {
             "fieldPath": "myPubkey",
@@ -765,23 +741,11 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_bookmark_myPubkey` ON `${TABLE_NAME}` (`myPubkey`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "account",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "myPubkey"
-            ],
-            "referencedColumns": [
-              "pubkey"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "mute",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myPubkey` TEXT NOT NULL, `mutedItem` TEXT NOT NULL, `tag` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`mutedItem`, `tag`), FOREIGN KEY(`myPubkey`) REFERENCES `account`(`pubkey`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myPubkey` TEXT NOT NULL, `mutedItem` TEXT NOT NULL, `tag` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`mutedItem`, `tag`))",
         "fields": [
           {
             "fieldPath": "myPubkey",
@@ -826,23 +790,11 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_mute_myPubkey` ON `${TABLE_NAME}` (`myPubkey`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "account",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "myPubkey"
-            ],
-            "referencedColumns": [
-              "pubkey"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "profileSet",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`identifier` TEXT NOT NULL, `myPubkey` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL DEFAULT '', `createdAt` INTEGER NOT NULL, `deleted` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`identifier`), FOREIGN KEY(`myPubkey`) REFERENCES `account`(`pubkey`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`identifier` TEXT NOT NULL, `myPubkey` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL DEFAULT '', `createdAt` INTEGER NOT NULL, `deleted` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`identifier`))",
         "fields": [
           {
             "fieldPath": "identifier",
@@ -900,19 +852,7 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_profileSet_myPubkey` ON `${TABLE_NAME}` (`myPubkey`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "account",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "myPubkey"
-            ],
-            "referencedColumns": [
-              "pubkey"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "profileSetItem",
@@ -955,7 +895,7 @@
       },
       {
         "tableName": "topicSet",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`identifier` TEXT NOT NULL, `myPubkey` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL DEFAULT '', `createdAt` INTEGER NOT NULL, `deleted` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`identifier`), FOREIGN KEY(`myPubkey`) REFERENCES `account`(`pubkey`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`identifier` TEXT NOT NULL, `myPubkey` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL DEFAULT '', `createdAt` INTEGER NOT NULL, `deleted` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`identifier`))",
         "fields": [
           {
             "fieldPath": "identifier",
@@ -1013,19 +953,7 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_topicSet_myPubkey` ON `${TABLE_NAME}` (`myPubkey`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "account",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "myPubkey"
-            ],
-            "referencedColumns": [
-              "pubkey"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "topicSetItem",
@@ -1065,32 +993,6 @@
             ]
           }
         ]
-      },
-      {
-        "tableName": "account",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pubkey` TEXT NOT NULL, `packageName` TEXT, PRIMARY KEY(`pubkey`))",
-        "fields": [
-          {
-            "fieldPath": "pubkey",
-            "columnName": "pubkey",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "packageName",
-            "columnName": "packageName",
-            "affinity": "TEXT",
-            "notNull": false
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "pubkey"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
       },
       {
         "tableName": "profile",
@@ -1136,7 +1038,7 @@
       },
       {
         "tableName": "fullProfile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pubkey` TEXT NOT NULL, `name` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `about` TEXT NOT NULL, `picture` TEXT NOT NULL, `lud06` TEXT NOT NULL, `lud16` TEXT NOT NULL, `nip05` TEXT NOT NULL, `displayName` TEXT NOT NULL, `website` TEXT NOT NULL, `banner` TEXT NOT NULL, PRIMARY KEY(`pubkey`), FOREIGN KEY(`pubkey`) REFERENCES `account`(`pubkey`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pubkey` TEXT NOT NULL, `name` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `about` TEXT NOT NULL, `picture` TEXT NOT NULL, `lud06` TEXT NOT NULL, `lud16` TEXT NOT NULL, `nip05` TEXT NOT NULL, `displayName` TEXT NOT NULL, `website` TEXT NOT NULL, `banner` TEXT NOT NULL, PRIMARY KEY(`pubkey`))",
         "fields": [
           {
             "fieldPath": "pubkey",
@@ -1212,51 +1114,13 @@
           ]
         },
         "indices": [],
-        "foreignKeys": [
-          {
-            "table": "account",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "pubkey"
-            ],
-            "referencedColumns": [
-              "pubkey"
-            ]
-          }
-        ]
-      },
-      {
-        "tableName": "lock",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pubkey` TEXT NOT NULL, `json` TEXT NOT NULL, PRIMARY KEY(`pubkey`))",
-        "fields": [
-          {
-            "fieldPath": "pubkey",
-            "columnName": "pubkey",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "json",
-            "columnName": "json",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "pubkey"
-          ]
-        },
-        "indices": [],
         "foreignKeys": []
       }
     ],
     "views": [
       {
         "viewName": "SimplePostView",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mainEvent.id, mainEvent.pubkey, rootPost.subject, mainEvent.content, (SELECT EXISTS(SELECT * FROM account WHERE account.pubkey = mainEvent.pubkey)) AS authorIsOneself, (SELECT EXISTS(SELECT * FROM friend WHERE friend.friendPubkey = mainEvent.pubkey)) AS authorIsFriend, (SELECT EXISTS(SELECT * FROM weboftrust WHERE weboftrust.webOfTrustPubkey = mainEvent.pubkey)) AS authorIsTrusted, (SELECT EXISTS(SELECT * FROM mute WHERE mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p')) AS authorIsMuted, (SELECT EXISTS(SELECT * FROM profileSetItem WHERE profileSetItem.pubkey = mainEvent.pubkey)) AS authorIsInList, (SELECT EXISTS(SELECT * FROM lock WHERE lock.pubkey = mainEvent.pubkey)) AS authorIsLocked FROM mainEvent LEFT JOIN rootPost ON rootPost.eventId = mainEvent.id"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mainEvent.id, mainEvent.pubkey, rootPost.subject, mainEvent.content, (SELECT EXISTS(SELECT * FROM friend WHERE friend.friendPubkey = mainEvent.pubkey)) AS authorIsFriend, (SELECT EXISTS(SELECT * FROM weboftrust WHERE weboftrust.webOfTrustPubkey = mainEvent.pubkey)) AS authorIsTrusted, (SELECT EXISTS(SELECT * FROM mute WHERE mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p')) AS authorIsMuted, (SELECT EXISTS(SELECT * FROM profileSetItem WHERE profileSetItem.pubkey = mainEvent.pubkey)) AS authorIsInList FROM mainEvent LEFT JOIN rootPost ON rootPost.eventId = mainEvent.id"
       },
       {
         "viewName": "EventRelayAuthorView",
@@ -1264,36 +1128,36 @@
       },
       {
         "viewName": "RootPostView",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            mainEvent.id,\n            mainEvent.pubkey,\n            rootPost.subject,\n            mainEvent.content,\n            mainEvent.createdAt,\n            mainEvent.relayUrl,\n            mainEvent.isMentioningMe,\n            mainEvent.blurhashes,\n            profile.name AS authorName,\n            ht.min_hashtag AS myTopic,\n            CASE WHEN account.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsOneself,\n            CASE WHEN friend.friendPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsFriend,\n            CASE WHEN weboftrust.webOfTrustPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsTrusted,\n            CASE WHEN mute.mutedItem IS NOT NULL THEN 1 ELSE 0 END AS authorIsMuted,\n            CASE WHEN profileSetItem.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsInList,\n            CASE WHEN lock.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsLocked,\n            CASE WHEN vote.eventId IS NOT NULL THEN 1 ELSE 0 END isUpvoted,\n            upvotes.upvoteCount,\n            legacyReplies.legacyReplyCount,\n            comments.commentCount,\n            (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked\n        FROM rootPost\n        JOIN mainEvent ON mainEvent.id = rootPost.eventId\n        LEFT JOIN profile ON profile.pubkey = mainEvent.pubkey\n        LEFT JOIN (\n            SELECT DISTINCT hashtag.eventId, MIN(hashtag.hashtag) AS min_hashtag\n            FROM hashtag\n            JOIN topic ON hashtag.hashtag = topic.topic\n            WHERE topic.myPubkey = (SELECT pubkey FROM account LIMIT 1)\n            GROUP BY hashtag.eventId\n        ) AS ht ON ht.eventId = mainEvent.id\n        LEFT JOIN account ON account.pubkey = mainEvent.pubkey\n        LEFT JOIN friend ON friend.friendPubkey = mainEvent.pubkey\n        LEFT JOIN weboftrust ON weboftrust.webOfTrustPubkey = mainEvent.pubkey\n        LEFT JOIN mute ON mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p'\n        LEFT JOIN profileSetItem ON profileSetItem.pubkey = mainEvent.pubkey\n        LEFT JOIN lock ON lock.pubkey = mainEvent.pubkey\n        LEFT JOIN vote ON vote.eventId = mainEvent.id AND vote.pubkey = (SELECT pubkey FROM account LIMIT 1)\n        LEFT JOIN (\n            SELECT vote.eventId, COUNT(*) AS upvoteCount\n            FROM vote\n            GROUP BY vote.eventId\n        ) AS upvotes ON upvotes.eventId = mainEvent.id\n        LEFT JOIN (\n            SELECT legacyReply.parentId, COUNT(*) AS legacyReplyCount\n            FROM legacyReply\n            GROUP BY legacyReply.parentId\n        ) AS legacyReplies ON legacyReplies.parentId = mainEvent.id\n        LEFT JOIN (\n            SELECT comment.parentId, COUNT(*) AS commentCount\n            FROM comment\n            GROUP BY comment.parentId\n        ) AS comments ON comments.parentId = mainEvent.id"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            mainEvent.id,\n            mainEvent.pubkey,\n            rootPost.subject,\n            mainEvent.content,\n            mainEvent.createdAt,\n            mainEvent.relayUrl,\n            mainEvent.isMentioningMe,\n            mainEvent.blurhashes,\n            profile.name AS authorName,\n            ht.min_hashtag AS myTopic,\n            CASE WHEN friend.friendPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsFriend,\n            CASE WHEN weboftrust.webOfTrustPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsTrusted,\n            CASE WHEN mute.mutedItem IS NOT NULL THEN 1 ELSE 0 END AS authorIsMuted,\n            CASE WHEN profileSetItem.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsInList,\n            upvotes.upvoteCount,\n            legacyReplies.legacyReplyCount,\n            comments.commentCount,\n            (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked\n        FROM rootPost\n        JOIN mainEvent ON mainEvent.id = rootPost.eventId\n        LEFT JOIN profile ON profile.pubkey = mainEvent.pubkey\n        LEFT JOIN (\n            SELECT DISTINCT hashtag.eventId, MIN(hashtag.hashtag) AS min_hashtag\n            FROM hashtag\n            JOIN topic ON hashtag.hashtag = topic.topic\n            GROUP BY hashtag.eventId\n        ) AS ht ON ht.eventId = mainEvent.id\n        LEFT JOIN friend ON friend.friendPubkey = mainEvent.pubkey\n        LEFT JOIN weboftrust ON weboftrust.webOfTrustPubkey = mainEvent.pubkey\n        LEFT JOIN mute ON mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p'\n        LEFT JOIN profileSetItem ON profileSetItem.pubkey = mainEvent.pubkey\n        LEFT JOIN (\n            SELECT vote.eventId, COUNT(*) AS upvoteCount\n            FROM vote\n            GROUP BY vote.eventId\n        ) AS upvotes ON upvotes.eventId = mainEvent.id\n        LEFT JOIN (\n            SELECT legacyReply.parentId, COUNT(*) AS legacyReplyCount\n            FROM legacyReply\n            GROUP BY legacyReply.parentId\n        ) AS legacyReplies ON legacyReplies.parentId = mainEvent.id\n        LEFT JOIN (\n            SELECT comment.parentId, COUNT(*) AS commentCount\n            FROM comment\n            GROUP BY comment.parentId\n        ) AS comments ON comments.parentId = mainEvent.id"
       },
       {
         "viewName": "LegacyReplyView",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mainEvent.id, legacyReply.parentId, mainEvent.pubkey, mainEvent.content, mainEvent.createdAt, mainEvent.relayUrl, mainEvent.isMentioningMe, mainEvent.blurhashes, (SELECT name FROM profile WHERE profile.pubkey = mainEvent.pubkey) AS authorName, (SELECT EXISTS(SELECT * FROM account WHERE account.pubkey = mainEvent.pubkey)) AS authorIsOneself, (SELECT EXISTS(SELECT * FROM friend WHERE friend.friendPubkey = mainEvent.pubkey)) AS authorIsFriend, (SELECT EXISTS(SELECT * FROM weboftrust WHERE weboftrust.webOfTrustPubkey = mainEvent.pubkey)) AS authorIsTrusted, (SELECT EXISTS(SELECT * FROM mute WHERE mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p')) AS authorIsMuted, (SELECT EXISTS(SELECT * FROM profileSetItem WHERE profileSetItem.pubkey = mainEvent.pubkey)) AS authorIsInList, (SELECT EXISTS(SELECT * FROM lock WHERE lock.pubkey = mainEvent.pubkey)) AS authorIsLocked, (SELECT EXISTS(SELECT* FROM vote WHERE vote.eventId = mainEvent.id AND vote.pubkey = (SELECT pubkey FROM account LIMIT 1))) AS isUpvoted, (SELECT COUNT(*) FROM vote WHERE vote.eventId = mainEvent.id) AS upvoteCount, (SELECT COUNT(*) FROM legacyReply AS legacyReply2 WHERE legacyReply2.parentId = mainEvent.id) AS legacyReplyCount, (SELECT COUNT(*) FROM comment WHERE comment.parentId = mainEvent.id) AS commentCount, (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked FROM legacyReply JOIN mainEvent ON mainEvent.id = legacyReply.eventId"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mainEvent.id, legacyReply.parentId, mainEvent.pubkey, mainEvent.content, mainEvent.createdAt, mainEvent.relayUrl, mainEvent.isMentioningMe, mainEvent.blurhashes, (SELECT name FROM profile WHERE profile.pubkey = mainEvent.pubkey) AS authorName, (SELECT EXISTS(SELECT * FROM friend WHERE friend.friendPubkey = mainEvent.pubkey)) AS authorIsFriend, (SELECT EXISTS(SELECT * FROM weboftrust WHERE weboftrust.webOfTrustPubkey = mainEvent.pubkey)) AS authorIsTrusted, (SELECT EXISTS(SELECT * FROM mute WHERE mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p')) AS authorIsMuted, (SELECT EXISTS(SELECT * FROM profileSetItem WHERE profileSetItem.pubkey = mainEvent.pubkey)) AS authorIsInList, (SELECT COUNT(*) FROM vote WHERE vote.eventId = mainEvent.id) AS upvoteCount, (SELECT COUNT(*) FROM legacyReply AS legacyReply2 WHERE legacyReply2.parentId = mainEvent.id) AS legacyReplyCount, (SELECT COUNT(*) FROM comment WHERE comment.parentId = mainEvent.id) AS commentCount, (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked FROM legacyReply JOIN mainEvent ON mainEvent.id = legacyReply.eventId"
       },
       {
         "viewName": "CommentView",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mainEvent.id, comment.parentId, comment.parentKind, mainEvent.pubkey, mainEvent.content, mainEvent.createdAt, mainEvent.relayUrl, mainEvent.isMentioningMe, mainEvent.blurhashes, (SELECT name FROM profile WHERE profile.pubkey = mainEvent.pubkey) AS authorName, (SELECT EXISTS(SELECT * FROM account WHERE account.pubkey = mainEvent.pubkey)) AS authorIsOneself, (SELECT EXISTS(SELECT * FROM friend WHERE friend.friendPubkey = mainEvent.pubkey)) AS authorIsFriend, (SELECT EXISTS(SELECT * FROM weboftrust WHERE weboftrust.webOfTrustPubkey = mainEvent.pubkey)) AS authorIsTrusted, (SELECT EXISTS(SELECT * FROM mute WHERE mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p')) AS authorIsMuted, (SELECT EXISTS(SELECT * FROM profileSetItem WHERE profileSetItem.pubkey = mainEvent.pubkey)) AS authorIsInList, (SELECT EXISTS(SELECT * FROM lock WHERE lock.pubkey = mainEvent.pubkey)) AS authorIsLocked, (SELECT EXISTS(SELECT* FROM vote WHERE vote.eventId = mainEvent.id AND vote.pubkey = (SELECT pubkey FROM account LIMIT 1))) AS isUpvoted, (SELECT COUNT(*) FROM vote WHERE vote.eventId = mainEvent.id) AS upvoteCount, (SELECT COUNT(*) FROM comment AS comment2 WHERE comment2.parentId = mainEvent.id) AS replyCount, (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked FROM comment JOIN mainEvent ON mainEvent.id = comment.eventId"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mainEvent.id, comment.parentId, comment.parentKind, mainEvent.pubkey, mainEvent.content, mainEvent.createdAt, mainEvent.relayUrl, mainEvent.isMentioningMe, mainEvent.blurhashes, (SELECT name FROM profile WHERE profile.pubkey = mainEvent.pubkey) AS authorName, (SELECT EXISTS(SELECT * FROM friend WHERE friend.friendPubkey = mainEvent.pubkey)) AS authorIsFriend, (SELECT EXISTS(SELECT * FROM weboftrust WHERE weboftrust.webOfTrustPubkey = mainEvent.pubkey)) AS authorIsTrusted, (SELECT EXISTS(SELECT * FROM mute WHERE mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p')) AS authorIsMuted, (SELECT EXISTS(SELECT * FROM profileSetItem WHERE profileSetItem.pubkey = mainEvent.pubkey)) AS authorIsInList, (SELECT COUNT(*) FROM vote WHERE vote.eventId = mainEvent.id) AS upvoteCount, (SELECT COUNT(*) FROM comment AS comment2 WHERE comment2.parentId = mainEvent.id) AS replyCount, (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked FROM comment JOIN mainEvent ON mainEvent.id = comment.eventId"
       },
       {
         "viewName": "CrossPostView",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            mainEvent.id,\n            mainEvent.pubkey,\n            crossPost.crossPostedId,\n            mainEvent.createdAt,\n            mainEvent.blurhashes,\n            rootPost.subject AS crossPostedSubject,\n            crossPostedEvent.content AS crossPostedContent,\n            crossPostedEvent.relayUrl AS crossPostedRelayUrl,\n            crossPostedEvent.pubkey AS crossPostedPubkey,\n            profile.name AS authorName,\n            cross_posted_profile.name AS crossPostedAuthorName,\n            ht.min_hashtag AS myTopic,\n            CASE WHEN account.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsOneself,\n            CASE WHEN friend.friendPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsFriend,\n            CASE WHEN weboftrust.webOfTrustPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsTrusted,\n            CASE WHEN mute.mutedItem IS NOT NULL THEN 1 ELSE 0 END AS authorIsMuted,\n            CASE WHEN profileSetItem.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsInList,\n            CASE WHEN lock.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsLocked,\n            CASE WHEN vote.eventId IS NOT NULL THEN 1 ELSE 0 END crossPostedIsUpvoted,\n            upvotes.upvoteCount AS crossPostedUpvoteCount,\n            legacyReplies.legacyReplyCount AS crossPostedLegacyReplyCount,\n            comments.commentCount AS crossPostedCommentCount,\n            CASE WHEN cross_posted_account.pubkey IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsOneself,\n            CASE WHEN cross_posted_friend.friendPubkey IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsFriend,\n            CASE WHEN cross_posted_wot.webOfTrustPubkey IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsTrusted,\n            CASE WHEN cross_posted_mute.mutedItem IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsMuted,\n            CASE WHEN cross_posted_profile_set_item.pubkey IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsInList,\n            CASE WHEN cross_posted_lock.pubkey IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsLocked,\n            (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = crossPost.crossPostedId)) AS crossPostedIsBookmarked\n        FROM crossPost\n        JOIN mainEvent ON crossPost.eventId = mainEvent.id\n        JOIN mainEvent AS crossPostedEvent ON crossPost.crossPostedId = crossPostedEvent.id\n        LEFT JOIN profile ON profile.pubkey = mainEvent.pubkey\n        LEFT JOIN profile AS cross_posted_profile ON cross_posted_profile.pubkey = crossPostedEvent.pubkey\n        LEFT JOIN rootPost ON rootPost.eventId = crossPost.crossPostedId\n        LEFT JOIN (\n            SELECT DISTINCT hashtag.eventId, MIN(hashtag.hashtag) AS min_hashtag\n            FROM hashtag\n            JOIN topic ON hashtag.hashtag = topic.topic\n            WHERE topic.myPubkey = (SELECT pubkey FROM account LIMIT 1)\n            GROUP BY hashtag.eventId\n        ) AS ht ON ht.eventId = mainEvent.id\n        LEFT JOIN (\n            SELECT legacyReply.parentId, COUNT(*) AS legacyReplyCount\n            FROM legacyReply\n            GROUP BY legacyReply.parentId\n        ) AS legacyReplies ON legacyReplies.parentId = crossPost.crossPostedId\n        LEFT JOIN (\n            SELECT comment.parentId, COUNT(*) AS commentCount\n            FROM comment\n            GROUP BY comment.parentId\n        ) AS comments ON comments.parentId = crossPost.crossPostedId\n        LEFT JOIN account ON account.pubkey = mainEvent.pubkey\n        LEFT JOIN friend ON friend.friendPubkey = mainEvent.pubkey\n        LEFT JOIN weboftrust ON weboftrust.webOfTrustPubkey = mainEvent.pubkey\n        LEFT JOIN mute ON mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p'\n        LEFT JOIN profileSetItem ON profileSetItem.pubkey = mainEvent.pubkey\n        LEFT JOIN lock ON lock.pubkey = mainEvent.pubkey\n        LEFT JOIN vote ON vote.eventId = crossPost.crossPostedId AND vote.pubkey = (SELECT pubkey FROM account LIMIT 1)\n        LEFT JOIN (\n            SELECT vote.eventId, COUNT(*) AS upvoteCount\n            FROM vote\n            GROUP BY vote.eventId\n        ) AS upvotes ON upvotes.eventId = crossPost.crossPostedId\n        LEFT JOIN account AS cross_posted_account ON cross_posted_account.pubkey = crossPostedEvent.pubkey\n        LEFT JOIN friend AS cross_posted_friend ON cross_posted_friend.friendPubkey = crossPostedEvent.pubkey\n        LEFT JOIN weboftrust AS cross_posted_wot ON cross_posted_wot.webOfTrustPubkey = crossPostedEvent.pubkey\n        LEFT JOIN mute AS cross_posted_mute ON cross_posted_mute.mutedItem = crossPostedEvent.pubkey AND cross_posted_mute.tag IS 'p'\n        LEFT JOIN profileSetItem AS cross_posted_profile_set_item ON cross_posted_profile_set_item.pubkey = crossPostedEvent.pubkey\n        LEFT JOIN lock AS cross_posted_lock ON cross_posted_lock.pubkey = crossPostedEvent.pubkey"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            mainEvent.id,\n            mainEvent.pubkey,\n            crossPost.crossPostedId,\n            mainEvent.createdAt,\n            mainEvent.blurhashes,\n            rootPost.subject AS crossPostedSubject,\n            crossPostedEvent.content AS crossPostedContent,\n            crossPostedEvent.relayUrl AS crossPostedRelayUrl,\n            crossPostedEvent.pubkey AS crossPostedPubkey,\n            profile.name AS authorName,\n            cross_posted_profile.name AS crossPostedAuthorName,\n            ht.min_hashtag AS myTopic,\n            CASE WHEN friend.friendPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsFriend,\n            CASE WHEN weboftrust.webOfTrustPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsTrusted,\n            CASE WHEN mute.mutedItem IS NOT NULL THEN 1 ELSE 0 END AS authorIsMuted,\n            CASE WHEN profileSetItem.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsInList,\n            upvotes.upvoteCount AS crossPostedUpvoteCount,\n            legacyReplies.legacyReplyCount AS crossPostedLegacyReplyCount,\n            comments.commentCount AS crossPostedCommentCount,\n            CASE WHEN cross_posted_friend.friendPubkey IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsFriend,\n            CASE WHEN cross_posted_wot.webOfTrustPubkey IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsTrusted,\n            CASE WHEN cross_posted_mute.mutedItem IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsMuted,\n            CASE WHEN cross_posted_profile_set_item.pubkey IS NOT NULL THEN 1 ELSE 0 END AS crossPostedAuthorIsInList,\n            (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = crossPost.crossPostedId)) AS crossPostedIsBookmarked\n        FROM crossPost\n        JOIN mainEvent ON crossPost.eventId = mainEvent.id\n        JOIN mainEvent AS crossPostedEvent ON crossPost.crossPostedId = crossPostedEvent.id\n        LEFT JOIN profile ON profile.pubkey = mainEvent.pubkey\n        LEFT JOIN profile AS cross_posted_profile ON cross_posted_profile.pubkey = crossPostedEvent.pubkey\n        LEFT JOIN rootPost ON rootPost.eventId = crossPost.crossPostedId\n        LEFT JOIN (\n            SELECT DISTINCT hashtag.eventId, MIN(hashtag.hashtag) AS min_hashtag\n            FROM hashtag\n            JOIN topic ON hashtag.hashtag = topic.topic\n            GROUP BY hashtag.eventId\n        ) AS ht ON ht.eventId = mainEvent.id\n        LEFT JOIN (\n            SELECT legacyReply.parentId, COUNT(*) AS legacyReplyCount\n            FROM legacyReply\n            GROUP BY legacyReply.parentId\n        ) AS legacyReplies ON legacyReplies.parentId = crossPost.crossPostedId\n        LEFT JOIN (\n            SELECT comment.parentId, COUNT(*) AS commentCount\n            FROM comment\n            GROUP BY comment.parentId\n        ) AS comments ON comments.parentId = crossPost.crossPostedId\n        LEFT JOIN friend ON friend.friendPubkey = mainEvent.pubkey\n        LEFT JOIN weboftrust ON weboftrust.webOfTrustPubkey = mainEvent.pubkey\n        LEFT JOIN mute ON mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p'\n        LEFT JOIN profileSetItem ON profileSetItem.pubkey = mainEvent.pubkey\n        LEFT JOIN (\n            SELECT vote.eventId, COUNT(*) AS upvoteCount\n            FROM vote\n            GROUP BY vote.eventId\n        ) AS upvotes ON upvotes.eventId = crossPost.crossPostedId\n        LEFT JOIN friend AS cross_posted_friend ON cross_posted_friend.friendPubkey = crossPostedEvent.pubkey\n        LEFT JOIN weboftrust AS cross_posted_wot ON cross_posted_wot.webOfTrustPubkey = crossPostedEvent.pubkey\n        LEFT JOIN mute AS cross_posted_mute ON cross_posted_mute.mutedItem = crossPostedEvent.pubkey AND cross_posted_mute.tag IS 'p'\n        LEFT JOIN profileSetItem AS cross_posted_profile_set_item ON cross_posted_profile_set_item.pubkey = crossPostedEvent.pubkey"
       },
       {
         "viewName": "AdvancedProfileView",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT profile.pubkey, profile.name,  (SELECT EXISTS(SELECT * FROM friend WHERE friend.friendPubkey = profile.pubkey)) AS isFriend, (SELECT EXISTS(SELECT * FROM weboftrust WHERE weboftrust.webOfTrustPubkey = profile.pubkey)) AS isWebOfTrust, (SELECT EXISTS(SELECT * FROM account WHERE account.pubkey = profile.pubkey)) AS isMe, (SELECT EXISTS(SELECT * FROM mute WHERE mute.mutedItem = profile.pubkey AND mute.tag IS 'p')) AS isMuted, (SELECT EXISTS(SELECT * FROM profileSetItem WHERE profileSetItem.pubkey = profile.pubkey)) AS isInList, (SELECT EXISTS(SELECT * FROM lock WHERE pubkey = profile.pubkey)) AS isLocked FROM profile"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT profile.pubkey, profile.name,  (SELECT EXISTS(SELECT * FROM friend WHERE friend.friendPubkey = profile.pubkey)) AS isFriend, (SELECT EXISTS(SELECT * FROM weboftrust WHERE weboftrust.webOfTrustPubkey = profile.pubkey)) AS isWebOfTrust, (SELECT EXISTS(SELECT * FROM mute WHERE mute.mutedItem = profile.pubkey AND mute.tag IS 'p')) AS isMuted, (SELECT EXISTS(SELECT * FROM profileSetItem WHERE profileSetItem.pubkey = profile.pubkey)) AS isInList FROM profile"
       },
       {
         "viewName": "PollView",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            mainEvent.id,\n            mainEvent.pubkey,\n            mainEvent.content,\n            poll.endsAt,\n            mainEvent.createdAt,\n            mainEvent.relayUrl,\n            mainEvent.isMentioningMe,\n            mainEvent.blurhashes,\n            profile.name AS authorName,\n            ht.min_hashtag AS myTopic,\n            CASE WHEN account.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsOneself,\n            CASE WHEN friend.friendPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsFriend,\n            CASE WHEN weboftrust.webOfTrustPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsTrusted,\n            CASE WHEN mute.mutedItem IS NOT NULL THEN 1 ELSE 0 END AS authorIsMuted,\n            CASE WHEN profileSetItem.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsInList,\n            CASE WHEN lock.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsLocked,\n            CASE WHEN vote.eventId IS NOT NULL THEN 1 ELSE 0 END isUpvoted,\n            upvotes.upvoteCount,\n            comments.commentCount,\n            (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked,\n             (SELECT createdAt FROM pollResponse WHERE pollId = mainEvent.id) AS latestResponse\n        FROM poll\n        JOIN mainEvent ON mainEvent.id = poll.eventId\n        LEFT JOIN profile ON profile.pubkey = mainEvent.pubkey\n        LEFT JOIN (\n            SELECT DISTINCT hashtag.eventId, MIN(hashtag.hashtag) AS min_hashtag\n            FROM hashtag\n            JOIN topic ON hashtag.hashtag = topic.topic\n            WHERE topic.myPubkey = (SELECT pubkey FROM account LIMIT 1)\n            GROUP BY hashtag.eventId\n        ) AS ht ON ht.eventId = mainEvent.id\n        LEFT JOIN account ON account.pubkey = mainEvent.pubkey\n        LEFT JOIN friend ON friend.friendPubkey = mainEvent.pubkey\n        LEFT JOIN weboftrust ON weboftrust.webOfTrustPubkey = mainEvent.pubkey\n        LEFT JOIN mute ON mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p'\n        LEFT JOIN profileSetItem ON profileSetItem.pubkey = mainEvent.pubkey\n        LEFT JOIN lock ON lock.pubkey = mainEvent.pubkey\n        LEFT JOIN vote ON vote.eventId = mainEvent.id AND vote.pubkey = (SELECT pubkey FROM account LIMIT 1)\n        LEFT JOIN (\n            SELECT vote.eventId, COUNT(*) AS upvoteCount\n            FROM vote\n            GROUP BY vote.eventId\n        ) AS upvotes ON upvotes.eventId = mainEvent.id\n        LEFT JOIN (\n            SELECT comment.parentId, COUNT(*) AS commentCount\n            FROM comment\n            GROUP BY comment.parentId\n        ) AS comments ON comments.parentId = mainEvent.id"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            mainEvent.id,\n            mainEvent.pubkey,\n            mainEvent.content,\n            poll.endsAt,\n            mainEvent.createdAt,\n            mainEvent.relayUrl,\n            mainEvent.isMentioningMe,\n            mainEvent.blurhashes,\n            profile.name AS authorName,\n            ht.min_hashtag AS myTopic,\n            CASE WHEN friend.friendPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsFriend,\n            CASE WHEN weboftrust.webOfTrustPubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsTrusted,\n            CASE WHEN mute.mutedItem IS NOT NULL THEN 1 ELSE 0 END AS authorIsMuted,\n            CASE WHEN profileSetItem.pubkey IS NOT NULL THEN 1 ELSE 0 END AS authorIsInList,\n            upvotes.upvoteCount,\n            comments.commentCount,\n            (SELECT EXISTS(SELECT * FROM bookmark WHERE bookmark.eventId = mainEvent.id)) AS isBookmarked,\n             (SELECT createdAt FROM pollResponse WHERE pollId = mainEvent.id) AS latestResponse\n        FROM poll\n        JOIN mainEvent ON mainEvent.id = poll.eventId\n        LEFT JOIN profile ON profile.pubkey = mainEvent.pubkey\n        LEFT JOIN (\n            SELECT DISTINCT hashtag.eventId, MIN(hashtag.hashtag) AS min_hashtag\n            FROM hashtag\n            JOIN topic ON hashtag.hashtag = topic.topic\n            GROUP BY hashtag.eventId\n        ) AS ht ON ht.eventId = mainEvent.id\n        LEFT JOIN friend ON friend.friendPubkey = mainEvent.pubkey\n        LEFT JOIN weboftrust ON weboftrust.webOfTrustPubkey = mainEvent.pubkey\n        LEFT JOIN mute ON mute.mutedItem = mainEvent.pubkey AND mute.tag IS 'p'\n        LEFT JOIN profileSetItem ON profileSetItem.pubkey = mainEvent.pubkey\n        LEFT JOIN (\n            SELECT vote.eventId, COUNT(*) AS upvoteCount\n            FROM vote\n            GROUP BY vote.eventId\n        ) AS upvotes ON upvotes.eventId = mainEvent.id\n        LEFT JOIN (\n            SELECT comment.parentId, COUNT(*) AS commentCount\n            FROM comment\n            GROUP BY comment.parentId\n        ) AS comments ON comments.parentId = mainEvent.id"
       },
       {
         "viewName": "PollOptionView",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT pollOption.pollId, pollOption.optionId, pollOption.label, (SELECT COUNT(*) FROM pollResponse WHERE pollResponse.pollId = pollOption.pollId AND pollResponse.optionId = pollOption.optionId) AS voteCount, (SELECT EXISTS(SELECT * FROM pollResponse WHERE pubkey = (SELECT pubkey FROM account) AND pollResponse.pollId = pollOption.pollId AND pollResponse.optionId = pollOption.optionId)) AS isMyVote FROM pollOption"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT pollOption.pollId, pollOption.optionId, pollOption.label, (SELECT COUNT(*) FROM pollResponse WHERE pollResponse.pollId = pollOption.pollId AND pollResponse.optionId = pollOption.optionId) AS voteCount FROM pollOption"
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4daa457a258aec9411760f4f37eaaa63')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c3b57dd32a96d7065cf4d2774c9471ea')"
     ]
   }
 }

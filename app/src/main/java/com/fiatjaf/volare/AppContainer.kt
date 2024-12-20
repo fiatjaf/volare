@@ -7,7 +7,6 @@ import androidx.room.Room
 import com.anggrayudi.storage.SimpleStorageHelper
 import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.model.ConnectionStatus
-import com.fiatjaf.volare.data.account.AccountLocker
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.account.AccountSwitcher
 import com.fiatjaf.volare.data.account.ExternalSignerHandler
@@ -51,7 +50,6 @@ import com.fiatjaf.volare.data.provider.DatabaseInteractor
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.data.provider.FriendProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
-import com.fiatjaf.volare.data.provider.LockProvider
 import com.fiatjaf.volare.data.provider.MuteProvider
 import com.fiatjaf.volare.data.provider.NameProvider
 import com.fiatjaf.volare.data.provider.ProfileProvider
@@ -112,8 +110,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
 
     val muteProvider = MuteProvider(muteDao = roomDb.muteDao())
 
-    val lockProvider = LockProvider(lockDao = roomDb.lockDao())
-
     val metadataInMemory = MetadataInMemory()
 
     private val nameProvider = NameProvider(
@@ -136,6 +132,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     val relayProvider = RelayProvider(
         nip65Dao = roomDb.nip65Dao(),
         eventRelayDao = roomDb.eventRelayDao(),
+        accountManager = accountManager,
         nostrClient = nostrClient,
         connectionStatuses = connectionStatuses,
         pubkeyProvider = pubkeyProvider,
@@ -150,7 +147,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         muteProvider = muteProvider,
         annotatedStringProvider = annotatedStringProvider,
         relayProvider = relayProvider,
-        lockProvider = lockProvider,
     )
 
     val topicProvider = TopicProvider(
@@ -173,7 +169,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     private val filterCreator = FilterCreator(
         room = roomDb,
         accountManager = accountManager,
-        lockProvider = lockProvider,
         relayProvider = relayProvider,
     )
 
@@ -235,7 +230,8 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         room = roomDb,
         context = context,
         storageHelper = storageHelper,
-        snackbar = snackbar
+        snackbar = snackbar,
+        accountManager = accountManager
     )
 
     val nostrService = NostrService(
@@ -274,17 +270,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         snackbar = snackbar,
     )
 
-    val accountLocker = AccountLocker(
-        context = context,
-        accountManager = accountManager,
-        snackbar = snackbar,
-        eventRebroadcaster = eventRebroadcaster,
-        lockDao = roomDb.lockDao(),
-        lockInsertDao = roomDb.lockInsertDao(),
-        nostrService = nostrService,
-        relayProvider = relayProvider,
-    )
-
     val postVoter = PostVoter(
         nostrService = nostrService,
         relayProvider = relayProvider,
@@ -292,7 +277,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         context = context,
         voteDao = roomDb.voteDao(),
         eventDeletor = eventDeletor,
-        rebroadcaster = eventRebroadcaster,
+        accountManager = accountManager,
         eventPreferences = eventPreferences,
     )
 
@@ -358,9 +343,11 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         forcedFollows = profileFollower.forcedFollowsFlow,
         forcedBookmarks = bookmarker.forcedBookmarksFlow,
         muteProvider = muteProvider,
+        accountManager = accountManager,
     )
 
     val threadProvider = ThreadProvider(
+        accountManager = accountManager,
         nostrSubscriber = nostrSubscriber,
         lazyNostrSubscriber = lazyNostrSubscriber,
         room = roomDb,
@@ -378,13 +365,14 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         forcedMuteFlow = muter.forcedProfileMuteFlow,
         accountManager = accountManager,
         metadataInMemory = metadataInMemory,
-        room = roomDb,
+        profileDao = roomDb.profileDao(),
+        fullProfileDao = roomDb.fullProfileDao(),
+        webOfTrustDao = roomDb.webOfTrustDao(),
         friendProvider = friendProvider,
         muteProvider = muteProvider,
         itemSetProvider = itemSetProvider,
         lazyNostrSubscriber = lazyNostrSubscriber,
         annotatedStringProvider = annotatedStringProvider,
-        lockProvider = lockProvider,
     )
 
     val searchProvider = SearchProvider(
@@ -408,6 +396,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     )
 
     val eventSweeper = EventSweeper(
+        accountManager = accountManager,
         databasePreferences = databasePreferences,
         idCacheClearer = idCacheClearer,
         deleteDao = roomDb.deleteDao(),

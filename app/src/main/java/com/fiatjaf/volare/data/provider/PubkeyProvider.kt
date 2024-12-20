@@ -2,7 +2,7 @@ package com.fiatjaf.volare.data.provider
 
 import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.model.CustomPubkeys
-import com.fiatjaf.volare.data.model.FriendPubkeysNoLock
+import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
 import com.fiatjaf.volare.data.model.ListPubkeys
 import com.fiatjaf.volare.data.model.NoPubkeys
@@ -19,7 +19,7 @@ class PubkeyProvider(
     suspend fun getPubkeys(selection: PubkeySelection): List<PubkeyHex> {
         return when (selection) {
             is CustomPubkeys -> selection.pubkeys.toList()
-            FriendPubkeysNoLock -> friendProvider.getFriendPubkeysNoLock()
+            FriendPubkeys -> friendProvider.getFriendPubkeys()
             is ListPubkeys -> itemSetProvider.getPubkeysFromList(identifier = selection.identifier)
             is SingularPubkey -> selection.asList()
             Global -> emptyList()

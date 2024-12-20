@@ -2,7 +2,7 @@ package com.fiatjaf.volare.data.room.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.fiatjaf.volare.data.model.FriendPubkeysNoLock
+import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
 import com.fiatjaf.volare.data.model.HomeFeedSetting
 import com.fiatjaf.volare.data.model.NoPubkeys
@@ -21,16 +21,12 @@ private const val CROSS = "FROM CrossPostView $CREATED_AT"
 private const val POLL = "FROM PollView $CREATED_AT"
 private const val POLL_OPTION = "FROM PollOptionView "
 
-private const val ROOT_COND = "AND authorIsOneself = 0 " +
-        "AND authorIsMuted = 0 " +
-        "AND authorIsLocked = 0 " +
+private const val ROOT_COND = "AND authorIsMuted = 0 " +
         "AND NOT EXISTS (SELECT * FROM hashtag WHERE eventId = id AND hashtag IN (SELECT mutedItem FROM mute WHERE tag IS 't')) " +
         "ORDER BY createdAt DESC " +
         "LIMIT :size"
 
-private const val CROSS_COND = "AND crossPostedAuthorIsOneself = 0 " +
-        "AND crossPostedAuthorIsMuted = 0 " +
-        ROOT_COND
+private const val CROSS_COND = "AND crossPostedAuthorIsMuted = 0 $ROOT_COND"
 
 private const val POLL_COND = ROOT_COND
 
@@ -160,7 +156,6 @@ private const val GLOBAL_POLL_OPTION_QUERY = "SELECT * $GLOBAL_MAIN_POLL_OPTION"
 
 @Dao
 interface HomeFeedDao {
-
     fun getHomeRootPostFlow(
         setting: HomeFeedSetting,
         until: Long,
@@ -175,7 +170,7 @@ interface HomeFeedDao {
                 flowOf(emptyList())
             }
 
-            FriendPubkeysNoLock -> if (withMyTopics) {
+            FriendPubkeys -> if (withMyTopics) {
                 internalGetFriendOrTopicRootFlow(until = until, size = size)
             } else {
                 internalGetFriendRootFlow(until = until, size = size)
@@ -205,7 +200,7 @@ interface HomeFeedDao {
                 flowOf(emptyList())
             }
 
-            FriendPubkeysNoLock -> if (withMyTopics) {
+            FriendPubkeys -> if (withMyTopics) {
                 internalGetFriendOrTopicCrossFlow(until = until, size = size)
             } else {
                 internalGetFriendCrossFlow(until = until, size = size)
@@ -235,7 +230,7 @@ interface HomeFeedDao {
                 flowOf(emptyList())
             }
 
-            FriendPubkeysNoLock -> if (withMyTopics) {
+            FriendPubkeys -> if (withMyTopics) {
                 internalGetFriendOrTopicPollFlow(until = until, size = size)
             } else {
                 internalGetFriendPollFlow(until = until, size = size)
@@ -265,7 +260,7 @@ interface HomeFeedDao {
                 flowOf(emptyList())
             }
 
-            FriendPubkeysNoLock -> if (withMyTopics) {
+            FriendPubkeys -> if (withMyTopics) {
                 internalGetFriendOrTopicPollOptionFlow(until = until, size = size)
             } else {
                 internalGetFriendPollOptionFlow(until = until, size = size)
@@ -295,7 +290,7 @@ interface HomeFeedDao {
                 emptyList()
             }
 
-            FriendPubkeysNoLock -> if (withMyTopics) {
+            FriendPubkeys -> if (withMyTopics) {
                 internalGetFriendOrTopicRoot(until = until, size = size)
             } else {
                 internalGetFriendRoot(until = until, size = size)
@@ -325,7 +320,7 @@ interface HomeFeedDao {
                 emptyList()
             }
 
-            FriendPubkeysNoLock -> if (withMyTopics) {
+            FriendPubkeys -> if (withMyTopics) {
                 internalGetFriendOrTopicCross(until = until, size = size)
             } else {
                 internalGetFriendCross(until = until, size = size)
@@ -355,7 +350,7 @@ interface HomeFeedDao {
                 emptyList()
             }
 
-            FriendPubkeysNoLock -> if (withMyTopics) {
+            FriendPubkeys -> if (withMyTopics) {
                 internalGetFriendOrTopicPoll(until = until, size = size)
             } else {
                 internalGetFriendPoll(until = until, size = size)
@@ -389,7 +384,7 @@ interface HomeFeedDao {
                 flowOf(false)
             }
 
-            FriendPubkeysNoLock -> if (withMyTopics) {
+            FriendPubkeys -> if (withMyTopics) {
                 combine(
                     internalHasFriendOrTopicRootFlow(until = until, size = size),
                     internalHasFriendOrTopicCrossFlow(until = until, size = size),
@@ -443,7 +438,7 @@ interface HomeFeedDao {
                 emptyList()
             }
 
-            FriendPubkeysNoLock -> if (withMyTopics) {
+            FriendPubkeys -> if (withMyTopics) {
                 internalGetFriendOrTopicCreatedAtRoot(until = until, size = size) +
                         internalGetFriendOrTopicCreatedAtCross(until = until, size = size) +
                         internalGetFriendOrTopicCreatedAtPoll(until = until, size = size)

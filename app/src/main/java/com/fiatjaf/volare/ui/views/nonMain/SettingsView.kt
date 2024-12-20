@@ -80,7 +80,6 @@ fun SettingsView(vm: SettingsViewModel, snackbar: SnackbarHostState, onUpdate: O
 private fun SettingsViewContent(vm: SettingsViewModel, onUpdate: OnUpdate) {
     val scope = rememberCoroutineScope()
 
-    // val isLocked = vm.isLocked.collectAsState()
     LazyColumn {
         if (vm.isLoadingAccount.value) item { FullLinearProgressIndicator() }
         item {
@@ -88,9 +87,6 @@ private fun SettingsViewContent(vm: SettingsViewModel, onUpdate: OnUpdate) {
                 accountType = vm.accountType(),
                 pubkey = vm.publicKey(),
                 nsec = vm.nsec.value,
-                // isLocking = vm.isLocking.value,
-                // isLocked = vm.isLockedForced.value || isLocked.value,
-                // scope = scope,
                 onUpdate = onUpdate
             )
         }
@@ -111,9 +107,6 @@ private fun AccountSection(
     accountType: AccountType,
     pubkey: PublicKey,
     nsec: String,
-    // isLocking: Boolean,
-    // isLocked: Boolean,
-    // scope: CoroutineScope,
     onUpdate: OnUpdate
 ) {
     SettingsSection(header = stringResource(id = R.string.account)) {
@@ -145,29 +138,6 @@ private fun AccountSection(
                 onLoadNsec = { onUpdate(LoadSecretKeyForDisplay) },
                 onDismiss = { showNsec.value = false })
         }
-
-        // TODO: revive this later when we have a standard way to fix compromised keys?
-        // val showLockDialog = remember { mutableStateOf(false) }
-        // if (showLockDialog.value) BaseActionDialog(
-        //     title = stringResource(id = R.string.lock_your_account),
-        //     icon = WarningIcon,
-        //     iconTint = getTrustColor(trustType = Locked),
-        //     text = stringResource(id = R.string.lock_your_account_warning),
-        //     confirmText = stringResource(id = R.string.lock_my_account),
-        //     onConfirm = {
-        //         onUpdate(LockAccount(uiScope = scope))
-        //         showLockDialog.value = false
-        //     },
-        //     onDismiss = { showLockDialog.value = false })
-        // if (!isLocked) ClickableRow(
-        //     header = stringResource(id = R.string.lock_your_account),
-        //     text = stringResource(id = R.string.lock_your_account_in_case_your_keys_are_compromised),
-        //     trailingContent = { if (isLocking) SmallCircleProgressIndicator() },
-        //     onClick = { showLockDialog.value = true })
-        // else ClickableRow(
-        //     header = stringResource(id = R.string.rebroadcast_your_lock_event),
-        //     text = stringResource(id = R.string.your_account_is_locked_click_to_rebroadcast),
-        //     onClick = { onUpdate(RebroadcastMyLockEvent(uiScope = scope)) })
     }
 }
 

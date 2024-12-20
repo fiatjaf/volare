@@ -102,7 +102,6 @@ class Paginator(
         }
     }
 
-
     fun append() {
         if (isAppending.value || isRefreshing.value || pageTimestamps.value.isEmpty()) return
 

@@ -20,6 +20,7 @@ import com.fiatjaf.volare.core.utils.isBareTopicStr
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.normalizeTopic
 import com.fiatjaf.volare.core.utils.showToast
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.nostr.createNevent
 import com.fiatjaf.volare.data.nostr.createNprofile
@@ -36,6 +37,7 @@ import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.PublicKey
 
 class SearchViewModel(
+    private val accountManager: AccountManager,
     private val searchProvider: SearchProvider,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
     private val snackbar: SnackbarHostState,
@@ -43,6 +45,7 @@ class SearchViewModel(
     val topics = mutableStateOf<List<Topic>>(emptyList())
     val profiles = mutableStateOf<List<AdvancedProfileView>>(emptyList())
     val posts = mutableStateOf<List<SimplePostView>>(emptyList())
+    val ourPubkey = accountManager.getPublicKeyHex()
 
     fun handle(action: SearchViewAction) {
         when (action) {

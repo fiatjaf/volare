@@ -18,7 +18,7 @@ import com.fiatjaf.volare.core.InboxViewInit
 import com.fiatjaf.volare.core.InboxViewRefresh
 import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.viewModel.InboxViewModel
-import com.fiatjaf.volare.data.model.FriendPubkeysNoLock
+import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
 import com.fiatjaf.volare.data.model.InboxFeedSetting
 import com.fiatjaf.volare.data.model.WebOfTrustPubkeys
@@ -67,8 +67,8 @@ private fun Filter(setting: MutableState<InboxFeedSetting>) {
         )
         FeedPubkeySelectionRadio(
             current = setting.value.pubkeySelection,
-            target = FriendPubkeysNoLock,
-            onClick = { setting.value = setting.value.copy(pubkeySelection = FriendPubkeysNoLock) })
+            target = FriendPubkeys,
+            onClick = { setting.value = setting.value.copy(pubkeySelection = FriendPubkeys) })
         FeedPubkeySelectionRadio(
             current = setting.value.pubkeySelection,
             target = WebOfTrustPubkeys,

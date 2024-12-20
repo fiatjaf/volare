@@ -1,6 +1,7 @@
 package com.fiatjaf.volare.core.viewModel
 
 import androidx.compose.material3.DrawerState
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiatjaf.volare.core.CloseDrawer
@@ -14,7 +15,9 @@ import com.fiatjaf.volare.data.provider.ItemSetProvider
 import com.fiatjaf.volare.data.provider.ProfileProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -23,10 +26,19 @@ class DrawerViewModel(
     itemSetProvider: ItemSetProvider,
     val drawerState: DrawerState,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
-) :
-    ViewModel() {
-    val personalProfile = profileProvider.getPersonalProfileFlow()
-        .stateIn(viewModelScope, SharingStarted.Eagerly, profileProvider.getDefaultProfile())
+) : ViewModel() {
+    val personalProfile = MutableStateFlow(profileProvider.getDefaultProfile())
+
+    /* TODO: figure out how to do this without the UI thread panicking
+    init {
+        viewModelScope.launch {
+            profileProvider.getPersonalProfileFlow()
+                .collect {
+                    personalProfile.value = it
+                }
+        }
+    }*/
+
     val itemSetMetas = itemSetProvider.getMySetsFlow()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
