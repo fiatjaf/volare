@@ -16,8 +16,8 @@ build_release: gomobile
 
 emulator: gomobile
     ./gradlew assembleDebug
-    adb install app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+    ./gradlew installDebug
 
 emulator_release: gomobile
     ./gradlew assembleRelease
-    adb install app/build/outputs/apk/release/app-arm64-v8a-release.apk
+    ./gradlew installRelease
