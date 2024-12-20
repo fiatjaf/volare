@@ -40,7 +40,6 @@ fun ProfileTopAppBar(
                 )
                 if (!profile.inner.isMuted || profile.inner.isFriend) FollowButton(
                     isFollowed = profile.inner.isFriend,
-                    isEnabled = profile.inner.isFriend,
                     onFollow = {
                         onUpdate(FollowProfile(pubkey = profile.inner.pubkey))
                     },

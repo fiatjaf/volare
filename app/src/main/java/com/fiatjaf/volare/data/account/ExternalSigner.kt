@@ -87,16 +87,16 @@ private const val PERMISSIONS = """
 """
 
 class ExternalSignerHandler {
-    private var signerLauncher: ManagedLauncher? = null
     private var reqAccountLauncher: ManagedLauncher? = null
+    private var signerLauncher: ManagedLauncher? = null
     private val signatureChannel = Channel<String?>()
 
-    fun setSignerLauncher(launcher: ManagedLauncher) {
-        signerLauncher = launcher
+    fun setRequester(req: ManagedLauncher) {
+        this.reqAccountLauncher = req
     }
 
-    fun setAccountLauncher(launcher: ManagedLauncher) {
-        reqAccountLauncher = launcher
+    fun setLauncher(lch: ManagedLauncher) {
+        this.signerLauncher = lch
     }
 
     fun requestExternalAccount(): Throwable? {
@@ -104,7 +104,7 @@ class ExternalSignerHandler {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("nostrsigner:"))
             intent.putExtra("permissions", PERMISSIONS)
             intent.putExtra("type", "get_public_key")
-            reqAccountLauncher?.launch(intent) ?: throw IllegalStateException("Signer is null")
+            reqAccountLauncher?.launch(intent) ?: throw IllegalStateException("req account launcher is null")
         }.exceptionOrNull()
     }
 
@@ -120,7 +120,7 @@ class ExternalSignerHandler {
             signerLauncher?.launch(
                 input = intent,
                 options = ActivityOptionsCompat.makeBasic()
-            ) ?: throw IllegalStateException("Signer is null")
+            ) ?: throw IllegalStateException("signer launcher is null")
         }.exceptionOrNull()
         if (err != null) return Result.failure(err)
 

@@ -49,7 +49,7 @@ class FeedProvider(
     private val staticFeedProvider = StaticFeedProvider(
         room = room,
         annotatedStringProvider = annotatedStringProvider,
-        ourPubKeyFlow = accountManager.pubkeyHexFlow,
+        ourPubKey = accountManager.getPublicKeyHex(),
     )
 
     suspend fun getStaticFeed(

@@ -25,7 +25,7 @@ interface ProfileDao {
                 "WHERE pubkey = :ourPubkey " +
                 "LIMIT 1"
     )
-    fun getPersonalProfile(ourPubkey: String): ProfileEntity
+    suspend fun getPersonalProfile(ourPubkey: String): ProfileEntity?
 
     @Query("SELECT * FROM AdvancedProfileView WHERE pubkey IN (:pubkeys)")
     fun getAdvancedProfilesFlow(pubkeys: Collection<PubkeyHex>): Flow<List<AdvancedProfileView>>

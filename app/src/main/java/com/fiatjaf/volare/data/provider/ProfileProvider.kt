@@ -99,15 +99,19 @@ class ProfileProvider(
         }
     }
 
-    suspend fun getPersonalProfileFlow(): Flow<ProfileEntity> {
+    fun getPersonalProfileFlow(): Flow<ProfileEntity> {
         return combine(
             accountManager.pubkeyHexFlow.map { pubkey -> profileDao.getPersonalProfile(pubkey) },
             metadataInMemory.getMetadataFlow()
         ) { profile, meta ->
-            val name = profile.name
-                .ifEmpty { meta[profile.pubkey]?.name.orEmpty() }
-                .ifEmpty { profile.pubkey.toShortenedBech32() }
-            profile.copy(name = name)
+            if (profile != null) {
+                val name = profile.name
+                    .ifEmpty { meta[profile.pubkey]?.name.orEmpty() }
+                    .ifEmpty { profile.pubkey.toShortenedBech32() }
+                profile.copy(name = name)
+            } else {
+                getDefaultProfile()
+            }
         }
     }
 

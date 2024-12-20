@@ -58,8 +58,8 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            val activity = (LocalContext.current as? Activity)
-            val closeApp: Fn = { activity?.finish() }
+            val context = (LocalContext.current as? Activity)
+            val closeApp: Fn = { context?.finish() }
             val vmContainer = createVMContainer(appContainer = appContainer)
             val core = viewModel {
                 Core(

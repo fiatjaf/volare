@@ -2,8 +2,14 @@ package com.fiatjaf.volare.data.account
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.collectAsState
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.skip
+import kotlinx.coroutines.launch
 import rust.nostr.sdk.Event
 import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.SecretKey
@@ -35,12 +41,15 @@ enum class AccountType {
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 class AccountManager(
     val context: Context,
     val externalSignerHandler: ExternalSignerHandler,
 )  {
     var accountType: AccountType
-    val pubkeyHexFlow = MutableStateFlow<String>("") // in practice this will never be ""
+
+    // in practice this will never be ""
+    val pubkeyHexFlow = MutableStateFlow<String>("")
 
     private var signer: Signer
     private val store = context.getSharedPreferences("account", Context.MODE_PRIVATE)
@@ -62,7 +71,7 @@ class AccountManager(
 
                 signer = ExternalSigner(
                     context,
-                    handler = ExternalSignerHandler(),
+                    handler = externalSignerHandler,
                 )
             }
             else -> {
@@ -78,7 +87,7 @@ class AccountManager(
         runBlocking {
             val pk = signer.getPublicKey()
             this@AccountManager.cachedPublicKey = pk
-            this@AccountManager.pubkeyHexFlow.value = pk.toHex()
+            this@AccountManager.pubkeyHexFlow.emit(pk.toHex())
         }
     }
 
@@ -90,8 +99,19 @@ class AccountManager(
         this.signer = set(context)
         runBlocking {
             val pk = signer.getPublicKey()
+            store.edit()
+                .putInt("active",
+                    when (signer) {
+                        is BunkerSigner -> AccountType.BUNKER
+                        is PlainKeySigner -> AccountType.PLAINKEY
+                        is ExternalSigner -> AccountType.EXTERNAL
+                        else ->
+                            throw Exception("unknown signer type $signer, this should not happen!")
+                    }.toInt()
+                )
+                .apply()
             this@AccountManager.cachedPublicKey = pk
-            this@AccountManager.pubkeyHexFlow.value = pk.toHex()
+            this@AccountManager.pubkeyHexFlow.emit(pk.toHex())
         }
     }
 

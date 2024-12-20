@@ -111,6 +111,12 @@ class Core(
             is ListViewAction -> vmContainer.listVM.handle(action = uiEvent)
             is MuteListViewAction -> vmContainer.muteListVM.handle(action = uiEvent)
 
+            is ProcessExternalRequester -> viewModelScope.launch {
+                appContainer.externalSignerHandler.setRequester(uiEvent.target)
+            }
+            is ProcessExternalLauncher -> viewModelScope.launch {
+                appContainer.externalSignerHandler.setLauncher(uiEvent.target)
+            }
             is ProcessExternalSignature -> viewModelScope.launch {
                 appContainer.externalSignerHandler.processExternalSignature(
                     result = uiEvent.activityResult
@@ -120,12 +126,6 @@ class Core(
             is ClickClickableText -> clickText(action = uiEvent)
 
             is SuggestionAction -> appContainer.suggestionProvider.handle(action = uiEvent)
-
-            is RegisterAccountLauncher -> appContainer.externalSignerHandler
-                .setAccountLauncher(launcher = uiEvent.launcher)
-
-            is RegisterSignerLauncher -> appContainer.externalSignerHandler
-                .setSignerLauncher(launcher = uiEvent.launcher)
 
             is RegisterUriHandler -> appContainer.annotatedStringProvider
                 .setUriHandler(uriHandler = uiEvent.uriHandler)

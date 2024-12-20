@@ -27,17 +27,8 @@ class DrawerViewModel(
     val drawerState: DrawerState,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
 ) : ViewModel() {
-    val personalProfile = MutableStateFlow(profileProvider.getDefaultProfile())
-
-    /* TODO: figure out how to do this without the UI thread panicking
-    init {
-        viewModelScope.launch {
-            profileProvider.getPersonalProfileFlow()
-                .collect {
-                    personalProfile.value = it
-                }
-        }
-    }*/
+    val personalProfile = profileProvider.getPersonalProfileFlow()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, profileProvider.getDefaultProfile())
 
     val itemSetMetas = itemSetProvider.getMySetsFlow()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())

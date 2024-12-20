@@ -1,5 +1,6 @@
 package com.fiatjaf.volare.core.utils
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.LazyListState
@@ -14,14 +15,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.MAX_TOPICS
 import com.fiatjaf.volare.core.ManagedLauncher
-import com.fiatjaf.volare.core.OnUpdate
-import com.fiatjaf.volare.core.ProcessExternalAccount
-import com.fiatjaf.volare.core.ProcessExternalSignature
 
 
 @Composable
@@ -58,25 +55,6 @@ fun getSimpleLauncher(): ManagedLauncher {
         contract = ActivityResultContracts.StartActivityForResult(),
         onResult = {}
     )
-}
-
-@Composable
-fun getSignerLauncher(onUpdate: OnUpdate): ManagedLauncher {
-    return rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { activityResult ->
-        onUpdate(ProcessExternalSignature(activityResult = activityResult))
-    }
-}
-
-@Composable
-fun getAccountLauncher(onUpdate: OnUpdate): ManagedLauncher {
-    val context = LocalContext.current
-    return rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { activityResult ->
-        onUpdate(ProcessExternalAccount(activityResult = activityResult, context = context))
-    }
 }
 
 @Composable
