@@ -75,6 +75,8 @@ val md_theme_dark_scrim = Color(0xFF000000)
 
 fun Color.light(factor: Float = 0.5f) = this.copy(alpha = this.alpha * factor)
 
+val Neutral100 = Color(0XFFF5F5F5)
+val Neutral800 = Color(0XFF262626)
 val Red400 = Color(0xFFF87171)
 val Red600 = Color(0xFFDC2626)
 val Amber200 = Color(0XFFFDE68A)

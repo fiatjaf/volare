@@ -12,6 +12,7 @@ data class ExtendedColors(
     val hashtag: Color,
     val link: Color,
     val opLabel: Color,
+    val text: Color,
 )
 
 // Define light and dark versions of your extended colors
@@ -20,6 +21,7 @@ val LightExtendedColors = ExtendedColors(
     hashtag = Sky600,
     link = Lime600,
     opLabel = Sky600,
+    text = Neutral800,
 )
 
 val DarkExtendedColors = ExtendedColors(
@@ -27,6 +29,7 @@ val DarkExtendedColors = ExtendedColors(
     hashtag = Sky600,
     link = Lime600,
     opLabel = Sky400,
+    text = Neutral100,
 )
 
 private val LightColors = lightColorScheme(

@@ -45,6 +45,7 @@ import com.fiatjaf.volare.ui.components.video.VideoPlayer
 import com.fiatjaf.volare.ui.theme.VideoIcon
 import com.fiatjaf.volare.data.provider.TextItem
 import com.fiatjaf.volare.core.utils.BlurHash
+import com.fiatjaf.volare.ui.theme.extendedColors
 
 private const val TAG = "AnnotatedText"
 private const val previewRowHeight = 21
@@ -60,7 +61,7 @@ fun AnnotatedText(
     val gradientBrush = Brush.linearGradient(
         colors = listOf(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.background)
     )
-    val textStyle = style.copy(color = MaterialTheme.colorScheme.onSurface)
+    val textStyle = style.copy(color = MaterialTheme.extendedColors.text)
     val addedHeight = remember { mutableStateOf(0) }
 
     Column(
