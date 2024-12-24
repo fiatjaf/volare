@@ -10,5 +10,8 @@ val MentionStyle: SpanStyle
 val HashtagStyle: SpanStyle
     get() = SpanStyle(color = AppTheme.extendedColors.hashtag)
 
-val UrlStyle: SpanStyle
-    get() = SpanStyle(color = AppTheme.extendedColors.link, textDecoration = TextDecoration.Underline)
+val GenericUrlStyle: SpanStyle
+    get() = SpanStyle(color = AppTheme.extendedColors.genericLink, textDecoration = TextDecoration.Underline)
+
+val MediaUrlStyle: SpanStyle
+    get() = SpanStyle(color = AppTheme.extendedColors.mediaLink, textDecoration = TextDecoration.Underline)

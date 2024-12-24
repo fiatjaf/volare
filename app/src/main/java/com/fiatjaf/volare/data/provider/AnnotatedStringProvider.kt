@@ -22,7 +22,8 @@ import com.fiatjaf.volare.core.utils.BlurHashDef
 import com.fiatjaf.volare.data.nostr.createNprofile
 import com.fiatjaf.volare.ui.theme.HashtagStyle
 import com.fiatjaf.volare.ui.theme.MentionStyle
-import com.fiatjaf.volare.ui.theme.UrlStyle
+import com.fiatjaf.volare.ui.theme.GenericUrlStyle
+import com.fiatjaf.volare.ui.theme.MediaUrlStyle
 
 private const val TAG = "AnnotatedStringProvider"
 
@@ -281,13 +282,13 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
     }
 
     private fun AnnotatedString.Builder.pushStyledUrlAnnotation(url: String) {
-        pushLink(LinkAnnotation.Url(url = url, styles = TextLinkStyles(style = UrlStyle)))
+        pushLink(LinkAnnotation.Url(url = url, styles = TextLinkStyles(style = GenericUrlStyle)))
         append(shortenUrl(url))
         pop()
     }
 
     private fun AnnotatedString.Builder.pushRawUrlAnnotation(url: String) {
-        pushLink(LinkAnnotation.Url(url = url, styles = TextLinkStyles(style = UrlStyle)))
+        pushLink(LinkAnnotation.Url(url = url, styles = TextLinkStyles(style = MediaUrlStyle)))
         append(url)
         pop()
     }
