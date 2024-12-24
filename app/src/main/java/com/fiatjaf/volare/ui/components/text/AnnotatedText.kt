@@ -48,7 +48,7 @@ import com.fiatjaf.volare.core.utils.BlurHash
 import com.fiatjaf.volare.ui.theme.extendedColors
 
 private const val TAG = "AnnotatedText"
-private const val previewRowHeight = 21
+private const val previewRowHeight = 34
 
 @Composable
 fun AnnotatedText(
