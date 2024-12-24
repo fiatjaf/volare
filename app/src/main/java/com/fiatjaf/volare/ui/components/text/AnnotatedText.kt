@@ -4,14 +4,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.width
@@ -222,27 +215,43 @@ fun ImageRow(
                 .fillMaxWidth()
                 .background(gradientBrush, shape = RoundedCornerShape(4.dp))
         ) {
-            Image(
-                contentDescription = null,
-                painter = coilImage?.asPainter(context) ?: bigBlurhashPainter,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(4.dp))
                     .onPlaced { coords ->
                         if (onPlacedCalled) return@onPlaced
                         setOnPlacedCalled(true)
-
-                        if (coilImage == null) {
-                            val width = coords.size.width
-                            val impliedHeight =
-                                ((item.blurhash.dim?.let { (x, y) -> y.toDouble() / x.toDouble() }
-                                    ?: 0.78) * width).toInt()
-                            setBigBlurhashPainter(paintBlurhash(width, impliedHeight))
-                            addedHeight.value += impliedHeight
-                        }
                     }
-                    .clip(RoundedCornerShape(4.dp))
-            )
+            ) {
+                Image(
+                    contentDescription = null,
+                    painter = coilImage?.asPainter(context) ?: bigBlurhashPainter,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .let { modifier ->
+                            if (coilImage != null) {
+                                // If image is available, calculate aspect ratio using width and height
+                                modifier.aspectRatio(coilImage.width.toFloat() / coilImage.height.toFloat())
+                            } else {
+                                // Aspect ratio will be calculated after the layout
+                                modifier
+                            }
+                        }
+                        .onPlaced { coords ->
+                            // Only when the Box is placed, we can use coords to calculate the aspect ratio
+                            if (coilImage == null) {
+                                val width = coords.size.width
+                                val impliedHeight =
+                                    ((item.blurhash.dim?.let { (x, y) -> y.toDouble() / x.toDouble() }
+                                        ?: 0.78) * width).toInt()
+                                setBigBlurhashPainter(paintBlurhash(width, impliedHeight))
+                                addedHeight.value += impliedHeight
+                            }
+                        }
+                        .clip(RoundedCornerShape(4.dp))
+                )
+            }
             Text(
                 text = item.value,
                 style = textStyle.copy(fontSize = 12.sp /* font is 20% smaller */),
