@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
@@ -29,7 +30,6 @@ private const val TAG = "AnnotatedStringProvider"
 
 sealed class TextItem {
   data class AString (val value: AnnotatedString): TextItem()
-  data object Paragraph: TextItem()
   data class ImageURL (val value: AnnotatedString, val short: String, val blurhash: BlurHashDef): TextItem()
   data class VideoURL (val value: AnnotatedString, val short: String): TextItem()
 }
@@ -85,16 +85,29 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
         var isCacheable = true
         val result = mutableListOf<TextItem>()
 
-        for (line in str.lines()) {
-            val tline = line.trim()
-            if (tline.isEmpty()) continue
+        val chunks = str.split(Regex("\\n{2,}")).map { it.trim() }
+
+        chunks.forEach { chunk ->
+            if (chunk.isEmpty()) return@forEach
+
+            val tline = chunk.trim()
+
+            Log.d(TAG, "Processing chunk: ${tline}")
 
             var currIdx = 0
             mainLineLoop@ while (currIdx < tline.length) {
                 var media: TextItem? = null // media is reset to null
 
+                // skip spaces or carriage return at the begin of a chunk or _after_ a media
+                if (tline[currIdx] == '\n' || tline[currIdx] == ' ') {
+                    Log.d(TAG, "Found newline or space at the begin of a chunk or after a media")
+                    currIdx++
+                    continue@mainLineLoop
+                }
+
                 val annotatedString = buildAnnotatedString {
                     internal@ while (currIdx < tline.length) {
+
                         val res = tline.findAnyOf(anyTarget, currIdx, true)
 
                         if (res == null) {
@@ -139,12 +152,12 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
                                 currIdx += urlLen
                                 break@internal
                             } else if (withMedia &&
-                                       base.endsWith(".mp4", true) ||
-                                       base.endsWith(".avi", true) ||
-                                       base.endsWith(".mpeg", true) ||
-                                       base.endsWith(".mpg", true) ||
-                                       base.endsWith(".wmv", true) ||
-                                       base.endsWith(".webm", true)
+                                    base.endsWith(".mp4", true) ||
+                                    base.endsWith(".avi", true) ||
+                                    base.endsWith(".mpeg", true) ||
+                                    base.endsWith(".mpg", true) ||
+                                    base.endsWith(".wmv", true) ||
+                                    base.endsWith(".webm", true)
                             ) {
                                 media = TextItem.VideoURL(
                                     buildAnnotatedString { pushRawUrlAnnotation(urlText) },
@@ -196,9 +209,9 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
                     }
                 }
 
-                // every line is a different TextItem (unless it is empty)
+                // every paragraph (including carriage returns) is a different TextItem (unless it is empty)
                 if (annotatedString.length > 0) {
-                    result.add(TextItem.AString(annotatedString))
+                    result.add(TextItem.AString(trimTrailingWhitespace(annotatedString)))
                 }
 
                 // lines can be split if there is a media URL in them
@@ -207,12 +220,20 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
                 // and then we either continue on the same line or it will end naturally
                 continue@mainLineLoop
             }
-
-            result.add(TextItem.Paragraph)
         }
 
         if (isCacheable) cache[str] = result
         return result
+    }
+
+    fun trimTrailingWhitespace(annotatedString: AnnotatedString): AnnotatedString {
+        val text = annotatedString.text
+        val trailingWhitespace = text.takeLastWhile { it.isWhitespace() }
+        if (trailingWhitespace.isNotEmpty()) {
+            val trimmedText = text.substring(0, text.length - trailingWhitespace.length)
+            return AnnotatedString(trimmedText)
+        }
+        return annotatedString
     }
 
     private fun AnnotatedString.Builder.pushNostrMention(token: String): Boolean {

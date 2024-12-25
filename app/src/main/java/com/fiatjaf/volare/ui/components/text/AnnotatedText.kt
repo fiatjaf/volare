@@ -56,23 +56,29 @@ fun AnnotatedText(
     )
     val textStyle = style.copy(color = MaterialTheme.extendedColors.text)
     val addedHeight = remember { mutableStateOf(0) }
+    var lastWasSpacer = remember { mutableStateOf(true) } // Start with true, so if a media is the first item, skip the spacer
 
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.heightIn(max = (addedHeight.value + (maxLines * style.lineHeight.value)).dp)
+        modifier = Modifier
+        .heightIn(max = (addedHeight.value + (maxLines * style.lineHeight.value)).dp)
+        .padding(top = 0.dp, bottom = 0.dp)
     ) {
         items.forEach { item ->
             when (item) {
-                is TextItem.Paragraph ->
-                    Spacer(modifier = Modifier.height(5.dp))
-                is TextItem.AString ->
+                is TextItem.AString -> {
                     Text(
                         modifier = modifier,
                         text = item.value,
                         overflow = TextOverflow.Ellipsis,
                         style = textStyle,
                     )
-                is TextItem.ImageURL ->
+                    lastWasSpacer.value = false
+                }
+                is TextItem.ImageURL -> {
+                    if (!lastWasSpacer.value) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
                     ImageRow(
                         item = item,
                         gradientBrush = gradientBrush,
@@ -80,14 +86,24 @@ fun AnnotatedText(
                         preload = preload,
                         addedHeight = addedHeight,
                     )
-                is TextItem.VideoURL ->
+                    Spacer(modifier = Modifier.height(4.dp))
+                    lastWasSpacer.value = true
+                }
+                is TextItem.VideoURL -> {
+                    if (!lastWasSpacer.value) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
                     VideoRow(
                         item = item,
                         gradientBrush = gradientBrush,
                         textStyle = textStyle
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    lastWasSpacer.value = true
+                }
             }
         }
+        lastWasSpacer.value = true
     }
 }
 
@@ -192,6 +208,7 @@ fun ImageRow(
                 .fillMaxWidth()
                 .height(previewRowHeight.dp)
                 .background(gradientBrush, shape = RoundedCornerShape(4.dp))
+                .padding(top = 0.dp, bottom = 0.dp)
         ) {
             Image(
                 contentDescription = null,
@@ -278,6 +295,7 @@ fun VideoRow(
                 .fillMaxWidth()
                 .height(previewRowHeight.dp)
                 .background(gradientBrush, shape = RoundedCornerShape(4.dp))
+                .padding(top = 0.dp, bottom = 0.dp)
         ) {
             Icon(
                 imageVector = VideoIcon,
