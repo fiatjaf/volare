@@ -42,7 +42,6 @@ import com.fiatjaf.volare.ui.components.icon.ClickableTrustIcon
 import com.fiatjaf.volare.ui.components.text.AnnotatedText
 import com.fiatjaf.volare.ui.components.text.RelativeTime
 import com.fiatjaf.volare.ui.theme.CrossPostIcon
-import com.fiatjaf.volare.ui.theme.Sky600
 import com.fiatjaf.volare.ui.theme.OnBgLight
 import com.fiatjaf.volare.ui.theme.light
 import com.fiatjaf.volare.ui.theme.sizing
@@ -150,7 +149,7 @@ private fun BorderedTopic(topic: Topic, onUpdate: OnUpdate) {
     Box(
         modifier = Modifier
             .border(
-                border = BorderStroke(width = 1.dp, color = Sky600),
+                border = BorderStroke(width = 1.dp, color = OnBgLight),
                 shape = RoundedCornerShape(corner = CornerSize(spacing.medium))
             )
             .clickable(onClick = { onUpdate(OpenTopic(topic = topic)) }),
