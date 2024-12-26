@@ -25,6 +25,7 @@ import com.fiatjaf.volare.ui.theme.HashtagStyle
 import com.fiatjaf.volare.ui.theme.MentionStyle
 import com.fiatjaf.volare.ui.theme.GenericUrlStyle
 import com.fiatjaf.volare.ui.theme.MediaUrlStyle
+import com.fiatjaf.volare.ui.theme.AppTheme
 
 private const val TAG = "AnnotatedStringProvider"
 
@@ -84,6 +85,7 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
 
         var isCacheable = true
         val result = mutableListOf<TextItem>()
+        var hashtagCount = 0
 
         val chunks = str.split(Regex("\\n{2,}")).map { it.trim() }
 
@@ -120,6 +122,11 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
                         val (idx, _) = res
                         // append up to the start of the next relevant token
                         append(tline.substring(currIdx, idx))
+
+                        // If there is some real text, reset the hashtag counter
+                        if (tline.substring(currIdx, idx).length > 5) {
+                            hashtagCount = 0
+                        }
                         currIdx = idx
 
                         val curr = tline.substring(idx)
@@ -184,10 +191,14 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
 
                         val hashtag = hashtagRegex.find(curr)
                         if (hashtag != null) {
+                            hashtagCount++
+                            val thisHashtagStyle = if (hashtagCount > 3) {
+                                SpanStyle(color = AppTheme.extendedColors.hashtagOverflow)
+                                } else { HashtagStyle }
                             pushAnnotatedString(
                                 tag = HASHTAG,
                                 rawString = hashtag.value,
-                                style = HashtagStyle,
+                                style = thisHashtagStyle,
                                 displayString = hashtag.value
                             )
                             currIdx += hashtag.range.endInclusive + 1

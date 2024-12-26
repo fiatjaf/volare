@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 data class ExtendedColors(
     val mention: Color,
     val hashtag: Color,
+    val hashtagOverflow: Color,
     val genericLink: Color,
     val mediaLink: Color,
     val opLabel: Color,
@@ -20,6 +21,7 @@ data class ExtendedColors(
 val LightExtendedColors = ExtendedColors(
     mention = Pink500,
     hashtag = Sky600,
+    hashtagOverflow = Neutral400,
     genericLink = Lime600,
     mediaLink = Neutral800,
     opLabel = Sky600,
@@ -29,6 +31,7 @@ val LightExtendedColors = ExtendedColors(
 val DarkExtendedColors = ExtendedColors(
     mention = Pink400,
     hashtag = Sky600,
+    hashtagOverflow = Neutral500,
     genericLink = Lime600,
     mediaLink = Neutral100,
     opLabel = Sky400,
