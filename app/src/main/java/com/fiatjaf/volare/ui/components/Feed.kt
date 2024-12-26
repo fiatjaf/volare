@@ -2,13 +2,7 @@ package com.fiatjaf.volare.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -34,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.FEED_PAGE_SIZE
 import com.fiatjaf.volare.core.Fn
@@ -167,16 +162,18 @@ private fun MostRecentPostsTextButton(onClick: Fn) {
 
 @Composable
 private fun NextPageButton(onAppend: Fn) {
-    Row(
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(20.dp))
         Button(
             modifier = Modifier.padding(horizontal = spacing.screenEdge),
             onClick = onAppend
         ) {
             Text(text = stringResource(id = R.string.next_page))
         }
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
