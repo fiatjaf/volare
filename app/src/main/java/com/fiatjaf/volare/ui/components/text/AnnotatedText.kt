@@ -16,6 +16,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -29,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import coil3.compose.asPainter
 import coil3.imageLoader
@@ -57,53 +61,76 @@ fun AnnotatedText(
     val textStyle = style.copy(color = MaterialTheme.extendedColors.text)
     val addedHeight = remember { mutableStateOf(0) }
     var lastWasSpacer = remember { mutableStateOf(true) } // Start with true, so if a media is the first item, skip the spacer
+    var realHeight by remember { mutableStateOf(0) }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier
-        .heightIn(max = (addedHeight.value + (maxLines * style.lineHeight.value)).dp)
-        .padding(top = 0.dp, bottom = 0.dp)
-    ) {
-        items.forEach { item ->
-            when (item) {
-                is TextItem.AString -> {
-                    Text(
-                        modifier = modifier,
-                        text = item.value,
-                        overflow = TextOverflow.Ellipsis,
-                        style = textStyle,
-                    )
-                    lastWasSpacer.value = false
-                }
-                is TextItem.ImageURL -> {
-                    if (!lastWasSpacer.value) {
-                        Spacer(modifier = Modifier.height(4.dp))
+    Box(modifier = modifier) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier
+            .onGloballyPositioned { layoutCoordinates ->
+                realHeight = layoutCoordinates.size.height
+            }
+            .heightIn(max = (addedHeight.value + (maxLines * style.lineHeight.value)).dp)
+            .padding(top = 0.dp, bottom = 0.dp)
+        ) {
+            items.forEach { item ->
+                when (item) {
+                    is TextItem.AString -> {
+                        Text(
+                            modifier = modifier,
+                            text = item.value,
+                            overflow = TextOverflow.Ellipsis,
+                            style = textStyle,
+                        )
+                        lastWasSpacer.value = false
                     }
-                    ImageRow(
-                        item = item,
-                        gradientBrush = gradientBrush,
-                        textStyle = textStyle,
-                        preload = preload,
-                        addedHeight = addedHeight,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    lastWasSpacer.value = true
-                }
-                is TextItem.VideoURL -> {
-                    if (!lastWasSpacer.value) {
+                    is TextItem.ImageURL -> {
+                        if (!lastWasSpacer.value) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                        ImageRow(
+                            item = item,
+                            gradientBrush = gradientBrush,
+                            textStyle = textStyle,
+                            preload = preload,
+                            addedHeight = addedHeight,
+                        )
                         Spacer(modifier = Modifier.height(4.dp))
+                        lastWasSpacer.value = true
                     }
-                    VideoRow(
-                        item = item,
-                        gradientBrush = gradientBrush,
-                        textStyle = textStyle
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    lastWasSpacer.value = true
+                    is TextItem.VideoURL -> {
+                        if (!lastWasSpacer.value) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                        VideoRow(
+                            item = item,
+                            gradientBrush = gradientBrush,
+                            textStyle = textStyle
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        lastWasSpacer.value = true
+                    }
                 }
             }
+            lastWasSpacer.value = true
         }
-        lastWasSpacer.value = true
+
+        val maxHeight = addedHeight.value + maxLines * style.lineHeight.value
+        if (realHeight > maxHeight) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background),
+                            startY = 0f,
+                            endY = 100f
+                        )
+                    )
+            )
+        }
     }
 }
 
