@@ -3,6 +3,14 @@ package com.fiatjaf.volare.core
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.UriHandler
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,6 +35,7 @@ import com.fiatjaf.volare.data.nostr.createNprofile
 import kotlinx.coroutines.launch
 import rust.nostr.sdk.Nip19Event
 import rust.nostr.sdk.Nip19Profile
+import backend.Backend
 
 private const val TAG = "Core"
 
@@ -38,12 +47,48 @@ class Core(
     val navigator = Navigator(vmContainer = vmContainer, closeApp = closeApp)
 
     private var lastDeeplink = ""
+
+   @Composable
     fun handleDeeplink(intent: Intent) {
-        if (intent.scheme != "nostr") return
+        val showDialog = remember { mutableStateOf(false) }
+        val context = LocalContext.current
+
+        // Process the intent right in the composable
+        if (intent.scheme != "nostr" && intent.scheme != "nostr-login") return
         val nostrString = intent.data?.schemeSpecificPart ?: return
-        if (lastDeeplink == nostrString) return
-        lastDeeplink = nostrString
-        openNostrString(str = nostrString)
+
+        // TODO: Support ncryptsec
+        if (nostrString.startsWith("ncryptsec")) { return }
+
+        // Use LaunchedEffect just for the one-time processing
+        LaunchedEffect(nostrString) {
+            if (intent.scheme == "nostr-login") {
+                if (Backend.isValidBunker(nostrString)) {
+                    onUpdate(UseBunkerAccount(nostrString, context))
+                    showDialog.value = true
+                } else {
+                    onUpdate(UsePlainKeyAccount(nostrString))
+                    showDialog.value = true
+                }
+            } else {
+                if (lastDeeplink == nostrString) return@LaunchedEffect
+                lastDeeplink = nostrString
+                openNostrString(str = nostrString)
+            }
+        }
+
+        if (showDialog.value) {
+            AlertDialog(
+                onDismissRequest = { showDialog.value = false },
+                title = { Text("Successful login!") },
+                text = { Text("All good, you are now logged-in with your new account, feel free to take a look around.") },
+                confirmButton = {
+                    Button(onClick = { showDialog.value = false }) {
+                        Text("OK, let's explore Nostr")
+                    }
+                }
+            )
+        }
     }
 
     val onUpdate: (UIEvent) -> Unit = { uiEvent ->
