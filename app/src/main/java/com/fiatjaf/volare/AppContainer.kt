@@ -7,6 +7,7 @@ import androidx.room.Room
 import com.anggrayudi.storage.SimpleStorageHelper
 import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.model.ConnectionStatus
+import com.fiatjaf.volare.data.BackendDatabase
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.account.AccountSwitcher
 import com.fiatjaf.volare.data.account.ExternalSignerHandler
@@ -68,6 +69,8 @@ import rust.nostr.sdk.Filter
 import java.util.Collections
 
 class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
+    val backendDB = BackendDatabase()
+
     val roomDb: AppDatabase = Room.databaseBuilder(
         context = context,
         klass = AppDatabase::class.java,
