@@ -31,7 +31,6 @@ class ItemSetProvider(
     private val room: AppDatabase,
     private val accountManager: AccountManager,
     private val friendProvider: FriendProvider,
-    private val muteProvider: MuteProvider,
     private val annotatedStringProvider: AnnotatedStringProvider,
     private val relayProvider: RelayProvider,
 ) {
@@ -127,7 +126,6 @@ class ItemSetProvider(
                 forcedMuteState = mutedPubkeys.contains(unknownPubkey),
                 metadata = null,
                 friendProvider = friendProvider,
-                muteProvider = muteProvider,
                 itemSetProvider = this,
             )
         }

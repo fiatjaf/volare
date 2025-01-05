@@ -19,11 +19,9 @@ import com.fiatjaf.volare.data.model.PostDetails
 import com.fiatjaf.volare.data.nostr.SubscriptionCreator
 import com.fiatjaf.volare.data.preferences.InboxPreferences
 import com.fiatjaf.volare.data.provider.FeedProvider
-import com.fiatjaf.volare.data.provider.MuteProvider
 
 class InboxViewModel(
     feedProvider: FeedProvider,
-    muteProvider: MuteProvider,
     subCreator: SubscriptionCreator,
     val postDetails: State<PostDetails?>,
     val feedState: LazyListState,
@@ -34,7 +32,6 @@ class InboxViewModel(
         mutableStateOf(inboxPreferences.getInboxFeedSetting())
     val paginator = Paginator(
         feedProvider = feedProvider,
-        muteProvider = muteProvider,
         scope = viewModelScope,
         subCreator = subCreator
     )

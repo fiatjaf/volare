@@ -17,7 +17,6 @@ private const val TAG = "NameProvider"
 
 class NameProvider(
     private val profileDao: ProfileDao,
-    private val metadataInMemory: MetadataInMemory,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val nameCache = Collections.synchronizedMap(mutableMapOf<PublicKey, String?>())

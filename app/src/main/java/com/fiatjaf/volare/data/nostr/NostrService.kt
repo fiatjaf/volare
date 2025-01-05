@@ -14,7 +14,6 @@ import com.fiatjaf.volare.core.model.ConnectionStatus
 import com.fiatjaf.volare.core.model.Spam
 import com.fiatjaf.volare.core.model.Waiting
 import com.fiatjaf.volare.core.utils.launchIO
-import com.fiatjaf.volare.data.event.EventCounter
 import com.fiatjaf.volare.data.event.EventMaker
 import com.fiatjaf.volare.data.event.EventQueue
 import com.fiatjaf.volare.data.preferences.RelayPreferences
@@ -36,7 +35,6 @@ class NostrService(
     private val filterCache: MutableMap<SubId, List<Filter>>,
     private val relayPreferences: RelayPreferences,
     private val connectionStatuses: MutableState<Map<RelayUrl, ConnectionStatus>>,
-    private val eventCounter: EventCounter,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -47,7 +45,7 @@ class NostrService(
         }
 
         override fun onEvent(subId: SubId, event: Event, relayUrl: RelayUrl?) {
-            if (!relayUrl.isNullOrEmpty() && eventCounter.isExceedingLimit(subId = subId)) {
+            if (!relayUrl.isNullOrEmpty() && /*eventCounter.isExceedingLimit(subId = subId)*/) {
                 nostrClient.removeRelay(
                     relayUrl = relayUrl,
                     reason = "You're sending me more than I requested"
@@ -398,7 +396,6 @@ class NostrService(
 
     fun close() {
         filterCache.clear()
-        eventCounter.clear()
         nostrClient.close()
     }
 

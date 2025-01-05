@@ -14,18 +14,15 @@ import com.fiatjaf.volare.data.model.BookmarksFeedSetting
 import com.fiatjaf.volare.data.model.PostDetails
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.provider.FeedProvider
-import com.fiatjaf.volare.data.provider.MuteProvider
 
 class BookmarksViewModel(
     feedProvider: FeedProvider,
-    muteProvider: MuteProvider,
     val feedState: LazyListState,
     val postDetails: State<PostDetails?>,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
 ) : ViewModel() {
     val paginator = Paginator(
         feedProvider = feedProvider,
-        muteProvider = muteProvider,
         subCreator = lazyNostrSubscriber.subCreator,
         scope = viewModelScope,
     )

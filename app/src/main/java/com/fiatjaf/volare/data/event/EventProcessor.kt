@@ -3,9 +3,7 @@ package com.fiatjaf.volare.data.event
 import android.util.Log
 import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.utils.toRelevantMetadata
 import com.fiatjaf.volare.data.account.AccountManager
-import com.fiatjaf.volare.data.inMemory.MetadataInMemory
 import com.fiatjaf.volare.data.room.AppDatabase
 import com.fiatjaf.volare.data.room.entity.FullProfileEntity
 import com.fiatjaf.volare.data.room.entity.ProfileEntity
@@ -19,7 +17,6 @@ private const val TAG = "EventProcessor"
 
 class EventProcessor(
     private val room: AppDatabase,
-    private val metadataInMemory: MetadataInMemory,
     private val accountManager: AccountManager,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -197,16 +194,6 @@ class EventProcessor(
         val uniqueProfiles = profiles
             .sortedByDescending { it.createdAt }
             .distinctBy { it.pubkey }
-
-        uniqueProfiles.forEach { profile ->
-            metadataInMemory.submit(
-                pubkey = profile.pubkey,
-                metadata = profile.metadata.toRelevantMetadata(
-                    pubkey = profile.pubkey,
-                    createdAt = profile.createdAt
-                )
-            )
-        }
 
         val entities = uniqueProfiles.map { ProfileEntity.from(it) }
 

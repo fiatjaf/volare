@@ -14,7 +14,6 @@ import com.fiatjaf.volare.core.ProfileViewRefresh
 import com.fiatjaf.volare.core.ProfileViewReplyAppend
 import com.fiatjaf.volare.core.ProfileViewRootAppend
 import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.REBROADCAST_DELAY
 import com.fiatjaf.volare.core.model.ItemSetProfile
 import com.fiatjaf.volare.core.model.Paginator
 import com.fiatjaf.volare.core.navigator.ProfileNavView
@@ -31,24 +30,19 @@ import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.createNprofile
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
-import com.fiatjaf.volare.data.provider.MuteProvider
 import com.fiatjaf.volare.data.provider.ProfileProvider
 import com.fiatjaf.volare.data.room.dao.EventRelayDao
 import com.fiatjaf.volare.data.room.dao.Nip65Dao
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
 
 class ProfileViewModel(
     feedProvider: FeedProvider,
-    muteProvider: MuteProvider,
     val postDetails: State<PostDetails?>,
     val rootFeedState: LazyListState,
     val replyFeedState: LazyListState,
@@ -76,13 +70,11 @@ class ProfileViewModel(
         mutableStateOf(MutableStateFlow(null))
     val rootPaginator = Paginator(
         feedProvider = feedProvider,
-        muteProvider = muteProvider,
         scope = viewModelScope,
         subCreator = nostrSubscriber.subCreator
     )
     val replyPaginator = Paginator(
         feedProvider = feedProvider,
-        muteProvider = muteProvider,
         scope = viewModelScope,
         subCreator = nostrSubscriber.subCreator
     )

@@ -20,7 +20,6 @@ import com.fiatjaf.volare.data.model.TopicFeedSetting
 import com.fiatjaf.volare.data.nostr.SubscriptionCreator
 import com.fiatjaf.volare.data.nostr.getCurrentSecs
 import com.fiatjaf.volare.data.provider.FeedProvider
-import com.fiatjaf.volare.data.provider.MuteProvider
 import com.fiatjaf.volare.data.provider.TextItem
 import com.fiatjaf.volare.ui.components.row.mainEvent.FeedCtx
 import com.fiatjaf.volare.ui.components.row.mainEvent.MainEventCtx
@@ -38,7 +37,6 @@ private const val TAG = "Paginator"
 
 class Paginator(
     private val feedProvider: FeedProvider,
-    private val muteProvider: MuteProvider,
     private val subCreator: SubscriptionCreator,
     private val scope: CoroutineScope,
 ) : IPaginator {
@@ -84,8 +82,6 @@ class Paginator(
     fun refresh(onSub: Fn? = null) {
         if (isRefreshing.value) return
 
-        val isFirstPage = !hasMoreRecentItems.value
-
         isRefreshing.value = true
         hasMoreRecentItems.value = false
         hasPage.value = getHasPosts(setting = feedSetting)
@@ -95,7 +91,7 @@ class Paginator(
                 onSub()
                 delay(DELAY_1SEC)
             }
-            setPage(until = getCurrentSecs(), forceSubscription = isFirstPage)
+            setPage(until = getCurrentSecs())
             delay(DELAY_1SEC)
         }.invokeOnCompletion {
             isRefreshing.value = false
@@ -120,7 +116,6 @@ class Paginator(
     private suspend fun setPage(
         until: Long,
         feedSetting: FeedSetting = this.feedSetting,
-        forceSubscription: Boolean = false
     ) {
         val mutedWords = muteProvider.getMutedWords()
 
@@ -128,7 +123,6 @@ class Paginator(
             until = until,
             size = FEED_PAGE_SIZE,
             setting = feedSetting,
-            forceSubscription = forceSubscription,
         )
 
         filteredPage.value = flow

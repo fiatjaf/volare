@@ -1,7 +1,6 @@
 package com.fiatjaf.volare.data.nostr
 
 import android.util.Log
-import com.fiatjaf.volare.data.event.EventCounter
 import rust.nostr.sdk.Filter
 
 private const val TAG = "SubscriptionCreator"
@@ -9,7 +8,6 @@ private const val TAG = "SubscriptionCreator"
 class SubscriptionCreator(
     private val nostrClient: NostrClient,
     private val syncedFilterCache: MutableMap<SubId, List<Filter>>,
-    private val eventCounter: EventCounter,
 ) {
     fun subscribe(relayUrl: RelayUrl, filters: List<Filter>): SubId? {
         if (filters.isEmpty()) return null
@@ -21,7 +19,6 @@ class SubscriptionCreator(
             return null
         }
         syncedFilterCache[subId] = filters
-        eventCounter.registerSubscription(subId = subId, filters = filters)
 
         return subId
     }

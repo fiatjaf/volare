@@ -78,8 +78,6 @@ class MainActivity : ComponentActivity() {
     override fun onPause() {
         super.onPause()
         Log.i(TAG, "onPause")
-
-        appContainer.eventSweeper.sweep()
     }
 
     override fun onDestroy() {

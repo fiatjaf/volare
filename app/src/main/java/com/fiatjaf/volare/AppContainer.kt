@@ -11,17 +11,12 @@ import com.fiatjaf.volare.data.BackendDatabase
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.account.AccountSwitcher
 import com.fiatjaf.volare.data.account.ExternalSignerHandler
-import com.fiatjaf.volare.data.event.EventCounter
 import com.fiatjaf.volare.data.event.EventDeletor
 import com.fiatjaf.volare.data.event.EventMaker
 import com.fiatjaf.volare.data.event.EventProcessor
-import com.fiatjaf.volare.data.event.EventQueue
 import com.fiatjaf.volare.data.event.EventRebroadcaster
 import com.fiatjaf.volare.data.event.EventSweeper
-import com.fiatjaf.volare.data.event.EventValidator
-import com.fiatjaf.volare.data.event.IdCacheClearer
 import com.fiatjaf.volare.data.event.OldestUsedEvent
-import com.fiatjaf.volare.data.inMemory.MetadataInMemory
 import com.fiatjaf.volare.data.interactor.Bookmarker
 import com.fiatjaf.volare.data.interactor.ItemSetEditor
 import com.fiatjaf.volare.data.interactor.Muter
@@ -39,7 +34,6 @@ import com.fiatjaf.volare.data.nostr.NostrService
 import com.fiatjaf.volare.data.nostr.NostrSubscriber
 import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.SubBatcher
-import com.fiatjaf.volare.data.nostr.SubId
 import com.fiatjaf.volare.data.nostr.SubscriptionCreator
 import com.fiatjaf.volare.data.preferences.DatabasePreferences
 import com.fiatjaf.volare.data.preferences.EventPreferences
@@ -51,7 +45,6 @@ import com.fiatjaf.volare.data.provider.DatabaseInteractor
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.data.provider.FriendProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
-import com.fiatjaf.volare.data.provider.MuteProvider
 import com.fiatjaf.volare.data.provider.NameProvider
 import com.fiatjaf.volare.data.provider.ProfileProvider
 import com.fiatjaf.volare.data.provider.PubkeyProvider
@@ -64,9 +57,6 @@ import com.fiatjaf.volare.data.provider.TopicProvider
 import com.fiatjaf.volare.data.provider.WebOfTrustProvider
 import com.fiatjaf.volare.data.room.AppDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
-import rust.nostr.sdk.EventId
-import rust.nostr.sdk.Filter
-import java.util.Collections
 
 class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     val backendDB = BackendDatabase()
@@ -77,18 +67,9 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         name = "volare_database",
     ).build()
 
-    // Shared collections
-    private val syncedFilterCache = Collections
-        .synchronizedMap(mutableMapOf<SubId, List<Filter>>())
-    private val syncedIdCache = Collections.synchronizedSet(mutableSetOf<EventId>())
-
     val snackbar = SnackbarHostState()
     private val nostrClient = NostrClient()
     val externalSignerHandler = ExternalSignerHandler()
-
-    private val idCacheClearer = IdCacheClearer(
-        syncedIdCache = syncedIdCache,
-    )
 
     val connectionStatuses = mutableStateOf(mapOf<RelayUrl, ConnectionStatus>())
 
@@ -111,13 +92,8 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         accountManager = accountManager,
     )
 
-    val muteProvider = MuteProvider(muteDao = roomDb.muteDao())
-
-    val metadataInMemory = MetadataInMemory()
-
     private val nameProvider = NameProvider(
         profileDao = roomDb.profileDao(),
-        metadataInMemory = metadataInMemory,
     )
 
     val annotatedStringProvider = AnnotatedStringProvider(nameProvider = nameProvider)
@@ -147,7 +123,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         room = roomDb,
         accountManager = accountManager,
         friendProvider = friendProvider,
-        muteProvider = muteProvider,
         annotatedStringProvider = annotatedStringProvider,
         relayProvider = relayProvider,
     )
@@ -160,15 +135,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         itemSetProvider = itemSetProvider,
     )
 
-
-    private val eventCounter = EventCounter()
-
-    val subCreator = SubscriptionCreator(
-        nostrClient = nostrClient,
-        syncedFilterCache = syncedFilterCache,
-        eventCounter = eventCounter
-    )
-
     private val filterCreator = FilterCreator(
         room = roomDb,
         accountManager = accountManager,
@@ -176,7 +142,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     )
 
     val lazyNostrSubscriber = LazyNostrSubscriber(
-        subCreator = subCreator,
         room = roomDb,
         relayProvider = relayProvider,
         filterCreator = filterCreator,
@@ -188,15 +153,11 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         pubkeyProvider = pubkeyProvider,
     )
 
-    private val subBatcher = SubBatcher(subCreator = subCreator)
-
     val nostrSubscriber = NostrSubscriber(
         topicProvider = topicProvider,
         accountManager = accountManager,
         friendProvider = friendProvider,
-        subCreator = subCreator,
         relayProvider = relayProvider,
-        subBatcher = subBatcher,
         room = roomDb,
         filterCreator = filterCreator,
     )
@@ -204,26 +165,16 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     val accountSwitcher = AccountSwitcher(
         accountManager = accountManager,
         mainEventDao = roomDb.mainEventDao(),
-        idCacheClearer = idCacheClearer,
         lazyNostrSubscriber = lazyNostrSubscriber,
         nostrSubscriber = nostrSubscriber,
         homePreferences = homePreferences,
     )
 
-    private val eventValidator = EventValidator(
-        syncedFilterCache = syncedFilterCache,
-        syncedIdCache = syncedIdCache,
-        accountManager = accountManager
-    )
     private val eventProcessor = EventProcessor(
         room = roomDb,
-        metadataInMemory = metadataInMemory,
         accountManager = accountManager
     )
-    private val eventQueue = EventQueue(
-        eventValidator = eventValidator,
-        eventProcessor = eventProcessor
-    )
+
     private val eventMaker = EventMaker(
         accountManager = accountManager,
         eventPreferences = eventPreferences,
@@ -239,12 +190,9 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
 
     val nostrService = NostrService(
         nostrClient = nostrClient,
-        eventQueue = eventQueue,
         eventMaker = eventMaker,
-        filterCache = syncedFilterCache,
         relayPreferences = relayPreferences,
         connectionStatuses = connectionStatuses,
-        eventCounter = eventCounter,
     )
 
     init {
@@ -339,13 +287,13 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
 
     val feedProvider = FeedProvider(
         nostrSubscriber = nostrSubscriber,
+        backend = backendDB,
         room = roomDb,
         oldestUsedEvent = oldestUsedEvent,
         annotatedStringProvider = annotatedStringProvider,
         forcedVotes = postVoter.forcedVotes,
         forcedFollows = profileFollower.forcedFollowsFlow,
         forcedBookmarks = bookmarker.forcedBookmarksFlow,
-        muteProvider = muteProvider,
         accountManager = accountManager,
     )
 
@@ -360,19 +308,16 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         forcedVotes = postVoter.forcedVotes,
         forcedFollows = profileFollower.forcedFollowsFlow,
         forcedBookmarks = bookmarker.forcedBookmarksFlow,
-        muteProvider = muteProvider,
     )
 
     val profileProvider = ProfileProvider(
         forcedFollowFlow = profileFollower.forcedFollowsFlow,
         forcedMuteFlow = muter.forcedProfileMuteFlow,
         accountManager = accountManager,
-        metadataInMemory = metadataInMemory,
         profileDao = roomDb.profileDao(),
         fullProfileDao = roomDb.fullProfileDao(),
         webOfTrustDao = roomDb.webOfTrustDao(),
         friendProvider = friendProvider,
-        muteProvider = muteProvider,
         itemSetProvider = itemSetProvider,
         lazyNostrSubscriber = lazyNostrSubscriber,
         annotatedStringProvider = annotatedStringProvider,
@@ -401,7 +346,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     val eventSweeper = EventSweeper(
         accountManager = accountManager,
         databasePreferences = databasePreferences,
-        idCacheClearer = idCacheClearer,
         deleteDao = roomDb.deleteDao(),
         oldestUsedEvent = oldestUsedEvent
     )

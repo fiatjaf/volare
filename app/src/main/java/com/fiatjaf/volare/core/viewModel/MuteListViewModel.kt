@@ -14,7 +14,6 @@ import com.fiatjaf.volare.core.MuteListViewOpen
 import com.fiatjaf.volare.core.MuteListViewRefresh
 import com.fiatjaf.volare.core.model.TopicMuteState
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
-import com.fiatjaf.volare.data.provider.MuteProvider
 import com.fiatjaf.volare.data.provider.ProfileProvider
 import com.fiatjaf.volare.data.provider.TopicProvider
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
@@ -33,7 +32,6 @@ class MuteListViewModel(
     private val lazyNostrSubscriber: LazyNostrSubscriber,
     private val profileProvider: ProfileProvider,
     private val topicProvider: TopicProvider,
-    private val muteProvider: MuteProvider,
 ) : ViewModel() {
     val tabIndex = mutableIntStateOf(0)
     val isRefreshing = mutableStateOf(false)
@@ -67,9 +65,9 @@ class MuteListViewModel(
                     SharingStarted.WhileSubscribed(),
                     mutedProfiles.value.value
                 )
-            mutedTopics.value = topicProvider.getMutedTopicsFlow()
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), mutedTopics.value.value)
-            mutedWords.value = muteProvider.getMutedWords()
+            // mutedTopics.value = topicProvider.getMutedTopicsFlow()
+            //    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), mutedTopics.value.value)
+            // mutedWords.value = muteProvider.getMutedWords()
             delay(DEBOUNCE)
         }.invokeOnCompletion {
             isRefreshing.value = false

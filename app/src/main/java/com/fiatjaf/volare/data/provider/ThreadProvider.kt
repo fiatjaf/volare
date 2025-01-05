@@ -44,10 +44,6 @@ class ThreadProvider(
     private val collapsedIds: Flow<Set<EventIdHex>>,
     private val annotatedStringProvider: AnnotatedStringProvider,
     private val oldestUsedEvent: OldestUsedEvent,
-    private val forcedVotes: Flow<Map<EventIdHex, Boolean>>,
-    private val forcedFollows: Flow<Map<PubkeyHex, Boolean>>,
-    private val forcedBookmarks: Flow<Map<EventIdHex, Boolean>>,
-    private val muteProvider: MuteProvider,
 ) {
     fun getLocalRoot(
         scope: CoroutineScope,

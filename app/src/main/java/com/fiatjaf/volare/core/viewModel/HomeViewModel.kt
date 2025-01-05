@@ -21,13 +21,11 @@ import com.fiatjaf.volare.data.model.PostDetails
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.preferences.HomePreferences
 import com.fiatjaf.volare.data.provider.FeedProvider
-import com.fiatjaf.volare.data.provider.MuteProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
 
 class HomeViewModel(
-    muteProvider: MuteProvider,
     feedProvider: FeedProvider,
     val postDetails: State<PostDetails?>,
     val feedState: LazyListState,
@@ -39,7 +37,6 @@ class HomeViewModel(
         mutableStateOf(homePreferences.getHomeFeedSetting())
     val paginator = Paginator(
         feedProvider = feedProvider,
-        muteProvider = muteProvider,
         scope = viewModelScope,
         subCreator = lazyNostrSubscriber.subCreator
     )
