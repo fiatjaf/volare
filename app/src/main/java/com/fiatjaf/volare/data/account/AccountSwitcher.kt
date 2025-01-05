@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.compose.runtime.State
 import com.fiatjaf.volare.core.DELAY_1SEC
 import com.fiatjaf.volare.core.FEED_PAGE_SIZE
-import com.fiatjaf.volare.data.event.IdCacheClearer
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.nostr.NostrSubscriber
 import com.fiatjaf.volare.data.nostr.getCurrentSecs
@@ -21,7 +20,6 @@ private const val TAG = "AccountSwitcher"
 class AccountSwitcher(
     private val accountManager: AccountManager,
     private val mainEventDao: MainEventDao,
-    private val idCacheClearer: IdCacheClearer,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
     private val nostrSubscriber: NostrSubscriber,
     private val homePreferences: HomePreferences,
@@ -68,7 +66,6 @@ class AccountSwitcher(
     private suspend fun updateAndReset(pubkey: PublicKey) {
         Log.i(TAG, "update account and reset caches")
         lazyNostrSubscriber.subCreator.unsubAll()
-        idCacheClearer.clear()
         mainEventDao.reindexMentions(newPubkey = pubkey)
         lazyNostrSubscriber.lazySubMyAccount()
         delay(DELAY_1SEC)

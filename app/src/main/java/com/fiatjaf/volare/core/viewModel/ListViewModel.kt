@@ -19,11 +19,9 @@ import com.fiatjaf.volare.data.model.PostDetails
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
-import com.fiatjaf.volare.data.provider.MuteProvider
 
 class ListViewModel(
     feedProvider: FeedProvider,
-    muteProvider: MuteProvider,
     val postDetails: State<PostDetails?>,
     val feedState: LazyListState,
     val profileState: LazyListState,
@@ -37,7 +35,6 @@ class ListViewModel(
 
     val paginator = Paginator(
         feedProvider = feedProvider,
-        muteProvider = muteProvider,
         scope = viewModelScope,
         subCreator = lazyNostrSubscriber.subCreator
     )

@@ -25,8 +25,15 @@ func NewInternalDB(path string) (*InternalDB, error) {
 				return nil, fmt.Errorf("what is this? %v", t)
 			}
 		},
-		Indexes: map[string]leafdb.IndexDefinition[any]{},
-		Views:   map[string]leafdb.ViewDefinition[any]{},
+		Indexes: map[string]leafdb.IndexDefinition[any]{
+			"": {
+				Version: 1,
+				Types:   []leafdb.DataType{},
+				Emit: func(t leafdb.DataType, value any, emit func([]byte)) {
+				},
+			},
+		},
+		Views: map[string]leafdb.ViewDefinition[any]{},
 	})
 	if err != nil {
 		return nil, err

@@ -32,7 +32,6 @@ class ProfileProvider(
     private val fullProfileDao: FullProfileDao,
     private val webOfTrustDao: WebOfTrustDao,
     private val friendProvider: FriendProvider,
-    private val muteProvider: MuteProvider,
     private val itemSetProvider: ItemSetProvider,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
     private val annotatedStringProvider: AnnotatedStringProvider,
@@ -86,7 +85,6 @@ class ProfileProvider(
                 forcedMuteState = forcedMute[dbProfile?.pubkey],
                 metadata = metadataInMemory.getMetadata(pubkey = dbProfile?.pubkey ?: trustedBy),
                 friendProvider = friendProvider,
-                muteProvider = muteProvider,
                 itemSetProvider = itemSetProvider,
             )
 

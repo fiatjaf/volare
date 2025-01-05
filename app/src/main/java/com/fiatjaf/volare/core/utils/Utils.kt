@@ -30,7 +30,6 @@ import com.fiatjaf.volare.data.nostr.getSubject
 import com.fiatjaf.volare.data.provider.AnnotatedStringProvider
 import com.fiatjaf.volare.data.provider.FriendProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
-import com.fiatjaf.volare.data.provider.MuteProvider
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.data.room.view.CommentView
 import com.fiatjaf.volare.data.room.view.CrossPostView
@@ -434,7 +433,6 @@ fun createAdvancedProfile(
     forcedMuteState: Boolean?,
     metadata: RelevantMetadata?,
     friendProvider: FriendProvider,
-    muteProvider: MuteProvider,
     itemSetProvider: ItemSetProvider,
 ): AdvancedProfileView {
     val name = normalizeName(metadata?.name.orEmpty().ifEmpty { dbProfile?.name.orEmpty() })

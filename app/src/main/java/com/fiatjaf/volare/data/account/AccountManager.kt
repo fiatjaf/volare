@@ -2,14 +2,9 @@ package com.fiatjaf.volare.data.account
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.skip
-import kotlinx.coroutines.launch
 import rust.nostr.sdk.Event
 import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.SecretKey

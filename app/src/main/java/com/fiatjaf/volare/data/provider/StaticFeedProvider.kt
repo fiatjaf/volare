@@ -26,18 +26,15 @@ class StaticFeedProvider(
 ) {
     suspend fun getStaticFeed(
         until: Long,
-        size: Int,
+        limit: Int,
         setting: FeedSetting,
     ): List<MainEvent> {
         return when (setting) {
-            is MainFeedSetting -> getStaticMainFeed(setting = setting, until = until, size = size)
-            is ReplyFeedSetting -> getStaticReplyFeed(setting = setting, until = until, size = size)
-            is InboxFeedSetting -> getStaticInboxFeed(setting = setting, until = until, size = size)
-            BookmarksFeedSetting -> getStaticBookmarkFeed(until = until, size = size)
+            is MainFeedSetting -> getStaticMainFeed(setting = setting, until = until, limit = limit)
+            is ReplyFeedSetting -> getStaticReplyFeed(setting = setting, until = until, limit = limit)
+            is InboxFeedSetting -> getStaticInboxFeed(setting = setting, until = until, limit = limit)
+            BookmarksFeedSetting -> getStaticBookmarkFeed(until = until, limit = limit)
         }
-            // Some query is buggy and returns duplicates.
-            // TODO: Will be fixed once we move to in-memory view instead of room-view
-            .distinctBy { it.id }
     }
 
     private suspend fun getStaticMainFeed(

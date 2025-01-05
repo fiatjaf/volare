@@ -21,7 +21,6 @@ import com.fiatjaf.volare.data.model.TopicFeedSetting
 import com.fiatjaf.volare.data.nostr.SubscriptionCreator
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
-import com.fiatjaf.volare.data.provider.MuteProvider
 import com.fiatjaf.volare.data.provider.TopicProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,7 +29,6 @@ import kotlinx.coroutines.flow.stateIn
 
 class TopicViewModel(
     feedProvider: FeedProvider,
-    muteProvider: MuteProvider,
     val postDetails: State<PostDetails?>,
     val feedState: LazyListState,
     private val subCreator: SubscriptionCreator,
@@ -44,7 +42,6 @@ class TopicViewModel(
     var isMuted: StateFlow<Boolean> = MutableStateFlow(false)
     val paginator = Paginator(
         feedProvider = feedProvider,
-        muteProvider = muteProvider,
         scope = viewModelScope,
         subCreator = subCreator
     )
