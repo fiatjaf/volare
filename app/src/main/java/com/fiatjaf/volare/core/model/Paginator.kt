@@ -6,23 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import com.fiatjaf.volare.core.DELAY_1SEC
 import com.fiatjaf.volare.core.FEED_PAGE_SIZE
 import com.fiatjaf.volare.core.Fn
-import com.fiatjaf.volare.core.utils.containsAnyIgnoreCase
 import com.fiatjaf.volare.core.SHORT_DEBOUNCE
 import com.fiatjaf.volare.core.utils.launchIO
-import com.fiatjaf.volare.data.model.BookmarksFeedSetting
 import com.fiatjaf.volare.data.model.FeedSetting
-import com.fiatjaf.volare.data.model.HomeFeedSetting
-import com.fiatjaf.volare.data.model.InboxFeedSetting
-import com.fiatjaf.volare.data.model.ListFeedSetting
-import com.fiatjaf.volare.data.model.ProfileFeedSetting
-import com.fiatjaf.volare.data.model.ReplyFeedSetting
-import com.fiatjaf.volare.data.model.TopicFeedSetting
 import com.fiatjaf.volare.data.nostr.SubscriptionCreator
 import com.fiatjaf.volare.data.nostr.getCurrentSecs
 import com.fiatjaf.volare.data.provider.FeedProvider
-import com.fiatjaf.volare.data.provider.TextItem
 import com.fiatjaf.volare.ui.components.row.mainEvent.FeedCtx
-import com.fiatjaf.volare.ui.components.row.mainEvent.MainEventCtx
+import com.fiatjaf.volare.ui.components.row.mainEvent.NoteCtx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,9 +38,8 @@ class Paginator(
     override val hasPage: MutableState<StateFlow<Boolean>> =
         mutableStateOf(MutableStateFlow(true))
     override val pageTimestamps: MutableState<List<Long>> = mutableStateOf(emptyList())
-    override val filteredPage: MutableState<StateFlow<List<MainEventCtx>>> =
+    override val filteredPage: MutableState<StateFlow<List<NoteCtx>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
-
 
     private lateinit var feedSetting: FeedSetting
 
@@ -117,50 +107,31 @@ class Paginator(
         until: Long,
         feedSetting: FeedSetting = this.feedSetting,
     ) {
-        val mutedWords = muteProvider.getMutedWords()
-
         val flow = feedProvider.getFeedFlow(
             until = until,
-            size = FEED_PAGE_SIZE,
+            limit = FEED_PAGE_SIZE,
             setting = feedSetting,
         )
 
         filteredPage.value = flow
-            .onEach { pageTimestamps.value = it.map { post -> post.createdAt } }
-            .map { list -> list.map { FeedCtx(mainEvent = it) } }
-            // No duplicate cross-posts
-            .map { postCtx -> postCtx.distinctBy { it.mainEvent.getRelevantId() } }
-            // Reported bug that LazyCol id has duplicates
-            // TODO: Will be fixed once we move to in-memory view instead of room-view
-            .map { postCtx -> postCtx.distinctBy { it.mainEvent.id } }
-            .map { postCtxs ->
-                when (feedSetting) {
-                    // No muted words
-                    is HomeFeedSetting, is TopicFeedSetting,
-                    is InboxFeedSetting, is ListFeedSetting -> {
-                        postCtxs.filter { postCtx ->
-                            postCtx.mainEvent.trustType == Oneself ||
-                            !postCtx.mainEvent.content.any {
-                                when (it) {
-                                    is TextItem.AString -> it.value.text.containsAnyIgnoreCase(strs = mutedWords)
-                                    else -> false
-                                }
-                            }
-                        }
+            .onEach { feed ->
+                pageTimestamps.value = buildList<Long> {
+                    for (i in 0..feed.len()) {
+                        add(i.toInt(), feed.get(i).createdAt())
                     }
-                    // Muted words allowed
-                    BookmarksFeedSetting, is ReplyFeedSetting, is ProfileFeedSetting -> postCtxs
                 }
             }
-            .stateIn(scope, SharingStarted.WhileSubscribed(), getStaticFeed(until = until))
-    }
-
-    private suspend fun getStaticFeed(until: Long): List<MainEventCtx> {
-        return feedProvider.getStaticFeed(
-            until = until,
-            size = FEED_PAGE_SIZE.div(6),
-            setting = feedSetting
-        ).map { FeedCtx(mainEvent = it) }
+            .map { feed -> buildList<FeedCtx> {
+                for (i in 0..feed.len()) {
+                    add(i.toInt(), FeedCtx(feed.get(i)))
+                }
+            }}
+            // No duplicate cross-posts
+            // .map { postCtx -> postCtx.distinctBy { it.mainEvent.getRelevantId() } }
+            // Reported bug that LazyCol id has duplicates
+            // TODO: Will be fixed once we move to in-memory view instead of room-view
+            // .map { postCtx -> postCtx.distinctBy { it.mainEvent.id } }
+            .stateIn(scope, SharingStarted.WhileSubscribed(), emptyList())
     }
 
     private fun getHasPosts(setting: FeedSetting) = feedProvider

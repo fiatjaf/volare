@@ -122,7 +122,7 @@ fun FeedItemDropdown(
             SimpleDropdownItem(
                 text = stringResource(id = R.string.bookmark),
                 onClick = {
-                    onUpdate(BookmarkPost(postId = mainEvent.getRelevantId()))
+                    onUpdate(BookmarkPost(id = mainEvent.getRelevantId()))
                     onDismiss()
                 }
             )

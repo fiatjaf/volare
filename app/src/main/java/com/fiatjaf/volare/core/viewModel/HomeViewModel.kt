@@ -52,7 +52,6 @@ class HomeViewModel(
             HomeViewSubAccountAndTrustData -> subMyAccountAndTrustData()
             HomeViewOpenFilter -> showFilterMenu.value = true
             HomeViewDismissFilter -> showFilterMenu.value = false
-
             is HomeViewApplyFilter -> if (setting.value != action.setting) {
                 homePreferences.setHomeFeedSettings(setting = action.setting)
                 showFilterMenu.value = false

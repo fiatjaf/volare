@@ -25,3 +25,8 @@ func IsValidKeyOrBunker(input string) bool {
 }
 
 func IsValidBunker(input string) bool { return nip46.IsValidBunkerURL(input) }
+
+func CreateNeventFromID(id string) string {
+	v, _ := nip19.EncodeEvent(id, nil, "")
+	return v
+}

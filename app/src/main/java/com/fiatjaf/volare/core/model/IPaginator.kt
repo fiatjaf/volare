@@ -1,7 +1,7 @@
 package com.fiatjaf.volare.core.model
 
 import androidx.compose.runtime.State
-import com.fiatjaf.volare.ui.components.row.mainEvent.MainEventCtx
+import com.fiatjaf.volare.ui.components.row.mainEvent.NoteCtx
 import kotlinx.coroutines.flow.StateFlow
 
 interface IPaginator {
@@ -11,5 +11,5 @@ interface IPaginator {
     val hasMoreRecentItems: State<Boolean>
     val hasPage: State<StateFlow<Boolean>>
     val pageTimestamps: State<List<Long>>
-    val filteredPage: State<StateFlow<List<MainEventCtx>>>
+    val filteredPage: State<StateFlow<List<NoteCtx>>>
 }

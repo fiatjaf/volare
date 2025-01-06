@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -42,7 +41,6 @@ import com.fiatjaf.volare.core.model.CrossPost
 import com.fiatjaf.volare.core.model.LegacyReply
 import com.fiatjaf.volare.core.model.Poll
 import com.fiatjaf.volare.core.model.RootPost
-import com.fiatjaf.volare.core.model.ThreadableMainEvent
 import com.fiatjaf.volare.data.nostr.createNevent
 import com.fiatjaf.volare.data.nostr.getCurrentSecs
 import com.fiatjaf.volare.ui.components.button.footer.CountedCommentButton
@@ -54,27 +52,27 @@ import com.fiatjaf.volare.ui.views.nonMain.MoreRepliesTextButton
 
 @Composable
 fun MainEventRow(
-    ctx: MainEventCtx,
+    ctx: NoteCtx,
     onUpdate: OnUpdate,
     isFocused: Boolean = false,
 ) {
     when (ctx) {
-        is FeedCtx -> MainEventMainRow(
+        is FeedCtx -> NoteMainRow(
             ctx = ctx,
             onUpdate = onUpdate,
             isFocused = isFocused
         )
 
         is ThreadRootCtx -> {
-            when (ctx.threadableMainEvent) {
-                is RootPost, is Poll -> MainEventMainRow(
+            when (ctx.threadableNote) {
+                is RootPost, is Poll -> NoteMainRow(
                     ctx = ctx,
                     onUpdate = onUpdate,
                     isFocused = true
                 )
 
                 is LegacyReply, is Comment -> RowWithDivider(level = 1) {
-                    MainEventMainRow(
+                    NoteMainRow(
                         ctx = ctx,
                         onUpdate = onUpdate,
                         isFocused = true
@@ -85,7 +83,7 @@ fun MainEventRow(
 
         is ThreadReplyCtx -> {
             RowWithDivider(level = ctx.level) {
-                MainEventMainRow(
+                NoteMainRow(
                     ctx = ctx,
                     onUpdate = onUpdate,
                     isFocused = true
@@ -96,8 +94,8 @@ fun MainEventRow(
 }
 
 @Composable
-private fun MainEventMainRow(
-    ctx: MainEventCtx,
+private fun NoteMainRow(
+    ctx: NoteCtx,
     onUpdate: OnUpdate,
     isFocused: Boolean = false
 ) {
@@ -105,9 +103,9 @@ private fun MainEventMainRow(
         when (ctx) {
             is ThreadReplyCtx -> onUpdate(ThreadViewToggleCollapse(id = ctx.reply.id))
             is FeedCtx -> {
-                when (val event = ctx.mainEvent) {
-                    is ThreadableMainEvent -> onUpdate(OpenThread(mainEvent = event))
-                    is CrossPost -> onUpdate(OpenThreadRaw(nevent = createNevent(hex = event.crossPostedId)))
+                when (ctx.note.`is`()) {
+                    backend.Backend.IsPoll, backend.Backend.IsRoot, backend.Backend.IsReply -> onUpdate(OpenThread(mainEvent = event))
+                    backend.Backend.IsRepost -> onUpdate(OpenThreadRaw(nevent = backend.Backend.createNeventFromID(ctx.note.repost()?.id())))
                 }
             }
             is ThreadRootCtx -> {}
@@ -159,7 +157,7 @@ private fun MainEventMainRow(
                 Spacer(modifier = Modifier.height(spacing.large))
             }
 
-            when (val event = ctx.mainEvent) {
+            when (val event = ctx.note) {
                 is Poll -> PollColumn(poll = event, onUpdate = onUpdate, onClickRow = onClickRow)
                 is CrossPost,
                 is RootPost,

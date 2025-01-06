@@ -6,10 +6,18 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mailru/easyjson"
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/nbd-wtf/go-nostr/nip14"
 	"github.com/nbd-wtf/go-nostr/nip92"
 	"github.com/nbd-wtf/go-nostr/sdk"
+)
+
+const (
+	IsRoot = iota
+	IsReply
+	IsRepost
+	IsPoll
 )
 
 type BlurhashDef interface {
@@ -25,8 +33,10 @@ func (b blurhashDef) Height() int      { return b.IMetaEntry.Height }
 func (b blurhashDef) Blurhash() string { return b.IMetaEntry.Blurhash }
 
 type Note interface {
+	Is() int
 	ID() string
 	PubKey() string
+	CreatedAt() int64
 	Subject() string
 	Content() string
 	Mentions(string) bool
@@ -39,6 +49,7 @@ type Note interface {
 	IsBookmarkedBy(string) bool
 	LikeCount() int
 	ReplyCount() int
+	Repost() Note
 }
 
 type note struct {
@@ -49,9 +60,29 @@ type note struct {
 
 func (n note) ID() string       { return n.Event.ID }
 func (n note) PubKey() string   { return n.Event.PubKey }
-func (n note) Content() string  { return n.Event.Content }
 func (n note) CreatedAt() int64 { return int64(n.Event.CreatedAt) }
+func (n note) Content() string  { return n.Event.Content }
 func (n note) Subject() string  { return nip14.GetSubject(n.Event.Tags) }
+
+func (n note) Is() int {
+	switch n.Event.Kind {
+	case 1068:
+		return IsPoll
+	case 6:
+		return IsRepost
+	case 22:
+		return IsReply
+	case 1:
+		for _, tag := range n.Event.Tags {
+			if len(tag) >= 2 && tag[0] == "e" {
+				return IsReply
+			}
+		}
+		return IsRoot
+	default:
+		return IsRoot
+	}
+}
 
 func (n note) RelaySource() []string {
 	// TODO: use internal db
@@ -150,6 +181,54 @@ func (n note) LikeCount() int {
 
 func (n note) ReplyCount() int {
 	return 12 // TODO
+}
+
+func (n note) Repost() Note {
+	if n.Kind != 6 {
+		return nil
+	}
+	tag := n.Event.Tags.GetFirst([]string{"e", ""})
+	if tag == nil {
+		return nil
+	}
+
+	evt := &nostr.Event{}
+	if n.Event.Content == "" {
+		// reposted event is not embedded, try to fetch it, we should probably do this beforehand in the background?
+		ctx, cancel := context.WithTimeout(ctx, time.Second*2)
+		defer cancel()
+
+		pointer := nostr.EventPointer{
+			ID: (*tag)[1],
+		}
+		if len(*tag) >= 3 {
+			if (*tag)[2] != "" {
+				pointer.Relays = []string{(*tag)[2]}
+			}
+			if len(*tag) >= 4 {
+				pointer.Author = (*tag)[3]
+			}
+		}
+
+		res, _, err := sys.FetchSpecificEvent(ctx, pointer, false)
+		if err != nil {
+			return nil
+		}
+
+		evt = res
+	}
+
+	easyjson.Unmarshal([]byte(n.Event.Content), evt)
+	if evt.ID != (*tag)[1] {
+		// invalid -- this should never happen, we should catch this before
+		return nil
+	}
+	if ok, _ := evt.CheckSignature(); !ok || !evt.CheckID() {
+		// idem
+		return nil
+	}
+
+	return note{Event: evt}
 }
 
 func (dbi DBInterface) GetNote(idOrCode string) (Note, error) {
