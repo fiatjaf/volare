@@ -51,12 +51,12 @@ class Bookmarker(
     fun handle(action: BookmarkEvent) {
         when (action) {
             is BookmarkPost -> handleAction(
-                postId = action.postId,
+                postId = action.id,
                 isBookmarked = true,
             )
 
             is UnbookmarkPost -> handleAction(
-                postId = action.postId,
+                postId = action.id,
                 isBookmarked = false,
             )
         }

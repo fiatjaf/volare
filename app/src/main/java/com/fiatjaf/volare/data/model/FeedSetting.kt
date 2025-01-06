@@ -12,7 +12,7 @@ sealed class MainFeedSetting : FeedSetting()
 
 data class TopicFeedSetting(val topic: Topic) : MainFeedSetting()
 data class ProfileFeedSetting(val nprofile: Nip19Profile) : MainFeedSetting()
-data class ListFeedSetting(val identifier: String) : MainFeedSetting()
+data class SetFeedSetting(val identifier: String) : MainFeedSetting()
 data class HomeFeedSetting(
     val topicSelection: HomeFeedTopicSelection,
     val pubkeySelection: FeedPubkeySelection,

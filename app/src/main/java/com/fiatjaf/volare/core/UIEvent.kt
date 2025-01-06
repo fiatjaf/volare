@@ -6,7 +6,6 @@ import androidx.compose.ui.platform.UriHandler
 import com.fiatjaf.volare.core.model.ItemSetItem
 import com.fiatjaf.volare.core.model.LabledGitIssue
 import com.fiatjaf.volare.core.model.MainEvent
-import com.fiatjaf.volare.core.model.ThreadableMainEvent
 import com.fiatjaf.volare.core.navigator.BookmarksNavView
 import com.fiatjaf.volare.core.navigator.CreateGitIssueNavView
 import com.fiatjaf.volare.core.navigator.CreatePostNavView
@@ -32,12 +31,9 @@ import com.fiatjaf.volare.core.navigator.ThreadRawNavView
 import com.fiatjaf.volare.core.navigator.TopicNavView
 import com.fiatjaf.volare.data.model.HomeFeedSetting
 import com.fiatjaf.volare.data.model.InboxFeedSetting
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import kotlinx.coroutines.CoroutineScope
 import rust.nostr.sdk.Metadata
-import rust.nostr.sdk.Nip19Event
-import rust.nostr.sdk.Nip19Profile
 
 sealed class UIEvent
 
@@ -65,7 +61,7 @@ sealed class PushNavEvent : NavEvent() {
             ClickMuteList -> MuteListNavView
             ClickCreateList -> EditNewListNavView
             ClickCreateGitIssue -> CreateGitIssueNavView
-            is OpenThread -> ThreadNavView(mainEvent = this.mainEvent)
+            is OpenThread -> ThreadNavView(note = this.note)
             is OpenProfile -> ProfileNavView(nprofile = this.nprofile)
             is OpenTopic -> TopicNavView(topic = this.topic)
             is OpenReplyCreation -> ReplyCreationNavView(parent = this.parent)
@@ -94,58 +90,57 @@ data object ClickCreateGitIssue : PushNavEvent()
 
 
 sealed class AdvancedPushNavEvent : PushNavEvent()
-data class OpenThread(val mainEvent: ThreadableMainEvent) : AdvancedPushNavEvent()
+data class OpenThread(val note: backend.Note) : AdvancedPushNavEvent()
 data class OpenThreadRaw(
-    val nevent: Nip19Event,
-    val parent: ThreadableMainEvent? = null
+    val nevent: String,
+    val parent: backend.Note? = null
 ) : AdvancedPushNavEvent()
 
-data class OpenProfile(val nprofile: Nip19Profile) : AdvancedPushNavEvent()
-data class OpenTopic(val topic: Topic) : AdvancedPushNavEvent()
-data class OpenReplyCreation(val parent: MainEvent) : AdvancedPushNavEvent()
-data class OpenCrossPostCreation(val id: EventIdHex) : AdvancedPushNavEvent()
-data class OpenRelayProfile(val relayUrl: RelayUrl) : AdvancedPushNavEvent()
+data class OpenProfile(val nprofile: String) : AdvancedPushNavEvent()
+data class OpenTopic(val topic: String) : AdvancedPushNavEvent()
+data class OpenReplyCreation(val parent: backend.Note) : AdvancedPushNavEvent()
+data class OpenCrossPostCreation(val id: String) : AdvancedPushNavEvent()
+data class OpenRelayProfile(val relayUrl: String) : AdvancedPushNavEvent()
 data class OpenList(val identifier: String) : AdvancedPushNavEvent()
 data class EditList(val identifier: String) : AdvancedPushNavEvent()
 
 
-sealed class VoteEvent(open val postId: EventIdHex, open val mention: PubkeyHex) : UIEvent()
+sealed class VoteEvent(open val targetId: String, open val mentionedPubKey: String) : UIEvent()
 
 data class ClickUpvote(
-    override val postId: EventIdHex,
-    override val mention: PubkeyHex,
-) : VoteEvent(postId = postId, mention = mention)
+    override val targetId: String,
+    override val mentionedPubKey: String,
+) : VoteEvent(targetId = targetId, mentionedPubKey = mentionedPubKey)
 
 data class ClickNeutralizeVote(
-    override val postId: EventIdHex,
-    override val mention: PubkeyHex,
-) : VoteEvent(postId = postId, mention = mention)
+    override val targetId: String,
+    override val mentionedPubKey: String,
+) : VoteEvent(targetId = targetId, mentionedPubKey = mentionedPubKey)
 
 data class VotePollOption(val pollId: EventIdHex, val optionId: OptionId) : UIEvent()
 
 sealed class MuteEvent : UIEvent()
-data class MuteProfile(val pubkey: PubkeyHex, val debounce: Boolean = true) : MuteEvent()
-data class UnmuteProfile(val pubkey: PubkeyHex, val debounce: Boolean = true) : MuteEvent()
-data class MuteTopic(val topic: Topic, val debounce: Boolean = true) : MuteEvent()
-data class UnmuteTopic(val topic: Topic, val debounce: Boolean = true) : MuteEvent()
+data class MuteProfile(val pubkey: String, val debounce: Boolean = true) : MuteEvent()
+data class UnmuteProfile(val pubkey: String, val debounce: Boolean = true) : MuteEvent()
+data class MuteTopic(val topic: String, val debounce: Boolean = true) : MuteEvent()
+data class UnmuteTopic(val topic: String, val debounce: Boolean = true) : MuteEvent()
 data class MuteWord(val word: String, val debounce: Boolean = true) : MuteEvent()
 data class UnmuteWord(val word: String, val debounce: Boolean = true) : MuteEvent()
 
 
-sealed class TopicEvent(open val topic: Topic) : UIEvent()
-data class FollowTopic(override val topic: Topic) : TopicEvent(topic = topic)
-data class UnfollowTopic(override val topic: Topic) : TopicEvent(topic = topic)
+sealed class TopicEvent(open val topic: String) : UIEvent()
+data class FollowTopic(override val topic: String) : TopicEvent(topic = topic)
+data class UnfollowTopic(override val topic: String) : TopicEvent(topic = topic)
 
 
-sealed class BookmarkEvent(open val postId: EventIdHex) : UIEvent()
-data class BookmarkPost(override val postId: EventIdHex) : BookmarkEvent(postId = postId)
-data class UnbookmarkPost(override val postId: EventIdHex) : BookmarkEvent(postId = postId)
+sealed class BookmarkEvent(open val id: String) : UIEvent()
+data class BookmarkPost(override val id: String) : BookmarkEvent(id = id)
+data class UnbookmarkPost(override val id: String) : BookmarkEvent(id = id)
 
 
 sealed class ProfileEvent(open val pubkey: PubkeyHex) : UIEvent()
 
 data class FollowProfile(override val pubkey: PubkeyHex) : ProfileEvent(pubkey = pubkey)
-
 data class UnfollowProfile(override val pubkey: PubkeyHex) : ProfileEvent(pubkey = pubkey)
 
 
@@ -227,14 +222,14 @@ data object TopicViewLoadLists : TopicViewAction()
 
 sealed class RelayEditorViewAction : UIEvent()
 data class AddRelay(
-    val relayUrl: RelayUrl,
+    val relayUrl: String,
     val scope: CoroutineScope,
     val context: Context
 ) : RelayEditorViewAction()
 
-data class RemoveRelay(val relayUrl: RelayUrl) : RelayEditorViewAction()
-data class ToggleReadRelay(val relayUrl: RelayUrl) : RelayEditorViewAction()
-data class ToggleWriteRelay(val relayUrl: RelayUrl) : RelayEditorViewAction()
+data class RemoveRelay(val relayUrl: String) : RelayEditorViewAction()
+data class ToggleReadRelay(val relayUrl: String) : RelayEditorViewAction()
+data class ToggleWriteRelay(val relayUrl: String) : RelayEditorViewAction()
 data class SaveRelays(val context: Context, val onGoBack: Fn) : RelayEditorViewAction()
 data object LoadRelays : RelayEditorViewAction()
 

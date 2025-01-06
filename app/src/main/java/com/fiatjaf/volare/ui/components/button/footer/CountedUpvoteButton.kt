@@ -24,14 +24,14 @@ fun CountedUpvoteButton(mainEvent: MainEvent, onUpdate: OnUpdate) {
             if (mainEvent.isUpvoted) {
                 onUpdate(
                     ClickNeutralizeVote(
-                        postId = mainEvent.getRelevantId(),
+                        targetId = mainEvent.getRelevantId(),
                         mention = mainEvent.getRelevantPubkey()
                     )
                 )
             } else {
                 onUpdate(
                     ClickUpvote(
-                        postId = mainEvent.getRelevantId(),
+                        targetId = mainEvent.getRelevantId(),
                         mention = mainEvent.getRelevantPubkey()
                     )
                 )

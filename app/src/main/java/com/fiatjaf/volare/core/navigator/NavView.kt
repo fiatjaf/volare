@@ -4,13 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.Topic
-import com.fiatjaf.volare.core.model.MainEvent
-import com.fiatjaf.volare.core.model.ThreadableMainEvent
-import com.fiatjaf.volare.data.nostr.RelayUrl
-import rust.nostr.sdk.Nip19Event
-import rust.nostr.sdk.Nip19Profile
 
 sealed class NavView
 
@@ -47,15 +40,15 @@ data object CreateGitIssueNavView : SimpleNonMainNavView()
 
 
 sealed class AdvancedNonMainNavView : NonMainNavView()
-data class ThreadNavView(val mainEvent: ThreadableMainEvent) : AdvancedNonMainNavView()
-data class ThreadRawNavView(val nevent: Nip19Event, val parent: ThreadableMainEvent?) :
+data class ThreadNavView(val note: backend.Note) : AdvancedNonMainNavView()
+data class ThreadRawNavView(val nevent: String, val parent: backend.Note?) :
     AdvancedNonMainNavView()
 
-data class ProfileNavView(val nprofile: Nip19Profile) : AdvancedNonMainNavView()
-data class TopicNavView(val topic: Topic) : AdvancedNonMainNavView()
-data class ReplyCreationNavView(val parent: MainEvent) : AdvancedNonMainNavView()
-data class CrossPostCreationNavView(val id: EventIdHex) : AdvancedNonMainNavView()
-data class RelayProfileNavView(val relayUrl: RelayUrl) : AdvancedNonMainNavView()
+data class ProfileNavView(val nprofile: String) : AdvancedNonMainNavView()
+data class TopicNavView(val topic: String) : AdvancedNonMainNavView()
+data class ReplyCreationNavView(val parent: backend.Note) : AdvancedNonMainNavView()
+data class CrossPostCreationNavView(val id: String) : AdvancedNonMainNavView()
+data class RelayProfileNavView(val relayUrl: String) : AdvancedNonMainNavView()
 data class OpenListNavView(val identifier: String) : AdvancedNonMainNavView()
 data object EditNewListNavView : AdvancedNonMainNavView()
 data class EditExistingListNavView(val identifier: String) : AdvancedNonMainNavView()

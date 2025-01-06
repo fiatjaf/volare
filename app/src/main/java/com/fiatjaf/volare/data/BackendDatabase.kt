@@ -97,7 +97,7 @@ class BackendDatabase {
         }
     }
 
-    fun getListFeedFlow(pubkey: String, identifier: String, until: Long = 9999999999L, limit: Int): Flow<backend.NoteFeed> {
+    fun getSetFeedFlow(pubkey: String, identifier: String, until: Long = 9999999999L, limit: Int): Flow<backend.NoteFeed> {
         return callbackFlow {
             val emitter = FeedEmitter { p -> trySend(p) }
             val canceller = dbi.watchSetFeed(pubkey, identifier, until, limit.toLong(), emitter)

@@ -13,5 +13,5 @@ fun BookmarkIconButton(relevantId: EventIdHex, onUpdate: OnUpdate) {
     FooterIconButton(
         icon = BookmarkIcon,
         description = stringResource(id = R.string.remove_bookmark),
-        onClick = { onUpdate(UnbookmarkPost(postId = relevantId)) })
+        onClick = { onUpdate(UnbookmarkPost(id = relevantId)) })
 }

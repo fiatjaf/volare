@@ -10,15 +10,12 @@ import com.fiatjaf.volare.core.DEBOUNCE
 import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.VoteEvent
-import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.event.EventDeletor
-import com.fiatjaf.volare.data.event.EventRebroadcaster
 import com.fiatjaf.volare.data.nostr.NostrService
 import com.fiatjaf.volare.data.nostr.secs
 import com.fiatjaf.volare.data.preferences.EventPreferences
-import com.fiatjaf.volare.data.preferences.RelayPreferences
 import com.fiatjaf.volare.data.provider.RelayProvider
 import com.fiatjaf.volare.data.room.dao.VoteDao
 import com.fiatjaf.volare.data.room.entity.main.VoteEntity
@@ -57,9 +54,9 @@ class PostVoter(
             is ClickUpvote -> true
             is ClickNeutralizeVote -> false
         }
-        updateForcedVote(action.postId, newVote)
+        updateForcedVote(action.targetId, newVote)
         vote(
-            postId = action.postId,
+            postId = action.targetId,
             mention = action.mention,
             isUpvote = newVote,
         )

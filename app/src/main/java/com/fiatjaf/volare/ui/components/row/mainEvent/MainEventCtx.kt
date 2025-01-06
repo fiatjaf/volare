@@ -1,10 +1,6 @@
 package com.fiatjaf.volare.ui.components.row.mainEvent
 
-import com.fiatjaf.volare.core.model.MainEvent
-import com.fiatjaf.volare.core.model.SomeReply
-import com.fiatjaf.volare.core.model.ThreadableMainEvent
-
-sealed class MainEventCtx(open val mainEvent: MainEvent) {
+sealed class NoteCtx(open val note: backend.Note) {
     fun isCollapsedReply(): Boolean {
         return when (this) {
             is ThreadReplyCtx -> this.isCollapsed
@@ -14,15 +10,15 @@ sealed class MainEventCtx(open val mainEvent: MainEvent) {
 }
 
 data class ThreadRootCtx(
-    val threadableMainEvent: ThreadableMainEvent
-) : MainEventCtx(mainEvent = threadableMainEvent)
+    val threadableNote: backend.Note
+) : NoteCtx(note = threadableNote)
 
 data class ThreadReplyCtx(
-    val reply: SomeReply,
+    val reply: backend.Note,
     val isOp: Boolean,
     val level: Int,
     val isCollapsed: Boolean,
     val hasLoadedReplies: Boolean,
-) : MainEventCtx(mainEvent = reply)
+) : NoteCtx(note = reply)
 
-data class FeedCtx(override val mainEvent: MainEvent) : MainEventCtx(mainEvent = mainEvent)
+data class FeedCtx(override val note: backend.Note) : NoteCtx(note = note)
