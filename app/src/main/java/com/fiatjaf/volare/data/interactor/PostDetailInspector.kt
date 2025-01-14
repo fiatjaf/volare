@@ -2,7 +2,6 @@ package com.fiatjaf.volare.data.interactor
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.data.event.POLL_U16
 import com.fiatjaf.volare.data.model.PostDetails
 import com.fiatjaf.volare.data.nostr.getClientTag
@@ -17,7 +16,7 @@ class PostDetailInspector(
 ) {
     val currentDetails: MutableState<PostDetails?> = mutableStateOf(null)
 
-    suspend fun setPostDetails(postId: EventIdHex) {
+    suspend fun setPostDetails(postId: String) {
         if (currentDetails.value?.base?.id == postId) return
 
         currentDetails.value = mainEventDao.getPostDetails(id = postId)?.let { base ->

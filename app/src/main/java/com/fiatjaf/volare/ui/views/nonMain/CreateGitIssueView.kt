@@ -23,7 +23,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.GoBack
 import com.fiatjaf.volare.core.MAX_SUBJECT_LINES
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.SendGitIssue
 import com.fiatjaf.volare.core.SubRepoOwnerRelays
 import com.fiatjaf.volare.core.model.BugReport
@@ -42,7 +41,7 @@ fun CreateGitIssueView(
     vm: CreateGitIssueViewModel,
     searchSuggestions: State<List<AdvancedProfileView>>,
     snackbar: SnackbarHostState,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val header = remember { mutableStateOf(TextFieldValue()) }
     val body = remember { mutableStateOf(TextFieldValue()) }
@@ -102,7 +101,7 @@ private fun CreateGitIssueContent(
     searchSuggestions: List<AdvancedProfileView>,
     isAnon: MutableState<Boolean>,
     focusRequester: FocusRequester,
-    onUpdate: OnUpdate,
+    onUpdate: (UIEvent) -> Unit,
 ) {
     InputWithSuggestions(
         body = body,

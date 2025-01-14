@@ -13,14 +13,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import backend.Backend
 
 @Composable
 fun SetKeyOrBunkerDialog(
     onSetKey: (String) -> Unit,
     onSetBunker: (String) -> Unit,
-    onDismiss: Fn,
+    onDismiss: () -> Unit,
 ) {
     val input = remember { mutableStateOf(TextFieldValue("")) }
     val showConfirmationButton = remember(input.value) { Backend.isValidKeyOrBunker(input.value.text) }

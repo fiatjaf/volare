@@ -12,7 +12,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.utils.normalizeMuteWord
 
 
@@ -20,7 +19,7 @@ import com.fiatjaf.volare.core.utils.normalizeMuteWord
 fun AddMuteWordDialog(
     showNext: Boolean,
     onAdd: (String) -> Unit,
-    onDismiss: Fn,
+    onDismiss: () -> Unit,
 ) {
     val input = remember { mutableStateOf(TextFieldValue("")) }
     val showConfirmationButton = remember(input.value) {

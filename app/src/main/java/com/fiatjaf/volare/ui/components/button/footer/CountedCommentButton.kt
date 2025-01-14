@@ -4,13 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenReplyCreation
 import com.fiatjaf.volare.ui.components.row.mainEvent.MainEventCtx
 import com.fiatjaf.volare.ui.theme.CommentIcon
 
 @Composable
-fun CountedCommentButton(ctx: MainEventCtx, modifier: Modifier = Modifier, onUpdate: OnUpdate) {
+fun CountedCommentButton(ctx: MainEventCtx, modifier: Modifier = Modifier, onUpdate: (UIEvent) -> Unit) {
     CountedIconButton(
         modifier = modifier,
         count = ctx.mainEvent.replyCount,

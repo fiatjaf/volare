@@ -2,7 +2,6 @@ package com.fiatjaf.volare.data.room.entity.main
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.data.event.ValidatedRootPost
 
 @Entity(
@@ -17,7 +16,7 @@ import com.fiatjaf.volare.data.event.ValidatedRootPost
     )],
 )
 data class RootPostEntity(
-    val eventId: EventIdHex,
+    val eventId: String,
     val subject: String,
 ) {
     companion object {

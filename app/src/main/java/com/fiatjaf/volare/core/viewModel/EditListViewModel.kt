@@ -13,7 +13,6 @@ import com.fiatjaf.volare.core.EditListViewAddProfile
 import com.fiatjaf.volare.core.EditListViewAddTopic
 import com.fiatjaf.volare.core.EditListViewSave
 import com.fiatjaf.volare.core.MAX_KEYS_SQL
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.VOLARE
 import com.fiatjaf.volare.core.utils.isBareTopicStr
 import com.fiatjaf.volare.core.utils.launchIO
@@ -40,7 +39,7 @@ class EditListViewModel(
     val title = mutableStateOf("")
     val description = mutableStateOf(TextFieldValue())
     val profiles = mutableStateOf(emptyList<AdvancedProfileView>())
-    val topics = mutableStateOf(emptyList<Topic>())
+    val topics = mutableStateOf(emptyList<String>())
     val tabIndex = mutableIntStateOf(0)
 
     fun createNew() {

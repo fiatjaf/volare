@@ -7,7 +7,6 @@ import com.anggrayudi.storage.SimpleStorageHelper
 import com.anggrayudi.storage.file.makeFile
 import com.anggrayudi.storage.file.openOutputStream
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
 import com.fiatjaf.volare.data.account.AccountManager

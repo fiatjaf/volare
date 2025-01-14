@@ -2,7 +2,6 @@ package com.fiatjaf.volare.data.room.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.getNormalizedName
 import com.fiatjaf.volare.data.event.ValidatedProfile
 import com.fiatjaf.volare.data.model.RelevantMetadata
@@ -16,7 +15,7 @@ import rust.nostr.sdk.PublicKey
     primaryKeys = ["pubkey"],
 )
 data class FullProfileEntity(
-    val pubkey: PubkeyHex,
+    val pubkey: String,
     val name: String,
     val createdAt: Long,
     val about: String,

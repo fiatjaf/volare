@@ -3,7 +3,6 @@ package com.fiatjaf.volare.ui.components.list
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.fiatjaf.volare.core.ComposableContent
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.ui.components.icon.TrustIcon
 
@@ -12,7 +11,7 @@ fun ProfileList(
     profiles: List<AdvancedProfileView>,
     state: LazyListState,
     isRemovable: Boolean = false,
-    firstRow: ComposableContent = {},
+    firstRow:  () -> Unit = {},
     onRemove: (Int) -> Unit = {},
     onClick: (Int) -> Unit = {},
 ) {

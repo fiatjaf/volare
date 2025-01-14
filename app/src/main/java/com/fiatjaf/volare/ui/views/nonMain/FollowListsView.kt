@@ -10,7 +10,6 @@ import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.FollowListsViewInit
 import com.fiatjaf.volare.core.FollowListsViewRefresh
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.viewModel.FollowListsViewModel
 import com.fiatjaf.volare.ui.components.list.ProfileAndTopicList
 import com.fiatjaf.volare.ui.components.scaffold.SimpleGoBackScaffold
@@ -18,7 +17,7 @@ import com.fiatjaf.volare.ui.model.FollowableProfileItem
 import com.fiatjaf.volare.ui.model.FollowableTopicItem
 
 @Composable
-fun FollowListsView(vm: FollowListsViewModel, snackbar: SnackbarHostState, onUpdate: OnUpdate) {
+fun FollowListsView(vm: FollowListsViewModel, snackbar: SnackbarHostState, onUpdate: (UIEvent) -> Unit) {
     val isRefreshing by vm.isRefreshing
     val profilesRaw by vm.profiles.value.collectAsState()
     val topicsRaw by vm.topics.value.collectAsState()

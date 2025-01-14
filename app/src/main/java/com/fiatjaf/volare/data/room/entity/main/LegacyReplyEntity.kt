@@ -3,7 +3,6 @@ package com.fiatjaf.volare.data.room.entity.main
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.data.event.ValidatedLegacyReply
 
 @Entity(
@@ -21,8 +20,8 @@ import com.fiatjaf.volare.data.event.ValidatedLegacyReply
     ],
 )
 data class LegacyReplyEntity(
-    val eventId: EventIdHex,
-    val parentId: EventIdHex,
+    val eventId: String,
+    val parentId: String,
 ) {
     companion object {
         fun from(legacyReply: ValidatedLegacyReply): LegacyReplyEntity {

@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiatjaf.volare.core.DELAY_1SEC
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.ThreadViewAction
 import com.fiatjaf.volare.core.ThreadViewRefresh
 import com.fiatjaf.volare.core.ThreadViewShowReplies
@@ -41,7 +40,7 @@ class ThreadViewModel(
     val replies: MutableState<StateFlow<List<ThreadReplyCtx>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
     val totalReplyCount: MutableState<StateFlow<Int>> = mutableStateOf(MutableStateFlow(0))
-    private val parentIds = mutableStateOf(emptySet<EventIdHex>())
+    private val parentIds = mutableStateOf(emptySet<String>())
     private var nevent: Nip19Event? = null
 
     fun openThread(nevent: Nip19Event, parentUi: ThreadableMainEvent?) {
@@ -110,8 +109,8 @@ class ThreadViewModel(
     }
 
     private fun loadReplies(
-        rootId: EventIdHex?,
-        parentId: EventIdHex,
+        rootId: String?,
+        parentId: String,
         isInit: Boolean,
     ) {
         if (rootId == null) return
@@ -126,7 +125,7 @@ class ThreadViewModel(
             .stateIn(viewModelScope, SharingStarted.Eagerly, init)
     }
 
-    private fun checkParentAvailability(replyId: EventIdHex, parentUi: MainEvent?) {
+    private fun checkParentAvailability(replyId: String, parentUi: MainEvent?) {
         if (parentUi is RootPost) return
 
         parentIsAvailable = threadProvider

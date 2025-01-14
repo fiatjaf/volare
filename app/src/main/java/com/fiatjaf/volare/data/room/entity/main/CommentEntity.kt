@@ -3,7 +3,6 @@ package com.fiatjaf.volare.data.room.entity.main
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.data.event.ValidatedComment
 
 @Entity(
@@ -21,8 +20,8 @@ import com.fiatjaf.volare.data.event.ValidatedComment
     ],
 )
 data class CommentEntity(
-    val eventId: EventIdHex,
-    val parentId: EventIdHex?, // We don't support a and i parent tags
+    val eventId: String,
+    val parentId: String?, // We don't support a and i parent tags
     val parentKind: Int?, // We save this to easily determine if parent is renderable
 ) {
     companion object {

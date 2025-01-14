@@ -23,9 +23,7 @@ import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.GoBack
 import com.fiatjaf.volare.core.MAX_TOPICS
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.SendCrossPost
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.utils.canAddAnotherTopic
 import com.fiatjaf.volare.core.viewModel.CreateCrossPostViewModel
 import com.fiatjaf.volare.ui.components.TopicSelectionColumn
@@ -39,12 +37,12 @@ import com.fiatjaf.volare.ui.theme.spacing
 @Composable
 fun CreateCrossPostView(
     vm: CreateCrossPostViewModel,
-    topicSuggestions: State<List<Topic>>,
+    topicSuggestions: State<List<String>>,
     snackbar: SnackbarHostState,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val isSending by vm.isSending
-    val selectedTopics = remember { mutableStateOf(emptyList<Topic>()) }
+    val selectedTopics = remember { mutableStateOf(emptyList<String>()) }
     val isAnon = remember { mutableStateOf(false) }
 
     ContentCreationScaffold(
@@ -69,10 +67,10 @@ fun CreateCrossPostView(
 
 @Composable
 private fun CreateCrossPostViewContent(
-    topicSuggestions: List<Topic>,
-    selectedTopics: MutableState<List<Topic>>,
+    topicSuggestions: List<String>,
+    selectedTopics: MutableState<List<String>>,
     isAnon: MutableState<Boolean>,
-    onUpdate: OnUpdate,
+    onUpdate: (UIEvent) -> Unit,
 ) {
     val showTopicSelection = remember { mutableStateOf(false) }
     if (showTopicSelection.value) AddTopicDialog(
@@ -108,9 +106,9 @@ private fun CreateCrossPostViewContent(
 @Composable
 private fun CrossPostButton(
     modifier: Modifier = Modifier,
-    selectedTopics: State<List<Topic>>,
+    selectedTopics: State<List<String>>,
     isAnon: Boolean,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val context = LocalContext.current
 

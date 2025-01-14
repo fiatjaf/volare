@@ -35,7 +35,7 @@ class FollowListsViewModel(
     val isRefreshing = mutableStateOf(false)
     val profiles: MutableState<StateFlow<List<AdvancedProfileView>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
-    val topics: MutableState<StateFlow<List<TopicFollowState>>> =
+    val topics: MutableState<StateFlow<List<StringFollowState>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
 
     fun handle(action: FollowListsViewAction) {

@@ -7,7 +7,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.data.event.ValidatedTopicSet
 import com.fiatjaf.volare.data.room.entity.sets.TopicSetEntity
 import com.fiatjaf.volare.data.room.entity.sets.TopicSetItemEntity
@@ -46,14 +45,14 @@ interface TopicSetUpsertDao {
     suspend fun internalUpsert(set: TopicSetEntity)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun internalInsert(entries: Collection<TopicSetItemEntity>)
+    suspend fun internalInsert(entries: Collection<StringSetItemEntity>)
 
     @Delete
-    suspend fun internalDelete(entries: Collection<TopicSetItemEntity>)
+    suspend fun internalDelete(entries: Collection<StringSetItemEntity>)
 
     @Query("SELECT MAX(createdAt) FROM topicSet WHERE identifier = :identifier")
     suspend fun internalGetNewestCreatedAt(identifier: String): Long?
 
     @Query("SELECT topic FROM topicSetItem WHERE identifier = :identifier")
-    suspend fun internalGetTopics(identifier: String): List<Topic>
+    suspend fun internalGetTopics(identifier: String): List<String>
 }

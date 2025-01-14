@@ -2,8 +2,6 @@ package com.fiatjaf.volare.data.room.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.data.room.view.CrossPostView
 import com.fiatjaf.volare.data.room.view.PollOptionView
 import com.fiatjaf.volare.data.room.view.PollView
@@ -91,19 +89,19 @@ private const val LIST_POLL_OPTION_QUERY =
 @Dao
 interface FeedDao {
     @Query(TOPIC_ROOT_QUERY)
-    fun getTopicRootPostFlow(topic: Topic, until: Long, size: Int): Flow<List<RootPostView>>
+    fun getTopicRootPostFlow(topic: String, until: Long, size: Int): Flow<List<RootPostView>>
 
     @Query(TOPIC_CROSS_QUERY)
-    fun getTopicCrossPostFlow(topic: Topic, until: Long, size: Int): Flow<List<CrossPostView>>
+    fun getTopicCrossPostFlow(topic: String, until: Long, size: Int): Flow<List<CrossPostView>>
 
     @Query(TOPIC_POLL_QUERY)
-    fun getTopicPollFlow(topic: Topic, until: Long, size: Int): Flow<List<PollView>>
+    fun getTopicPollFlow(topic: String, until: Long, size: Int): Flow<List<PollView>>
 
     @Query(TOPIC_POLL_OPTION_QUERY)
-    fun getTopicPollOptionFlow(topic: Topic, until: Long, size: Int): Flow<List<PollOptionView>>
+    fun getTopicPollOptionFlow(topic: String, until: Long, size: Int): Flow<List<PollOptionView>>
 
     fun hasTopicFeedFlow(
-        topic: Topic,
+        topic: String,
         until: Long = Long.MAX_VALUE,
         size: Int = 1
     ): Flow<Boolean> {
@@ -115,15 +113,15 @@ interface FeedDao {
     }
 
     @Query(TOPIC_ROOT_QUERY)
-    suspend fun getTopicRootPosts(topic: Topic, until: Long, size: Int): List<RootPostView>
+    suspend fun getTopicRootPosts(topic: String, until: Long, size: Int): List<RootPostView>
 
     @Query(TOPIC_CROSS_QUERY)
-    suspend fun getTopicCrossPosts(topic: Topic, until: Long, size: Int): List<CrossPostView>
+    suspend fun getTopicCrossPosts(topic: String, until: Long, size: Int): List<CrossPostView>
 
     @Query(TOPIC_POLL_QUERY)
-    suspend fun getTopicPolls(topic: Topic, until: Long, size: Int): List<PollView>
+    suspend fun getTopicPolls(topic: String, until: Long, size: Int): List<PollView>
 
-    suspend fun getTopicFeedCreatedAt(topic: Topic, until: Long, size: Int): List<Long> {
+    suspend fun getTopicFeedCreatedAt(topic: String, until: Long, size: Int): List<Long> {
         return (internalGetTopicRootCreatedAt(topic = topic, until = until, size = size) +
                 internalGetTopicCrossCreatedAt(topic = topic, until = until, size = size) +
                 internalGetTopicPollCreatedAt(topic = topic, until = until, size = size))
@@ -132,18 +130,18 @@ interface FeedDao {
     }
 
     @Query(PROFILE_ROOT_QUERY)
-    fun getProfileRootPostFlow(pubkey: PubkeyHex, until: Long, size: Int): Flow<List<RootPostView>>
+    fun getProfileRootPostFlow(pubkey: String, until: Long, size: Int): Flow<List<RootPostView>>
 
     @Query(PROFILE_CROSS_QUERY)
     fun getProfileCrossPostFlow(
-        pubkey: PubkeyHex,
+        pubkey: String,
         until: Long,
         size: Int
     ): Flow<List<CrossPostView>>
 
     @Query(PROFILE_POLL_QUERY)
     fun getProfilePollFlow(
-        pubkey: PubkeyHex,
+        pubkey: String,
         until: Long,
         size: Int
     ): Flow<List<PollView>>
@@ -156,7 +154,7 @@ interface FeedDao {
     ): Flow<List<PollOptionView>>
 
     fun hasProfileFeedFlow(
-        pubkey: PubkeyHex,
+        pubkey: String,
         until: Long = Long.MAX_VALUE,
         size: Int = 1
     ): Flow<Boolean> {
@@ -168,15 +166,15 @@ interface FeedDao {
     }
 
     @Query(PROFILE_ROOT_QUERY)
-    suspend fun getProfileRootPosts(pubkey: PubkeyHex, until: Long, size: Int): List<RootPostView>
+    suspend fun getProfileRootPosts(pubkey: String, until: Long, size: Int): List<RootPostView>
 
     @Query(PROFILE_CROSS_QUERY)
-    suspend fun getProfileCrossPosts(pubkey: PubkeyHex, until: Long, size: Int): List<CrossPostView>
+    suspend fun getProfileCrossPosts(pubkey: String, until: Long, size: Int): List<CrossPostView>
 
     @Query(PROFILE_POLL_QUERY)
-    suspend fun getProfilePolls(pubkey: PubkeyHex, until: Long, size: Int): List<PollView>
+    suspend fun getProfilePolls(pubkey: String, until: Long, size: Int): List<PollView>
 
-    suspend fun getProfileFeedCreatedAt(pubkey: PubkeyHex, until: Long, size: Int): List<Long> {
+    suspend fun getProfileFeedCreatedAt(pubkey: String, until: Long, size: Int): List<Long> {
         return (internalGetProfileRootCreatedAt(pubkey = pubkey, until = until, size = size) +
                 internalGetProfileCrossCreatedAt(pubkey = pubkey, until = until, size = size) +
                 internalGetProfilePollCreatedAt(pubkey = pubkey, until = until, size = size))
@@ -230,49 +228,49 @@ interface FeedDao {
     }
 
     @Query(TOPIC_EXISTS_ROOT_QUERY)
-    fun internalTopicRootExistsFlow(topic: Topic, until: Long, size: Int): Flow<Boolean>
+    fun internalTopicRootExistsFlow(topic: String, until: Long, size: Int): Flow<Boolean>
 
     @Query(TOPIC_EXISTS_CROSS_QUERY)
-    fun internalTopicCrossExistsFlow(topic: Topic, until: Long, size: Int): Flow<Boolean>
+    fun internalTopicCrossExistsFlow(topic: String, until: Long, size: Int): Flow<Boolean>
 
     @Query(TOPIC_EXISTS_POLL_QUERY)
-    fun internalTopicPollExistsFlow(topic: Topic, until: Long, size: Int): Flow<Boolean>
+    fun internalTopicPollExistsFlow(topic: String, until: Long, size: Int): Flow<Boolean>
 
     @Query(TOPIC_CREATED_AT_ROOT_QUERY)
-    suspend fun internalGetTopicRootCreatedAt(topic: Topic, until: Long, size: Int): List<Long>
+    suspend fun internalGetTopicRootCreatedAt(topic: String, until: Long, size: Int): List<Long>
 
     @Query(TOPIC_CREATED_AT_CROSS_QUERY)
-    suspend fun internalGetTopicCrossCreatedAt(topic: Topic, until: Long, size: Int): List<Long>
+    suspend fun internalGetTopicCrossCreatedAt(topic: String, until: Long, size: Int): List<Long>
 
     @Query(TOPIC_CREATED_AT_POLL_QUERY)
-    suspend fun internalGetTopicPollCreatedAt(topic: Topic, until: Long, size: Int): List<Long>
+    suspend fun internalGetTopicPollCreatedAt(topic: String, until: Long, size: Int): List<Long>
 
     @Query(PROFILE_EXISTS_ROOT_QUERY)
-    fun internalProfileRootExistsFlow(pubkey: PubkeyHex, until: Long, size: Int): Flow<Boolean>
+    fun internalProfileRootExistsFlow(pubkey: String, until: Long, size: Int): Flow<Boolean>
 
     @Query(PROFILE_EXISTS_CROSS_QUERY)
-    fun internalProfileCrossExistsFlow(pubkey: PubkeyHex, until: Long, size: Int): Flow<Boolean>
+    fun internalProfileCrossExistsFlow(pubkey: String, until: Long, size: Int): Flow<Boolean>
 
     @Query(PROFILE_EXISTS_POLL_QUERY)
-    fun internalProfilePollExistsFlow(pubkey: PubkeyHex, until: Long, size: Int): Flow<Boolean>
+    fun internalProfilePollExistsFlow(pubkey: String, until: Long, size: Int): Flow<Boolean>
 
     @Query(PROFILE_CREATED_AT_ROOT_QUERY)
     suspend fun internalGetProfileRootCreatedAt(
-        pubkey: PubkeyHex,
+        pubkey: String,
         until: Long,
         size: Int
     ): List<Long>
 
     @Query(PROFILE_CREATED_AT_CROSS_QUERY)
     suspend fun internalGetProfileCrossCreatedAt(
-        pubkey: PubkeyHex,
+        pubkey: String,
         until: Long,
         size: Int
     ): List<Long>
 
     @Query(PROFILE_CREATED_AT_POLL_QUERY)
     suspend fun internalGetProfilePollCreatedAt(
-        pubkey: PubkeyHex,
+        pubkey: String,
         until: Long,
         size: Int
     ): List<Long>

@@ -2,8 +2,6 @@ package com.fiatjaf.volare.data.room.entity.main
 
 import androidx.room.Entity
 import androidx.room.Index
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.BlurHashDef
 import com.fiatjaf.volare.data.event.ValidatedComment
 import com.fiatjaf.volare.data.event.ValidatedCrossPost
@@ -11,7 +9,6 @@ import com.fiatjaf.volare.data.event.ValidatedLegacyReply
 import com.fiatjaf.volare.data.event.ValidatedMainEvent
 import com.fiatjaf.volare.data.event.ValidatedPoll
 import com.fiatjaf.volare.data.event.ValidatedRootPost
-import com.fiatjaf.volare.data.nostr.RelayUrl
 
 @Entity(
     tableName = "mainEvent",
@@ -23,11 +20,11 @@ import com.fiatjaf.volare.data.nostr.RelayUrl
     ],
 )
 data class MainEventEntity(
-    val id: EventIdHex,
-    val pubkey: PubkeyHex,
+    val id: String,
+    val pubkey: String,
     val createdAt: Long,
     val content: String,
-    val relayUrl: RelayUrl,
+    val relayUrl: String,
     val isMentioningMe: Boolean,
     val blurhashes: List<BlurHashDef>?,
     val json: String?,

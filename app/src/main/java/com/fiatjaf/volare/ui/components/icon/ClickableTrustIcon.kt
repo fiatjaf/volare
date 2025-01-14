@@ -16,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.model.Oneself
 import com.fiatjaf.volare.core.model.TrustType
 import com.fiatjaf.volare.ui.theme.Sky600
@@ -29,7 +28,7 @@ fun ClickableTrustIcon(
     trustType: TrustType,
     authorName: String,
     isOp: Boolean = false,
-    onClick: Fn
+    onClick: () -> Unit
 ) {
     val isOneself = remember(trustType) { trustType is Oneself }
     Box(modifier = Modifier.clickable(onClick = onClick)) {

@@ -31,8 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.FEED_PAGE_SIZE
-import com.fiatjaf.volare.core.Fn
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.model.IPaginator
 import com.fiatjaf.volare.core.utils.debounce
 import com.fiatjaf.volare.core.utils.showScrollButton
@@ -56,9 +54,9 @@ fun Feed(
     paginator: IPaginator,
     postDetails: State<PostDetails?>,
     state: LazyListState,
-    onRefresh: Fn,
-    onAppend: Fn,
-    onUpdate: OnUpdate,
+    onRefresh: () -> Unit,
+    onAppend: () -> Unit,
+    onUpdate: (UIEvent) -> Unit,
 ) {
     val isRefreshing by paginator.isRefreshing
     val isAppending by paginator.isAppending
@@ -149,7 +147,7 @@ fun Feed(
 }
 
 @Composable
-private fun MostRecentPostsTextButton(onClick: Fn) {
+private fun MostRecentPostsTextButton(onClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
@@ -161,7 +159,7 @@ private fun MostRecentPostsTextButton(onClick: Fn) {
 }
 
 @Composable
-private fun NextPageButton(onAppend: Fn) {
+private fun NextPageButton(onAppend: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -178,7 +176,7 @@ private fun NextPageButton(onAppend: Fn) {
 }
 
 @Composable
-private fun ScrollUpButton(onScrollToTop: Fn) {
+private fun ScrollUpButton(onScrollToTop: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()

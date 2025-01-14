@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.fiatjaf.volare.core.Fn
 
 @Composable
 fun CountedIconButton(
@@ -14,7 +13,7 @@ fun CountedIconButton(
     icon: ImageVector,
     description: String,
     modifier: Modifier = Modifier,
-    onClick: Fn
+    onClick: () -> Unit
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         FooterIconButton(icon = icon, description = description, onClick = onClick)

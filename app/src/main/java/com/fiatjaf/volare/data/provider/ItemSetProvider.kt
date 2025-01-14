@@ -2,9 +2,7 @@ package com.fiatjaf.volare.data.provider
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.AnnotatedString
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.SHORT_DEBOUNCE
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.model.ItemSetItem
 import com.fiatjaf.volare.core.model.ItemSetProfile
 import com.fiatjaf.volare.core.model.ItemSetTopic
@@ -45,7 +43,7 @@ class ItemSetProvider(
     val topicListNaddr = mutableStateOf("")
 
     val profiles = mutableStateOf(emptyList<AdvancedProfileView>())
-    val topics = mutableStateOf(emptyList<Topic>())
+    val topics = mutableStateOf(emptyList<String>())
 
     suspend fun loadList(identifier: String) {
         this.identifier.value = identifier
@@ -131,22 +129,22 @@ class ItemSetProvider(
         }
     }
 
-    suspend fun getTopicsFromList(identifier: String, limit: Int = Int.MAX_VALUE): List<Topic> {
+    suspend fun getTopicsFromList(identifier: String, limit: Int = Int.MAX_VALUE): List<String> {
         return room.topicDao().getTopicsFromList(identifier = identifier, limit = limit)
     }
 
     suspend fun getPubkeysFromList(
         identifier: String,
         limit: Int = Int.MAX_VALUE
-    ): List<PubkeyHex> {
+    ): List<String> {
         return room.itemSetDao().getPubkeys(identifier = identifier, limit = limit)
     }
 
-    fun isInAnySet(pubkey: PubkeyHex): Boolean {
+    fun isInAnySet(pubkey: String): Boolean {
         return allPubkeys.value.contains(pubkey)
     }
 
-    suspend fun getPubkeysWithMissingNip65(identifier: String): List<PubkeyHex> {
+    suspend fun getPubkeysWithMissingNip65(identifier: String): List<String> {
         return room.itemSetDao().getPubkeysWithMissingNip65(identifier = identifier)
     }
 }

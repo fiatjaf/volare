@@ -5,7 +5,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.TopicViewAction
 import com.fiatjaf.volare.core.TopicViewAppend
 import com.fiatjaf.volare.core.TopicViewLoadLists
@@ -73,7 +72,7 @@ class TopicViewModel(
         }
     }
 
-    private fun updateLists(topic: Topic) {
+    private fun updateLists(topic: String) {
         viewModelScope.launchIO {
             addableLists.value = itemSetProvider
                 .getAddableSets(item = ItemSetTopic(topic = topic))

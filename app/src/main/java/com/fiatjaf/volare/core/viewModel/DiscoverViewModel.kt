@@ -33,7 +33,7 @@ class DiscoverViewModel(
 ) : ViewModel() {
     private val maxCount = 75
     val isRefreshing = mutableStateOf(false)
-    val popularTopics: MutableState<StateFlow<List<TopicFollowState>>> =
+    val popularTopics: MutableState<StateFlow<List<StringFollowState>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
     val popularProfiles: MutableState<StateFlow<List<AdvancedProfileView>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
@@ -70,7 +70,7 @@ class DiscoverViewModel(
         }
     }
 
-    private suspend fun getTopicFlow(): StateFlow<List<TopicFollowState>> {
+    private suspend fun getTopicFlow(): StateFlow<List<StringFollowState>> {
         val result = topicProvider.getPopularUnfollowedTopics(limit = maxCount)
         return topicProvider.forcedFollowStates.map { forcedStates ->
             result.map { TopicFollowState(topic = it, isFollowed = forcedStates[it] ?: false) }

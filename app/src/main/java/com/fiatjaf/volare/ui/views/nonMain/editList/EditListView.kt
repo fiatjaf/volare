@@ -17,8 +17,6 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.EditListViewAddProfile
 import com.fiatjaf.volare.core.EditListViewAddTopic
 import com.fiatjaf.volare.core.MAX_KEYS_SQL
-import com.fiatjaf.volare.core.OnUpdate
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.utils.getListTabHeaders
 import com.fiatjaf.volare.core.utils.getTransparentTextFieldColors
 import com.fiatjaf.volare.core.viewModel.EditListViewModel
@@ -37,9 +35,9 @@ import kotlinx.coroutines.launch
 fun EditListView(
     vm: EditListViewModel,
     profileSuggestions: State<List<AdvancedProfileView>>,
-    topicSuggestions: State<List<Topic>>,
+    topicSuggestions: State<List<String>>,
     snackbar: SnackbarHostState,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     EditListScaffold(
         title = vm.title,
@@ -59,9 +57,9 @@ fun EditListView(
 @Composable
 private fun ScreenContent(
     profileSuggestions: List<AdvancedProfileView>,
-    topicSuggestions: List<Topic>,
+    topicSuggestions: List<String>,
     vm: EditListViewModel,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val profileState = rememberLazyListState()
     val topicState = rememberLazyListState()

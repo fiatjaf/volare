@@ -6,7 +6,6 @@ import com.fiatjaf.volare.core.ClickProfileSuggestion
 import com.fiatjaf.volare.core.SearchProfileSuggestion
 import com.fiatjaf.volare.core.SearchTopicSuggestion
 import com.fiatjaf.volare.core.SuggestionAction
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.utils.isBareTopicStr
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.normalizeTopic
@@ -23,7 +22,7 @@ class SuggestionProvider(
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
     val profileSuggestions: MutableState<List<AdvancedProfileView>> = mutableStateOf(emptyList())
-    val topicSuggestions: MutableState<List<Topic>> = mutableStateOf(emptyList())
+    val topicSuggestions: MutableState<List<String>> = mutableStateOf(emptyList())
 
     fun handle(action: SuggestionAction) {
         when (action) {
@@ -53,7 +52,7 @@ class SuggestionProvider(
     }
 
     private var topicJob: Job? = null
-    private fun searchTopic(topic: Topic) {
+    private fun searchTopic(topic: String) {
         val normalized = topic.normalizeTopic()
         if (!normalized.isBareTopicStr()) {
             topicSuggestions.value = emptyList()

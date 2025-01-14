@@ -2,19 +2,16 @@ package com.fiatjaf.volare.ui.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.OnUpdate
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.utils.canAddAnotherTopic
 import com.fiatjaf.volare.ui.components.dialog.AddTopicDialog
 
 @Composable
 fun TopicSelectionContainer(
     showDialog: MutableState<Boolean>,
-    topicSuggestions: List<Topic>,
-    selectedTopics: MutableState<List<Topic>>,
-    onUpdate: OnUpdate,
-    content: ComposableContent,
+    topicSuggestions: List<String>,
+    selectedTopics: MutableState<List<String>>,
+    onUpdate: (UIEvent) -> Unit,
+    content:  () -> Unit,
 ) {
     if (showDialog.value) AddTopicDialog(
         topicSuggestions = topicSuggestions,

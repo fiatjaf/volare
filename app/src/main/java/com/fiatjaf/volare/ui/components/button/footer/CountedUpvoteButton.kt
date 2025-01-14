@@ -5,13 +5,12 @@ import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.ClickNeutralizeVote
 import com.fiatjaf.volare.core.ClickUpvote
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.model.MainEvent
 import com.fiatjaf.volare.ui.theme.UpvoteIcon
 import com.fiatjaf.volare.ui.theme.UpvoteOffIcon
 
 @Composable
-fun CountedUpvoteButton(mainEvent: MainEvent, onUpdate: OnUpdate) {
+fun CountedUpvoteButton(mainEvent: MainEvent, onUpdate: (UIEvent) -> Unit) {
     CountedIconButton(
         count = mainEvent.upvoteCount,
         icon = if (mainEvent.isUpvoted) UpvoteIcon else UpvoteOffIcon,

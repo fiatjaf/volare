@@ -2,8 +2,6 @@ package com.fiatjaf.volare.data.room.entity.main
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedVote
 
 @Entity(
@@ -18,9 +16,9 @@ import com.fiatjaf.volare.data.event.ValidatedVote
     )],
 )
 data class VoteEntity(
-    val id: EventIdHex,
-    val eventId: EventIdHex,
-    val pubkey: PubkeyHex,
+    val id: String,
+    val eventId: String,
+    val pubkey: String,
     val createdAt: Long
 ) {
     companion object {

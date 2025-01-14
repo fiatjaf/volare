@@ -12,9 +12,7 @@ import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.BookmarkPost
 import com.fiatjaf.volare.core.DeletePost
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.FollowProfile
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenPostInfo
 import com.fiatjaf.volare.core.OpenThreadRaw
 import com.fiatjaf.volare.core.RebroadcastPost
@@ -44,7 +42,7 @@ fun FeedItemDropdown(
     isOpen: Boolean,
     mainEvent: MainEvent,
     onDismiss: () -> Unit,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     DropdownMenu(
         expanded = isOpen,
@@ -178,8 +176,8 @@ fun FeedItemDropdown(
 @Composable
 private fun FollowItem(
     mainEvent: MainEvent,
-    onDismiss: Fn,
-    onUpdate: OnUpdate
+    onDismiss: () -> Unit,
+    onUpdate: (UIEvent) -> Unit
 ) {
     when (mainEvent.trustType) {
         Oneself, Muted -> {}
@@ -208,8 +206,8 @@ private fun FollowItem(
 @Composable
 private fun FollowCrossPostedItem(
     mainEvent: MainEvent,
-    onDismiss: Fn,
-    onUpdate: OnUpdate
+    onDismiss: () -> Unit,
+    onUpdate: (UIEvent) -> Unit
 ) {
     if (mainEvent is CrossPost) {
         when (mainEvent.crossPostedTrustType) {

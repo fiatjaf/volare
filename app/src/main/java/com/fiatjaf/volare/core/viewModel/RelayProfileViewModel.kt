@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.fiatjaf.volare.core.DELAY_1SEC
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.data.nostr.LOCALHOST
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.SIMPLE_WEBSOCKET_URI
 import com.fiatjaf.volare.data.nostr.WEBSOCKET_URI
 import com.fiatjaf.volare.data.provider.RelayProfileProvider
@@ -31,7 +30,7 @@ class RelayProfileViewModel(
 
     private var job: Job? = null
 
-    fun openProfile(relayUrl: RelayUrl) {
+    fun openProfile(relayUrl: String) {
         val noPrefix = relayUrl.removePrefix(WEBSOCKET_URI).removePrefix(SIMPLE_WEBSOCKET_URI)
         if (header.value == noPrefix) return
 

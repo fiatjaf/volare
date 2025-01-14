@@ -6,18 +6,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.ui.theme.HashtagIcon
 
 @Composable
 fun TopicList(
-    topics: List<Topic>,
+    topics: List<String>,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     isRemovable: Boolean = false,
-    firstRow: ComposableContent = {},
-    lastRow: ComposableContent = {},
+    firstRow:  () -> Unit = {},
+    lastRow:  () -> Unit = {},
     onRemove: (Int) -> Unit = {},
     onClick: (Int) -> Unit = {},
 ) {

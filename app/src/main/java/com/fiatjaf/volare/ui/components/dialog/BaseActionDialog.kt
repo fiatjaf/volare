@@ -10,20 +10,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.Fn
 
 @Composable
 fun BaseActionDialog(
     title: String,
-    main: ComposableContent,
+    main:  () -> Unit,
     confirmIsEnabled: Boolean = true,
     confirmText: String = stringResource(id = R.string.confirm),
     cancelText: String = stringResource(id = R.string.cancel),
     icon: ImageVector? = null,
     iconTint: Color? = null,
-    onConfirm: Fn,
-    onDismiss: Fn,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
 ) {
     AlertDialog(
         title = { Text(text = title) },
@@ -63,8 +61,8 @@ fun BaseActionDialog(
     cancelText: String = stringResource(id = R.string.cancel),
     icon: ImageVector? = null,
     iconTint: Color? = null,
-    onConfirm: Fn,
-    onDismiss: Fn,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
 ) {
     BaseActionDialog(
         title = title,

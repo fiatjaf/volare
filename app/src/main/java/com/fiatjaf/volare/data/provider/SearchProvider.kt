@@ -1,6 +1,5 @@
 package com.fiatjaf.volare.data.provider
 
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.data.room.dao.MainEventDao
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.data.room.view.SimplePostView
@@ -14,7 +13,7 @@ class SearchProvider(
     private val maxProfileSearchResult = 10
     private val maxPostSearchResult = 15
 
-    suspend fun getTopicSuggestions(text: String): List<Topic> {
+    suspend fun getTopicSuggestions(text: String): List<String> {
         val stripped = text.stripSearchText()
         return topicProvider.getAllTopics()
             .asSequence()

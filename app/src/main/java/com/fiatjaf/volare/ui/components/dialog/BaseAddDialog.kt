@@ -9,17 +9,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.Fn
 
 @Composable
 fun BaseAddDialog(
     header: String,
     focusRequester: FocusRequester,
-    main: ComposableContent,
-    onDismiss: Fn,
-    confirmButton: ComposableContent = {},
-    nextButton: ComposableContent = {}
+    main:  () -> Unit,
+    onDismiss: () -> Unit,
+    confirmButton:  () -> Unit = {},
+    nextButton:  () -> Unit = {}
 ) {
     LaunchedEffect(key1 = Unit) { focusRequester.requestFocus() }
 

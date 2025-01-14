@@ -13,7 +13,6 @@ import com.fiatjaf.volare.core.ProfileViewLoadLists
 import com.fiatjaf.volare.core.ProfileViewRefresh
 import com.fiatjaf.volare.core.ProfileViewReplyAppend
 import com.fiatjaf.volare.core.ProfileViewRootAppend
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.model.ItemSetProfile
 import com.fiatjaf.volare.core.model.Paginator
 import com.fiatjaf.volare.core.navigator.ProfileNavView
@@ -26,7 +25,6 @@ import com.fiatjaf.volare.data.model.ProfileFeedSetting
 import com.fiatjaf.volare.data.model.ReplyFeedSetting
 import com.fiatjaf.volare.data.nostr.Nip65Relay
 import com.fiatjaf.volare.data.nostr.NostrSubscriber
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.createNprofile
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
@@ -64,7 +62,7 @@ class ProfileViewModel(
         mutableStateOf(MutableStateFlow(FullProfileUI()))
     val nip65Relays: MutableState<StateFlow<List<Nip65Relay>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
-    val seenInRelays: MutableState<StateFlow<List<RelayUrl>>> =
+    val seenInRelays: MutableState<StateFlow<List<String>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
     val trustedBy: MutableState<StateFlow<AdvancedProfileView?>> =
         mutableStateOf(MutableStateFlow(null))
@@ -140,7 +138,7 @@ class ProfileViewModel(
         replyPaginator.refresh()
     }
 
-    private fun updateLists(pubkey: PubkeyHex) {
+    private fun updateLists(pubkey: String) {
         viewModelScope.launchIO {
             addableLists.value = itemSetProvider
                 .getAddableSets(item = ItemSetProfile(pubkey = pubkey))

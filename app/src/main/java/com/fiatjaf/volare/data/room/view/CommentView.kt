@@ -1,12 +1,9 @@
 package com.fiatjaf.volare.data.room.view
 
 import androidx.room.DatabaseView
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.BlurHashDef
 import com.fiatjaf.volare.core.model.Comment
 import com.fiatjaf.volare.core.model.TrustType
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.provider.AnnotatedStringProvider
 import com.fiatjaf.volare.ui.components.row.mainEvent.ThreadReplyCtx
 
@@ -32,10 +29,10 @@ import com.fiatjaf.volare.ui.components.row.mainEvent.ThreadReplyCtx
             "JOIN mainEvent ON mainEvent.id = comment.eventId"
 )
 data class CommentView(
-    val id: EventIdHex,
-    val parentId: EventIdHex?,
+    val id: String,
+    val parentId: String?,
     val parentKind: Int?,
-    val pubkey: PubkeyHex,
+    val pubkey: String,
     val authorName: String?,
     val content: String,
     val createdAt: Long,
@@ -45,7 +42,7 @@ data class CommentView(
     val authorIsInList: Boolean,
     val upvoteCount: Int,
     val replyCount: Int,
-    val relayUrl: RelayUrl,
+    val relayUrl: String,
     val isBookmarked: Boolean,
     val isMentioningMe: Boolean,
     val blurhashes: List<BlurHashDef>?,
@@ -53,11 +50,11 @@ data class CommentView(
     fun mapToThreadReplyCtx(
         level: Int,
         isOp: Boolean,
-        forcedVotes: Map<EventIdHex, Boolean>,
-        forcedFollows: Map<PubkeyHex, Boolean>,
-        forcedBookmarks: Map<EventIdHex, Boolean>,
-        collapsedIds: Set<EventIdHex>,
-        parentIds: Set<EventIdHex>,
+        forcedVotes: Map<String, Boolean>,
+        forcedFollows: Map<String, Boolean>,
+        forcedBookmarks: Map<String, Boolean>,
+        collapsedIds: Set<String>,
+        parentIds: Set<String>,
         ourPubKey: String,
         annotatedStringProvider: AnnotatedStringProvider,
     ): ThreadReplyCtx {
@@ -77,9 +74,9 @@ data class CommentView(
     }
 
     fun mapToCommentUI(
-        forcedVotes: Map<EventIdHex, Boolean>,
-        forcedFollows: Map<PubkeyHex, Boolean>,
-        forcedBookmarks: Map<EventIdHex, Boolean>,
+        forcedVotes: Map<String, Boolean>,
+        forcedFollows: Map<String, Boolean>,
+        forcedBookmarks: Map<String, Boolean>,
         ourPubKey: String,
         annotatedStringProvider: AnnotatedStringProvider
     ): Comment {

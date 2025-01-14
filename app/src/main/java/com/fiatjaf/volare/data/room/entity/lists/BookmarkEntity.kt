@@ -3,8 +3,6 @@ package com.fiatjaf.volare.data.room.entity.lists
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedBookmarkList
 
 @Entity(
@@ -13,8 +11,8 @@ import com.fiatjaf.volare.data.event.ValidatedBookmarkList
     indices = [Index(value = ["myPubkey"], unique = false)], // ksp suggestion: "Highly advised"
 )
 data class BookmarkEntity(
-    val myPubkey: PubkeyHex,
-    val eventId: EventIdHex,
+    val myPubkey: String,
+    val eventId: String,
     val createdAt: Long,
 ) {
     companion object {

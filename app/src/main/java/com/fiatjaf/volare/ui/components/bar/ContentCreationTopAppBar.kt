@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.Fn
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.ui.components.button.SendIconButton
 import com.fiatjaf.volare.ui.components.indicator.SmallCircleProgressIndicator
 import com.fiatjaf.volare.ui.theme.spacing
@@ -18,9 +15,9 @@ fun ContentCreationTopAppBar(
     showSendButton: Boolean,
     isSendingContent: Boolean,
     title: String? = null,
-    typeIcon: ComposableContent = {},
-    onSend: Fn,
-    onUpdate: OnUpdate
+    typeIcon:  () -> Unit = {},
+    onSend: () -> Unit,
+    onUpdate: (UIEvent) -> Unit
 ) {
     GoBackTopAppBar(
         title = {

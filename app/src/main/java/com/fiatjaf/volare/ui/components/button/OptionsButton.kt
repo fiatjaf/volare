@@ -7,7 +7,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.model.MainEvent
 import com.fiatjaf.volare.ui.components.button.footer.FooterIconButton
 import com.fiatjaf.volare.ui.components.dropdown.FeedItemDropdown
@@ -17,7 +16,7 @@ import com.fiatjaf.volare.ui.theme.VertMoreIcon
 @Composable
 fun OptionsButton(
     mainEvent: MainEvent,
-    onUpdate: OnUpdate,
+    onUpdate: (UIEvent) -> Unit,
 ) {
     val showMenu = remember { mutableStateOf(false) }
     Box(contentAlignment = Alignment.CenterEnd) {

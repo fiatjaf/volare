@@ -1,8 +1,6 @@
 package com.fiatjaf.volare.data.event
 
 import android.util.Log
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.room.AppDatabase
 import com.fiatjaf.volare.data.room.entity.FullProfileEntity
@@ -216,7 +214,7 @@ class EventProcessor(
     }
 
     private fun filterNewestVotes(votes: Collection<ValidatedVote>): List<ValidatedVote> {
-        val cache = mutableMapOf<PubkeyHex, EventIdHex>()
+        val cache = mutableMapOf<String, String>()
         val newest = mutableListOf<ValidatedVote>()
         for (vote in votes.sortedByDescending { it.createdAt }) {
             val isNew = cache.putIfAbsent(vote.pubkey, vote.eventId) == null

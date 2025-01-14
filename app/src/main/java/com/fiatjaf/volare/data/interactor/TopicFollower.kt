@@ -7,7 +7,6 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.FollowTopic
 import com.fiatjaf.volare.core.LIST_CHANGE_DEBOUNCE
 import com.fiatjaf.volare.core.MAX_KEYS_SQL
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.TopicEvent
 import com.fiatjaf.volare.core.UnfollowTopic
 import com.fiatjaf.volare.core.utils.getNormalizedTopics
@@ -34,7 +33,7 @@ class TopicFollower(
     private val topicDao: TopicDao,
     private val snackbar: SnackbarHostState,
     private val context: Context,
-    private val forcedFollowStates: MutableStateFlow<Map<Topic, Boolean>>
+    private val forcedFollowStates: MutableStateFlow<Map<String, Boolean>>
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -52,12 +51,12 @@ class TopicFollower(
         }
     }
 
-    private fun handleAction(topic: Topic, isFollowed: Boolean) {
+    private fun handleAction(topic: String, isFollowed: Boolean) {
         updateForcedState(topic = topic, isFollowed = isFollowed)
         handleFollowsInBackground()
     }
 
-    private fun updateForcedState(topic: Topic, isFollowed: Boolean) {
+    private fun updateForcedState(topic: String, isFollowed: Boolean) {
         synchronized(forcedFollowStates) {
             val mutable = forcedFollowStates.value.toMutableMap()
             mutable[topic] = isFollowed
@@ -72,7 +71,7 @@ class TopicFollower(
         job = scope.launchIO {
             delay(LIST_CHANGE_DEBOUNCE)
 
-            val toHandle: Map<Topic, Boolean>
+            val toHandle: Map<String, Boolean>
             synchronized(forcedFollowStates) {
                 toHandle = forcedFollowStates.value.toMap()
             }

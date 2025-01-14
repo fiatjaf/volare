@@ -3,7 +3,6 @@ package com.fiatjaf.volare.data.room.dao
 import androidx.room.Dao
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import com.fiatjaf.volare.core.PubkeyHex
 
 @Dao
 interface WebOfTrustDao {
@@ -11,14 +10,14 @@ interface WebOfTrustDao {
         "SELECT DISTINCT webOfTrustPubkey " +
                 "FROM weboftrust"
     )
-    fun getWebOfTrustFlow(): Flow<List<PubkeyHex>>
+    fun getWebOfTrustFlow(): Flow<List<String>>
 
     @Query(
         "SELECT webOfTrustPubkey " +
                 "FROM weboftrust " +
                 "WHERE webOfTrustPubkey NOT IN (SELECT pubkey FROM profile)"
     )
-    suspend fun getWotWithMissingProfile(): List<PubkeyHex>
+    suspend fun getWotWithMissingProfile(): List<String>
 
     @Query("SELECT MAX(createdAt) FROM weboftrust")
     suspend fun getNewestCreatedAt(): Long?
@@ -28,5 +27,5 @@ interface WebOfTrustDao {
                 "FROM weboftrust " +
                 "WHERE webOfTrustPubkey = :pubkey"
     )
-    suspend fun getTrustedByPubkey(pubkey: PubkeyHex): PubkeyHex?
+    suspend fun getTrustedByPubkey(pubkey: String): String?
 }

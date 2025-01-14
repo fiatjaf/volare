@@ -190,9 +190,9 @@ data object BookmarksViewAppend : BookmarksViewAction()
 
 
 sealed class EditListViewAction : UIEvent()
-data class EditListViewSave(val context: Context, val onGoBack: Fn) : EditListViewAction()
+data class EditListViewSave(val context: Context, val onGoBack: () -> Unit) : EditListViewAction()
 data class EditListViewAddProfile(val profile: AdvancedProfileView) : EditListViewAction()
-data class EditListViewAddTopic(val topic: Topic) : EditListViewAction()
+data class EditListViewAddTopic(val topic: String) : EditListViewAction()
 
 
 data class AddItemToList(
@@ -230,7 +230,7 @@ data class AddRelay(
 data class RemoveRelay(val relayUrl: String) : RelayEditorViewAction()
 data class ToggleReadRelay(val relayUrl: String) : RelayEditorViewAction()
 data class ToggleWriteRelay(val relayUrl: String) : RelayEditorViewAction()
-data class SaveRelays(val context: Context, val onGoBack: Fn) : RelayEditorViewAction()
+data class SaveRelays(val context: Context, val onGoBack: () -> Unit) : RelayEditorViewAction()
 data object LoadRelays : RelayEditorViewAction()
 
 
@@ -244,18 +244,18 @@ sealed class CreatePostViewAction : UIEvent()
 data class SendPost(
     val header: String,
     val body: String,
-    val topics: List<Topic>,
+    val topics: List<String>,
     val isAnon: Boolean,
     val context: Context,
-    val onGoBack: Fn
+    val onGoBack: () -> Unit
 ) : CreatePostViewAction()
 data class SendPoll(
     val question: String,
     val options: List<String>,
-    val topics: List<Topic>,
+    val topics: List<String>,
     val isAnon: Boolean,
     val context: Context,
-    val onGoBack: Fn
+    val onGoBack: () -> Unit
 ) : CreatePostViewAction()
 
 
@@ -264,7 +264,7 @@ data class SendGitIssue(
     val issue: LabledGitIssue,
     val isAnon: Boolean,
     val context: Context,
-    val onGoBack: Fn
+    val onGoBack: () -> Unit
 ) : CreateGitIssueViewAction()
 
 data object SubRepoOwnerRelays : CreateGitIssueViewAction()
@@ -275,23 +275,23 @@ data class SendReply(
     val body: String,
     val isAnon: Boolean,
     val context: Context,
-    val onGoBack: Fn
+    val onGoBack: () -> Unit
 ) : CreateReplyViewAction()
 
 
 sealed class CreateCrossPostViewAction : UIEvent()
 data class SendCrossPost(
-    val topics: List<Topic>,
+    val topics: List<String>,
     val isAnon: Boolean,
     val context: Context,
-    val onGoBack: Fn
+    val onGoBack: () -> Unit
 ) : CreateCrossPostViewAction()
 
 
 sealed class SuggestionAction : UIEvent()
 data class SearchProfileSuggestion(val name: String) : SuggestionAction()
-data class ClickProfileSuggestion(val pubkey: PubkeyHex) : SuggestionAction()
-data class SearchTopicSuggestion(val topic: Topic) : SuggestionAction()
+data class ClickProfileSuggestion(val pubkey: String) : SuggestionAction()
+data class SearchTopicSuggestion(val topic: String) : SuggestionAction()
 
 
 sealed class EditProfileViewAction : UIEvent()
@@ -299,7 +299,7 @@ data object LoadFullProfile : EditProfileViewAction()
 data class SaveProfile(
     val metadata: Metadata,
     val context: Context,
-    val onGoBack: Fn,
+    val onGoBack: () -> Unit,
 ) : EditProfileViewAction()
 
 
@@ -329,23 +329,23 @@ data class UpdateSearchText(val text: String) : SearchViewAction()
 data class SearchText(
     val text: String,
     val context: Context,
-    val onUpdate: OnUpdate
+    val onUpdate: (UIEvent) -> Unit
 ) : SearchViewAction()
 
-data class ProcessExternalLauncher(val target: ManagedLauncher) : UIEvent()
-data class ProcessExternalRequester(val target: ManagedLauncher) : UIEvent()
+data class ProcessExternalLauncher(val target: ManagedActivityResultLauncher<Intent, ActivityResult>) : UIEvent()
+data class ProcessExternalRequester(val target: ManagedActivityResultLauncher<Intent, ActivityResult>) : UIEvent()
 data class ProcessExternalSignature(val activityResult: ActivityResult) : UIEvent()
 data class ClickClickableText(val text: String, val uriHandler: UriHandler) : UIEvent()
 
 data class RegisterUriHandler(val uriHandler: UriHandler) : UIEvent()
-data class RebroadcastPost(val postId: EventIdHex, val context: Context) : UIEvent()
-data class DeleteList(val identifier: String, val onCloseDrawer: Fn) : UIEvent()
-data class DeletePost(val id: EventIdHex) : UIEvent()
-data class OpenPostInfo(val postId: EventIdHex) : UIEvent()
+data class RebroadcastPost(val postId: String, val context: Context) : UIEvent()
+data class DeleteList(val identifier: String, val onCloseDrawer: () -> Unit) : UIEvent()
+data class DeletePost(val id: String) : UIEvent()
+data class OpenPostInfo(val postId: String) : UIEvent()
 data object ClosePostInfo : UIEvent()
 
 data class OpenLightningWallet(
     val address: String,
-    val launcher: ManagedLauncher,
+    val launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
     val scope: CoroutineScope,
 ) : UIEvent()

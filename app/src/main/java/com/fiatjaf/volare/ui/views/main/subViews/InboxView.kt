@@ -16,7 +16,6 @@ import com.fiatjaf.volare.core.InboxViewApplyFilter
 import com.fiatjaf.volare.core.InboxViewDismissFilter
 import com.fiatjaf.volare.core.InboxViewInit
 import com.fiatjaf.volare.core.InboxViewRefresh
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.viewModel.InboxViewModel
 import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
@@ -30,7 +29,7 @@ import com.fiatjaf.volare.ui.theme.spacing
 import kotlinx.coroutines.launch
 
 @Composable
-fun InboxView(vm: InboxViewModel, onUpdate: OnUpdate) {
+fun InboxView(vm: InboxViewModel, onUpdate: (UIEvent) -> Unit) {
     LaunchedEffect(key1 = Unit) {
         onUpdate(InboxViewInit)
     }

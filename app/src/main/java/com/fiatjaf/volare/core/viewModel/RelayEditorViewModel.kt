@@ -23,7 +23,6 @@ import com.fiatjaf.volare.core.utils.showToast
 import com.fiatjaf.volare.data.event.ValidatedNip65
 import com.fiatjaf.volare.data.nostr.Nip65Relay
 import com.fiatjaf.volare.data.nostr.NostrService
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.WEBSOCKET_URI
 import com.fiatjaf.volare.data.nostr.getNip65s
 import com.fiatjaf.volare.data.nostr.removeTrailingSlashes
@@ -40,10 +39,10 @@ class RelayEditorViewModel(
     private val snackbar: SnackbarHostState,
     private val nostrService: NostrService,
     private val nip65UpsertDao: Nip65UpsertDao,
-    val connectionStatuses: MutableState<Map<RelayUrl, ConnectionStatus>>
+    val connectionStatuses: MutableState<Map<String, ConnectionStatus>>
 ) : ViewModel() {
     val myRelays = mutableStateOf(emptyList<Nip65Relay>())
-    val popularRelays = mutableStateOf(emptyList<RelayUrl>())
+    val popularRelays = mutableStateOf(emptyList<String>())
     val addIsEnabled = mutableStateOf(getAddIsEnabled(myRelays.value))
     val isSaving = mutableStateOf(false)
 
@@ -112,19 +111,19 @@ class RelayEditorViewModel(
         }.invokeOnCompletion { isSaving.value = false }
     }
 
-    private fun removeRelay(relayUrl: RelayUrl) {
+    private fun removeRelay(relayUrl: String) {
         if (myRelays.value.size <= 1) return
 
         myRelays.value = myRelays.value.filter { it.url != relayUrl }
         addIsEnabled.value = getAddIsEnabled(myRelays.value)
     }
 
-    private fun toggleRead(relayUrl: RelayUrl) {
+    private fun toggleRead(relayUrl: String) {
         myRelays.value = myRelays.value
             .map { if (it.url == relayUrl) it.copy(isRead = !it.isRead) else it }
     }
 
-    private fun toggleWrite(relayUrl: RelayUrl) {
+    private fun toggleWrite(relayUrl: String) {
         myRelays.value = myRelays.value
             .map { if (it.url == relayUrl) it.copy(isWrite = !it.isWrite) else it }
     }

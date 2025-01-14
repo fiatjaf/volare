@@ -6,11 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.GoBack
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.ui.theme.BackIcon
 
 @Composable
-fun GoBackIconButton(onUpdate: OnUpdate) {
+fun GoBackIconButton(onUpdate: (UIEvent) -> Unit) {
     IconButton(onClick = { onUpdate(GoBack) }) {
         Icon(
             imageVector = BackIcon,

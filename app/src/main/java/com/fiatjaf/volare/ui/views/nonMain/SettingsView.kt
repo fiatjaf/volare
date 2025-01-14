@@ -31,7 +31,6 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.AddClientTag
 import com.fiatjaf.volare.core.ChangeUpvoteContent
 import com.fiatjaf.volare.core.ClickCreateGitIssue
-import com.fiatjaf.volare.core.ComposableContent
 import com.fiatjaf.volare.core.DeleteAllPosts
 import com.fiatjaf.volare.core.ExportDatabase
 import com.fiatjaf.volare.core.LoadSecretKeyForDisplay
@@ -39,7 +38,6 @@ import com.fiatjaf.volare.core.MAX_AUTOPILOT_RELAYS
 import com.fiatjaf.volare.core.MAX_RETAIN_ROOT
 import com.fiatjaf.volare.core.MIN_AUTOPILOT_RELAYS
 import com.fiatjaf.volare.core.MIN_RETAIN_ROOT
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenProfile
 import com.fiatjaf.volare.core.RequestExternalAccount
 import com.fiatjaf.volare.core.SendAuth
@@ -66,7 +64,7 @@ import kotlinx.coroutines.CoroutineScope
 import rust.nostr.sdk.PublicKey
 
 @Composable
-fun SettingsView(vm: SettingsViewModel, snackbar: SnackbarHostState, onUpdate: OnUpdate) {
+fun SettingsView(vm: SettingsViewModel, snackbar: SnackbarHostState, onUpdate: (UIEvent) -> Unit) {
     SimpleGoBackScaffold(
         header = stringResource(id = R.string.settings),
         snackbar = snackbar,
@@ -77,7 +75,7 @@ fun SettingsView(vm: SettingsViewModel, snackbar: SnackbarHostState, onUpdate: O
 }
 
 @Composable
-private fun SettingsViewContent(vm: SettingsViewModel, onUpdate: OnUpdate) {
+private fun SettingsViewContent(vm: SettingsViewModel, onUpdate: (UIEvent) -> Unit) {
     val scope = rememberCoroutineScope()
 
     LazyColumn {
@@ -107,7 +105,7 @@ private fun AccountSection(
     accountType: AccountType,
     pubkey: PublicKey,
     nsec: String,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     SettingsSection(header = stringResource(id = R.string.account)) {
         val shortenedNpub = remember(accountType) { pubkey.toShortenedNpub() }
@@ -142,7 +140,7 @@ private fun AccountSection(
 }
 
 @Composable
-private fun RelaySection(vm: SettingsViewModel, onUpdate: OnUpdate) {
+private fun RelaySection(vm: SettingsViewModel, onUpdate: (UIEvent) -> Unit) {
     val focusRequester = remember { FocusRequester() }
 
     SettingsSection(header = stringResource(id = R.string.relays)) {
@@ -181,7 +179,7 @@ private fun RelaySection(vm: SettingsViewModel, onUpdate: OnUpdate) {
 private fun DatabaseSection(
     vm: SettingsViewModel,
     scope: CoroutineScope,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     SettingsSection(header = stringResource(id = R.string.database)) {
         val showThresholdDialog = remember { mutableStateOf(false) }
@@ -241,7 +239,7 @@ private fun DatabaseSection(
 }
 
 @Composable
-private fun AppSection(vm: SettingsViewModel, onUpdate: OnUpdate) {
+private fun AppSection(vm: SettingsViewModel, onUpdate: (UIEvent) -> Unit) {
     val focusRequester = remember { FocusRequester() }
 
     SettingsSection(header = stringResource(id = R.string.app)) {
@@ -299,7 +297,7 @@ private fun AppSection(vm: SettingsViewModel, onUpdate: OnUpdate) {
 @Composable
 private fun AccountRowButton(
     accountType: AccountType,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val context = LocalContext.current
     val showKeyDialog = remember { mutableStateOf(false) }
@@ -336,7 +334,7 @@ private fun AccountRowButton(
 }
 
 @Composable
-private fun SettingsSection(header: String, content: ComposableContent) {
+private fun SettingsSection(header: String, content:  () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         AltSectionHeader(header = header)
         content()

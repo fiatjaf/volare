@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.SHORT_DEBOUNCE
 import com.fiatjaf.volare.core.utils.showToast
 import com.fiatjaf.volare.data.nostr.NostrService
@@ -21,7 +20,7 @@ class EventRebroadcaster(
     private val relayProvider: RelayProvider,
     private val snackbar: SnackbarHostState,
 ) {
-    suspend fun rebroadcast(postId: EventIdHex, context: Context, uiScope: CoroutineScope) {
+    suspend fun rebroadcast(postId: String, context: Context, uiScope: CoroutineScope) {
         val json = mainEventDao.getJson(id = postId)
         if (json.isNullOrEmpty()) {
             Log.w(TAG, "Post $postId has no json in database")

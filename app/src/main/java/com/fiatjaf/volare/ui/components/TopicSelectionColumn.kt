@@ -8,18 +8,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.MAX_TOPICS
-import com.fiatjaf.volare.core.OnUpdate
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.ui.components.list.TopicList
 import com.fiatjaf.volare.ui.components.row.AddRow
 
 
 @Composable
 fun TopicSelectionColumn(
-    topicSuggestions: List<Topic>,
-    selectedTopics: MutableState<List<Topic>>,
+    topicSuggestions: List<String>,
+    selectedTopics: MutableState<List<String>>,
     modifier: Modifier = Modifier,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val showDialog = remember { mutableStateOf(false) }
     TopicSelectionContainer(

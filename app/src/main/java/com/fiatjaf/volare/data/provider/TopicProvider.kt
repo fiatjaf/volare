@@ -1,6 +1,5 @@
 package com.fiatjaf.volare.data.provider
 
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.VOLARE
 import com.fiatjaf.volare.core.model.TopicFollowState
 import com.fiatjaf.volare.core.model.TopicMuteState
@@ -16,20 +15,20 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 class TopicProvider(
-    val forcedFollowStates: Flow<Map<Topic, Boolean>>,
-    val forcedMuteStates: Flow<Map<Topic, Boolean>>,
+    val forcedFollowStates: Flow<Map<String, Boolean>>,
+    val forcedMuteStates: Flow<Map<String, Boolean>>,
     private val topicDao: TopicDao,
     private val muteDao: MuteDao,
     private val itemSetProvider: ItemSetProvider,
 ) {
-    suspend fun getMyTopics(limit: Int = Int.MAX_VALUE): List<Topic> {
+    suspend fun getMyTopics(limit: Int = Int.MAX_VALUE): List<String> {
         return topicDao.getMyTopics().takeRandom(limit)
     }
 
     suspend fun getTopicSelection(
         topicSelection: TopicSelection,
         limit: Int = Int.MAX_VALUE
-    ): List<Topic> {
+    ): List<String> {
         return when (topicSelection) {
             NoTopics -> emptyList()
             MyTopics -> getMyTopics(limit = limit)
@@ -40,16 +39,16 @@ class TopicProvider(
         }
     }
 
-    suspend fun getAllTopics(): List<Topic> {
+    suspend fun getAllTopics(): List<String> {
         return topicDao.getAllTopics()
     }
 
-    suspend fun getPopularUnfollowedTopics(limit: Int): List<Topic> {
+    suspend fun getPopularUnfollowedTopics(limit: Int): List<String> {
         return topicDao.getUnfollowedTopics(limit = limit)
             .ifEmpty { (defaultTopics - topicDao.getMyTopics().toSet()).shuffled() }
     }
 
-    suspend fun getMyTopicsFlow(): Flow<List<TopicFollowState>> {
+    suspend fun getMyTopicsFlow(): Flow<List<StringFollowState>> {
         // We want to be able to unfollow on the same list
         val myTopics = getMyTopics()
 
@@ -63,7 +62,7 @@ class TopicProvider(
         }
     }
 
-    suspend fun getMutedTopicsFlow(): Flow<List<TopicMuteState>> {
+    suspend fun getMutedTopicsFlow(): Flow<List<StringMuteState>> {
         // We want to be able to unmute on the same list
         val mutedTopics = muteDao.getMyTopicMutes()
 
@@ -77,7 +76,7 @@ class TopicProvider(
         }
     }
 
-    fun getIsFollowedFlow(topic: Topic): Flow<Boolean> {
+    fun getIsFollowedFlow(topic: String): Flow<Boolean> {
         return combine(
             topicDao.getIsFollowedFlow(topic = topic),
             forcedFollowStates
@@ -86,7 +85,7 @@ class TopicProvider(
         }
     }
 
-    fun getIsMutedFlow(topic: Topic): Flow<Boolean> {
+    fun getIsMutedFlow(topic: String): Flow<Boolean> {
         return combine(
             muteDao.getTopicIsMutedFlow(topic = topic),
             forcedMuteStates

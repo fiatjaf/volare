@@ -2,8 +2,6 @@ package com.fiatjaf.volare.data.room.dao.reply
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.room.view.LegacyReplyView
 import kotlinx.coroutines.flow.Flow
 
@@ -21,14 +19,14 @@ interface LegacyReplyDao {
         ORDER BY createdAt ASC
     """
     )
-    fun getRepliesFlow(parentIds: Collection<EventIdHex>): Flow<List<LegacyReplyView>>
+    fun getRepliesFlow(parentIds: Collection<String>): Flow<List<LegacyReplyView>>
 
     @Query("SELECT * FROM LegacyReplyView WHERE id = :id")
-    fun getReplyFlow(id: EventIdHex): Flow<LegacyReplyView?>
+    fun getReplyFlow(id: String): Flow<LegacyReplyView?>
 
     @Query(PROFILE_REPLY_FEED_QUERY)
-    fun getProfileReplyFlow(pubkey: PubkeyHex, until: Long, size: Int): Flow<List<LegacyReplyView>>
+    fun getProfileReplyFlow(pubkey: String, until: Long, size: Int): Flow<List<LegacyReplyView>>
 
     @Query(PROFILE_REPLY_FEED_QUERY)
-    suspend fun getProfileReplies(pubkey: PubkeyHex, until: Long, size: Int): List<LegacyReplyView>
+    suspend fun getProfileReplies(pubkey: String, until: Long, size: Int): List<LegacyReplyView>
 }

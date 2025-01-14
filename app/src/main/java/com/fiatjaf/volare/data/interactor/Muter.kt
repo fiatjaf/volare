@@ -10,8 +10,6 @@ import com.fiatjaf.volare.core.MuteEvent
 import com.fiatjaf.volare.core.MuteProfile
 import com.fiatjaf.volare.core.MuteTopic
 import com.fiatjaf.volare.core.MuteWord
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.UnmuteProfile
 import com.fiatjaf.volare.core.UnmuteTopic
 import com.fiatjaf.volare.core.UnmuteWord
@@ -36,7 +34,7 @@ import kotlinx.coroutines.flow.update
 private const val TAG = "Muter"
 
 class Muter(
-    private val forcedTopicMuteFlow: MutableStateFlow<Map<Topic, Boolean>>,
+    private val forcedTopicMuteFlow: MutableStateFlow<Map<String, Boolean>>,
     private val nostrService: NostrService,
     private val relayProvider: RelayProvider,
     private val muteUpsertDao: MuteUpsertDao,
@@ -46,7 +44,7 @@ class Muter(
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    private val _forcedProfileMutes = MutableStateFlow(mapOf<PubkeyHex, Boolean>())
+    private val _forcedProfileMutes = MutableStateFlow(mapOf<String, Boolean>())
     val forcedProfileMuteFlow = _forcedProfileMutes.stateIn(
         scope,
         SharingStarted.Eagerly,
@@ -95,12 +93,12 @@ class Muter(
         }
     }
 
-    private fun handleProfileAction(pubkey: PubkeyHex, isMuted: Boolean, debounce: Boolean) {
+    private fun handleProfileAction(pubkey: String, isMuted: Boolean, debounce: Boolean) {
         updateForcedProfileStates(pubkey = pubkey, isMuted = isMuted)
         handleMutes(debounce = debounce)
     }
 
-    private fun handleTopicAction(topic: Topic, isMuted: Boolean, debounce: Boolean) {
+    private fun handleTopicAction(topic: String, isMuted: Boolean, debounce: Boolean) {
         updateForcedTopicStates(topic = topic, isMuted = isMuted)
         handleMutes(debounce = debounce)
     }
@@ -213,7 +211,7 @@ class Muter(
         }
     }
 
-    private fun updateForcedProfileStates(pubkey: PubkeyHex, isMuted: Boolean) {
+    private fun updateForcedProfileStates(pubkey: String, isMuted: Boolean) {
         _forcedProfileMutes.update {
             val mutable = it.toMutableMap()
             mutable[pubkey] = isMuted
@@ -221,7 +219,7 @@ class Muter(
         }
     }
 
-    private fun updateForcedTopicStates(topic: Topic, isMuted: Boolean) {
+    private fun updateForcedTopicStates(topic: String, isMuted: Boolean) {
         forcedTopicMuteFlow.update {
             val mutable = it.toMutableMap()
             mutable[topic] = isMuted

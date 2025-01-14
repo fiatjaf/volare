@@ -10,7 +10,6 @@ import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.MuteListViewOpen
 import com.fiatjaf.volare.core.MuteListViewRefresh
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.viewModel.MuteListViewModel
 import com.fiatjaf.volare.ui.components.list.ProfileAndTopicList
 import com.fiatjaf.volare.ui.components.scaffold.SimpleGoBackScaffold
@@ -18,7 +17,7 @@ import com.fiatjaf.volare.ui.model.MutableProfileItem
 import com.fiatjaf.volare.ui.model.MutableTopicItem
 
 @Composable
-fun MuteListView(vm: MuteListViewModel, snackbar: SnackbarHostState, onUpdate: OnUpdate) {
+fun MuteListView(vm: MuteListViewModel, snackbar: SnackbarHostState, onUpdate: (UIEvent) -> Unit) {
     val isRefreshing by vm.isRefreshing
     val mutedProfilesRaw by vm.mutedProfiles.value.collectAsState()
     val mutedTopicsRaw by vm.mutedTopics.value.collectAsState()

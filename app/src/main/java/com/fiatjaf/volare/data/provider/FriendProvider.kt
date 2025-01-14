@@ -1,6 +1,5 @@
 package com.fiatjaf.volare.data.provider
 
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.takeRandom
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.room.dao.FriendDao
@@ -17,7 +16,7 @@ class FriendProvider(
     private val friends = friendDao.getFriendsFlow()
         .stateIn(scope, SharingStarted.Eagerly, emptyList())
 
-    fun getFriendPubkeys(max: Int = Int.MAX_VALUE): List<PubkeyHex> {
+    fun getFriendPubkeys(max: Int = Int.MAX_VALUE): List<String> {
         return (friends.value - accountManager.getPublicKeyHex()).takeRandom(max)
     }
 
@@ -30,7 +29,7 @@ class FriendProvider(
     // Not named "getMaxCreatedAt" bc there should only be one createdAt available
     suspend fun getCreatedAt() = friendDao.getMaxCreatedAt()
 
-    fun isFriend(pubkey: PubkeyHex): Boolean {
+    fun isFriend(pubkey: String): Boolean {
         return getFriendPubkeys().contains(pubkey)
     }
 }

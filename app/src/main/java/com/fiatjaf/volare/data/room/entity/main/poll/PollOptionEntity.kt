@@ -2,7 +2,6 @@ package com.fiatjaf.volare.data.room.entity.main.poll
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.data.event.ValidatedPoll
 
 @Entity(
@@ -17,7 +16,7 @@ import com.fiatjaf.volare.data.event.ValidatedPoll
     )],
 )
 data class PollOptionEntity(
-    val pollId: EventIdHex,
+    val pollId: String,
     val optionId: String,
     val label: String,
 ) {

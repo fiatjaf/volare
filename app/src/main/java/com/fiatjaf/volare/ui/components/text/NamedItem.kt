@@ -7,12 +7,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
-import com.fiatjaf.volare.core.ComposableContent
 
 @Composable
 fun NamedItem(
     name: String,
-    item: ComposableContent,
+    item:  () -> Unit,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified
 ) {

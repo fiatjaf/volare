@@ -19,7 +19,6 @@ import androidx.compose.ui.text.AnnotatedString
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.ListViewFeedAppend
 import com.fiatjaf.volare.core.ListViewRefresh
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenProfile
 import com.fiatjaf.volare.core.OpenTopic
 import com.fiatjaf.volare.core.utils.shortenBech32
@@ -39,7 +38,7 @@ import kotlinx.coroutines.launch
 fun ListView(
     vm: ListViewModel,
     snackbar: SnackbarHostState,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     ListScaffold(
         title = vm.itemSetProvider.title.value,
@@ -52,7 +51,7 @@ fun ListView(
 }
 
 @Composable
-private fun ScreenContent(vm: ListViewModel, onUpdate: OnUpdate) {
+private fun ScreenContent(vm: ListViewModel, onUpdate: (UIEvent) -> Unit) {
     val scope = rememberCoroutineScope()
 
     val profiles by vm.itemSetProvider.profiles

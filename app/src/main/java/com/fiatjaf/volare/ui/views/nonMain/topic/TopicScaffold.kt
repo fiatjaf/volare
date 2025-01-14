@@ -3,8 +3,6 @@ package com.fiatjaf.volare.ui.views.nonMain.topic
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.viewModel.TopicViewModel
 import com.fiatjaf.volare.ui.components.scaffold.VolareScaffold
 
@@ -12,8 +10,8 @@ import com.fiatjaf.volare.ui.components.scaffold.VolareScaffold
 fun TopicScaffold(
     vm: TopicViewModel,
     snackbar: SnackbarHostState,
-    onUpdate: OnUpdate,
-    content: ComposableContent
+    onUpdate: (UIEvent) -> Unit,
+    content:  () -> Unit
 ) {
     VolareScaffold(
         snackbar = snackbar,

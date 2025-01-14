@@ -8,19 +8,17 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.SelectableChipColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.Fn
 
 @Composable
 fun SmallFilterChip(
-    onClick: Fn,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     isEnabled: Boolean = true,
     heightRatio: Float? = null,
-    label: ComposableContent = {},
-    leadingIcon: ComposableContent = {},
-    trailingIcon: ComposableContent = {},
+    label:  () -> Unit = {},
+    leadingIcon:  () -> Unit = {},
+    trailingIcon:  () -> Unit = {},
     colors: SelectableChipColors = FilterChipDefaults.filterChipColors(),
     border: BorderStroke? = AssistChipDefaults.assistChipBorder(enabled = true)
 ) {

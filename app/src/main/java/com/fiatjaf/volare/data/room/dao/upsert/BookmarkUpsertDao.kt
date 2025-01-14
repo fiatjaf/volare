@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedBookmarkList
 import com.fiatjaf.volare.data.room.entity.lists.BookmarkEntity
 
@@ -42,10 +41,10 @@ interface BookmarkUpsertDao {
     suspend fun internalUpsert(bookmarkEntities: Collection<BookmarkEntity>)
 
     @Query("SELECT MAX(createdAt) FROM bookmark WHERE myPubkey = :myPubkey")
-    suspend fun internalGetNewestCreatedAt(myPubkey: PubkeyHex): Long?
+    suspend fun internalGetNewestCreatedAt(myPubkey: String): Long?
 
     @Query("DELETE FROM bookmark WHERE myPubkey = :myPubkey")
-    suspend fun internalDeleteList(myPubkey: PubkeyHex)
+    suspend fun internalDeleteList(myPubkey: String)
 
     @Query("DELETE FROM bookmark WHERE createdAt < :newestCreatedAt")
     suspend fun internalDeleteOutdated(newestCreatedAt: Long)

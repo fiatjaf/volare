@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.ui.components.indicator.BaseHint
 import com.fiatjaf.volare.ui.components.row.ClickableRow
 import com.fiatjaf.volare.ui.model.FollowableOrMutableItem
@@ -22,7 +21,7 @@ fun FollowOrMuteList(
     rows: List<FollowableOrMutableItem>,
     isRefreshing: Boolean,
     state: LazyListState,
-    onRefresh: Fn,
+    onRefresh: () -> Unit,
 ) {
     PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = onRefresh) {
         if (rows.isEmpty()) BaseHint(text = stringResource(id = R.string.list_is_empty))

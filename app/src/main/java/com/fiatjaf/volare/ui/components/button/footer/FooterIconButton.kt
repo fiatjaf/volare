@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.ui.theme.sizing
 
 @Composable
@@ -18,7 +17,7 @@ fun FooterIconButton(
     description: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.secondary,
-    onClick: Fn
+    onClick: () -> Unit
 ) {
     IconButton(
         modifier = modifier.size(sizing.footerIconButton.times(1.5f)),

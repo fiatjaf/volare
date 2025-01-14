@@ -17,8 +17,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.ClickProfileSuggestion
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.SearchProfileSuggestion
 import com.fiatjaf.volare.data.nostr.NOSTR_URI
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
@@ -31,9 +29,9 @@ fun InputWithSuggestions(
     body: MutableState<TextFieldValue>,
     searchSuggestions: List<AdvancedProfileView>,
     isAnon: MutableState<Boolean>,
-    onUpdate: OnUpdate,
+    onUpdate: (UIEvent) -> Unit,
     allowAnon: Boolean = false,
-    input: ComposableContent,
+    input:  () -> Unit,
 ) {
     val showSuggestions = remember { mutableStateOf(false) }
     remember(body.value) {

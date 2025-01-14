@@ -1,9 +1,6 @@
 package com.fiatjaf.volare.data.room.view
 
 import androidx.room.DatabaseView
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.Label
-import com.fiatjaf.volare.core.OptionId
 
 private const val RESP_TO_OPTION_COND =
     "pollResponse.pollId = pollOption.pollId AND pollResponse.optionId = pollOption.optionId"
@@ -16,8 +13,8 @@ private const val RESP_TO_OPTION_COND =
             "FROM pollOption "
 )
 data class PollOptionView(
-    val pollId: EventIdHex,
-    val optionId: OptionId,
-    val label: Label,
+    val pollId: String,
+    val optionId: String,
+    val label: String,
     val voteCount: Int
 )

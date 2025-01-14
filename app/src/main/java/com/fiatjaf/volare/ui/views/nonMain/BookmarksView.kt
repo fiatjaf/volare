@@ -8,13 +8,12 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.BookmarksViewAppend
 import com.fiatjaf.volare.core.BookmarksViewInit
 import com.fiatjaf.volare.core.BookmarksViewRefresh
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.viewModel.BookmarksViewModel
 import com.fiatjaf.volare.ui.components.Feed
 import com.fiatjaf.volare.ui.components.scaffold.SimpleGoBackScaffold
 
 @Composable
-fun BookmarksView(vm: BookmarksViewModel, snackbar: SnackbarHostState, onUpdate: OnUpdate) {
+fun BookmarksView(vm: BookmarksViewModel, snackbar: SnackbarHostState, onUpdate: (UIEvent) -> Unit) {
     LaunchedEffect(key1 = Unit) {
         onUpdate(BookmarksViewInit)
     }

@@ -10,8 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.fiatjaf.volare.core.MAX_TOPICS
-import com.fiatjaf.volare.core.OnUpdate
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.ui.components.TopicSelectionContainer
 import com.fiatjaf.volare.ui.components.chip.AddTopicChip
 import com.fiatjaf.volare.ui.components.chip.TopicChip
@@ -20,9 +18,9 @@ import com.fiatjaf.volare.ui.theme.spacing
 
 @Composable
 fun TopicSelectionRow(
-    topicSuggestions: List<Topic>,
-    selectedTopics: MutableState<List<Topic>>,
-    onUpdate: OnUpdate
+    topicSuggestions: List<String>,
+    selectedTopics: MutableState<List<String>>,
+    onUpdate: (UIEvent) -> Unit
 ) {
     val showDialog = remember { mutableStateOf(false) }
     TopicSelectionContainer(

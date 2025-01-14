@@ -3,8 +3,6 @@ package com.fiatjaf.volare.ui.views.nonMain.topic
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import com.fiatjaf.volare.core.FollowTopic
-import com.fiatjaf.volare.core.OnUpdate
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.UnfollowTopic
 import com.fiatjaf.volare.core.model.ItemSetTopic
 import com.fiatjaf.volare.data.model.ItemSetMeta
@@ -14,12 +12,12 @@ import com.fiatjaf.volare.ui.components.button.ProfileOrTopicOptionButton
 
 @Composable
 fun TopicTopAppBar(
-    topic: Topic,
+    topic: String,
     isFollowed: Boolean,
     isMuted: Boolean,
     addableLists: List<ItemSetMeta>,
     nonAddableLists: List<ItemSetMeta>,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     SimpleGoBackTopAppBar(
         title = "#$topic",

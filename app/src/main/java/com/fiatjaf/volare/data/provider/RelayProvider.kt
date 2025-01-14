@@ -7,7 +7,6 @@ import com.fiatjaf.volare.core.MAX_KEYS_SQL
 import com.fiatjaf.volare.core.MAX_POPULAR_RELAYS
 import com.fiatjaf.volare.core.MAX_RELAYS
 import com.fiatjaf.volare.core.MAX_RELAYS_PER_PUBKEY
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.model.ConnectionStatus
 import com.fiatjaf.volare.core.model.Disconnected
 import com.fiatjaf.volare.core.model.Spam
@@ -24,7 +23,6 @@ import com.fiatjaf.volare.data.model.SingularPubkey
 import com.fiatjaf.volare.data.model.WebOfTrustPubkeys
 import com.fiatjaf.volare.data.nostr.Nip65Relay
 import com.fiatjaf.volare.data.nostr.NostrClient
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.removeTrailingSlashes
 import com.fiatjaf.volare.data.preferences.RelayPreferences
 import com.fiatjaf.volare.data.room.dao.EventRelayDao
@@ -47,7 +45,7 @@ class RelayProvider(
     private val nip65Dao: Nip65Dao,
     private val eventRelayDao: EventRelayDao,
     private val nostrClient: NostrClient,
-    private val connectionStatuses: State<Map<RelayUrl, ConnectionStatus>>,
+    private val connectionStatuses: State<Map<String, ConnectionStatus>>,
     private val pubkeyProvider: PubkeyProvider,
     private val relayPreferences: RelayPreferences,
     private val webOfTrustProvider: WebOfTrustProvider,
@@ -62,7 +60,7 @@ class RelayProvider(
     fun getReadRelays(
         limit: Int = MAX_RELAYS,
         includeConnected: Boolean = false,
-    ): List<RelayUrl> {
+    ): List<String> {
         return myNip65.value
             .filter { it.nip65Relay.isRead }
             .map { it.nip65Relay.url }
@@ -74,7 +72,7 @@ class RelayProvider(
             .distinct()
     }
 
-    fun getWriteRelays(limit: Int = MAX_RELAYS): List<RelayUrl> {
+    fun getWriteRelays(limit: Int = MAX_RELAYS): List<String> {
         return myNip65.value
             .filter { it.nip65Relay.isWrite }
             .map { it.nip65Relay.url }
@@ -83,7 +81,7 @@ class RelayProvider(
             .distinct()
     }
 
-    fun getPublishRelays(addConnected: Boolean = true): List<RelayUrl> {
+    fun getPublishRelays(addConnected: Boolean = true): List<String> {
         val relays = getWriteRelays().toMutableSet()
         if (addConnected) relays.addAll(nostrClient.getAllConnectedUrls())
 
@@ -91,9 +89,9 @@ class RelayProvider(
     }
 
     suspend fun getPublishRelays(
-        publishTo: List<PubkeyHex>,
+        publishTo: List<String>,
         addConnected: Boolean = true
-    ): List<RelayUrl> {
+    ): List<String> {
         val relays = if (publishTo.isEmpty()) mutableSetOf()
         else nip65Dao.getReadRelays(pubkeys = publishTo)
             .groupBy { it.pubkey }
@@ -106,10 +104,10 @@ class RelayProvider(
     }
 
     private suspend fun getObserveRelays(
-        pubkey: PubkeyHex,
+        pubkey: String,
         limit: Int = MAX_RELAYS,
         includeConnected: Boolean = false
-    ): List<RelayUrl> {
+    ): List<String> {
         val relays = nip65Dao.getWriteRelays(pubkeys = listOf(pubkey))
             .map { it.nip65Relay.url }
             .preferConnected(limit)
@@ -124,7 +122,7 @@ class RelayProvider(
         nprofile: Nip19Profile,
         limit: Int = MAX_RELAYS,
         includeConnected: Boolean = false
-    ): List<RelayUrl> {
+    ): List<String> {
         val foreignRelays = nprofile.relays().normalize().preferConnected(limit = limit)
         val nip65 = getObserveRelays(
             pubkey = nprofile.publicKey().toHex(),
@@ -139,7 +137,7 @@ class RelayProvider(
         nevent: Nip19Event,
         limit: Int = MAX_RELAYS,
         includeConnected: Boolean = false
-    ): List<RelayUrl> {
+    ): List<String> {
         val foreignRelays = nevent.relays().normalize(limit = limit)
         val pubkey = nevent.author()?.toHex()
         val nip65 = if (pubkey != null) getObserveRelays(
@@ -151,7 +149,7 @@ class RelayProvider(
         return (foreignRelays + nip65).distinct()
     }
 
-    suspend fun getObserveRelays(selection: PubkeySelection): Map<RelayUrl, Set<PubkeyHex>> {
+    suspend fun getObserveRelays(selection: PubkeySelection): Map<String, Set<String>> {
         when (selection) {
             FriendPubkeys, is ListPubkeys -> {}
             is SingularPubkey -> {
@@ -179,7 +177,7 @@ class RelayProvider(
             }
         }
 
-        val result = mutableMapOf<RelayUrl, MutableSet<PubkeyHex>>()
+        val result = mutableMapOf<String, MutableSet<String>>()
         val connectedRelays = nostrClient.getAllConnectedUrls().toSet()
 
         val eventRelaysView = when (selection) {
@@ -221,7 +219,7 @@ class RelayProvider(
         val numToSelect = relayPreferences.getAutopilotRelays()
 
         // Cover pubkey-write-relay pairing
-        val pubkeyCache = mutableSetOf<PubkeyHex>()
+        val pubkeyCache = mutableSetOf<String>()
         writeRelays
             .groupBy { it.nip65Relay.url }
             .asSequence()
@@ -303,9 +301,9 @@ class RelayProvider(
 
     suspend fun getNewestCreatedAt() = nip65Dao.getNewestCreatedAt()
 
-    suspend fun getCreatedAt(pubkey: PubkeyHex) = nip65Dao.getNewestCreatedAt(pubkey = pubkey)
+    suspend fun getCreatedAt(pubkey: String) = nip65Dao.getNewestCreatedAt(pubkey = pubkey)
 
-    suspend fun filterMissingPubkeys(pubkeys: List<PubkeyHex>): List<PubkeyHex> {
+    suspend fun filterMissingPubkeys(pubkeys: List<String>): List<String> {
         if (pubkeys.isEmpty()) return emptyList()
 
         return pubkeys - nip65Dao.filterKnownPubkeys(pubkeys = pubkeys).toSet()
@@ -318,14 +316,14 @@ class RelayProvider(
 
     suspend fun getPopularRelays() = nip65Dao.getPopularRelays(limit = MAX_POPULAR_RELAYS)
 
-    private fun List<RelayUrl>.preferConnected(limit: Int): List<RelayUrl> {
+    private fun List<String>.preferConnected(limit: Int): List<String> {
         if (this.size <= limit) return this
 
         val connected = nostrClient.getAllConnectedUrls().toSet()
         return this.shuffled().sortedByDescending { connected.contains(it) }.take(limit)
     }
 
-    private fun List<RelayUrl>.normalize(limit: Int = Int.MAX_VALUE): List<RelayUrl> {
+    private fun List<String>.normalize(limit: Int = Int.MAX_VALUE): List<String> {
         return this.map { it.removeTrailingSlashes() }
             .distinct()
             .take(limit)

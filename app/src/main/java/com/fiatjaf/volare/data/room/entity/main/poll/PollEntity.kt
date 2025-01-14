@@ -2,9 +2,7 @@ package com.fiatjaf.volare.data.room.entity.main.poll
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.data.event.ValidatedPoll
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.room.entity.main.MainEventEntity
 
 @Entity(
@@ -19,9 +17,9 @@ import com.fiatjaf.volare.data.room.entity.main.MainEventEntity
     )],
 )
 data class PollEntity(
-    val eventId: EventIdHex,
-    val relay1: RelayUrl?,
-    val relay2: RelayUrl?,
+    val eventId: String,
+    val relay1: String?,
+    val relay2: String?,
     val endsAt: Long?,
 ) {
     companion object {

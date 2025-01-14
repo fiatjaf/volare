@@ -12,7 +12,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import com.fiatjaf.volare.core.ComposableContent
 import com.fiatjaf.volare.core.utils.getTransparentTextFieldColors
 import com.fiatjaf.volare.ui.theme.OnBgLight
 
@@ -26,7 +25,7 @@ fun TextInput(
     style: TextStyle = LocalTextStyle.current,
     imeAction: ImeAction = ImeAction.Default,
     keyboardType: KeyboardType = KeyboardType.Text,
-    trailingIcon: ComposableContent = {},
+    trailingIcon:  () -> Unit = {},
 ) {
     TextField(
         modifier = modifier.fillMaxWidth(),

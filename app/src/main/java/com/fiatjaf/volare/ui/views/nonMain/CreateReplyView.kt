@@ -26,7 +26,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.GoBack
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.SendReply
 import com.fiatjaf.volare.core.model.MainEvent
 import com.fiatjaf.volare.core.viewModel.CreateReplyViewModel
@@ -44,7 +43,7 @@ fun CreateReplyView(
     vm: CreateReplyViewModel,
     searchSuggestions: State<List<AdvancedProfileView>>,
     snackbar: SnackbarHostState,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val isSendingResponse by vm.isSendingReply
     val response = remember { mutableStateOf(TextFieldValue()) }
@@ -94,7 +93,7 @@ private fun CreateReplyViewContent(
     searchSuggestions: List<AdvancedProfileView>,
     isAnon: MutableState<Boolean>,
     focusRequester: FocusRequester,
-    onUpdate: OnUpdate,
+    onUpdate: (UIEvent) -> Unit,
 ) {
     InputWithSuggestions(
         body = response,

@@ -1,20 +1,18 @@
 package com.fiatjaf.volare.data.model
 
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
 data class ForcedData(
-    val votes: Map<EventIdHex /* = String */, Boolean>,
-    val follows: Map<PubkeyHex /* = String */, Boolean>,
-    val bookmarks: Map<EventIdHex /* = String */, Boolean>,
+    val votes: Map<String /* = String */, Boolean>,
+    val follows: Map<String /* = String */, Boolean>,
+    val bookmarks: Map<String /* = String */, Boolean>,
 ) {
     companion object {
         fun combineFlows(
-            votes: Flow<Map<EventIdHex /* = String */, Boolean>>,
-            follows: Flow<Map<PubkeyHex /* = String */, Boolean>>,
-            bookmarks: Flow<Map<EventIdHex /* = String */, Boolean>>,
+            votes: Flow<Map<String /* = String */, Boolean>>,
+            follows: Flow<Map<String /* = String */, Boolean>>,
+            bookmarks: Flow<Map<String /* = String */, Boolean>>,
         ): Flow<ForcedData> {
             return combine(votes, follows, bookmarks) { v, f, b ->
                 ForcedData(votes = v, follows = f, bookmarks = b)

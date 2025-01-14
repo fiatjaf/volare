@@ -6,7 +6,6 @@ import androidx.room.MapColumn
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.room.entity.ProfileEntity
 
 
@@ -34,7 +33,7 @@ interface ProfileUpsertDao {
                 "FROM profile " +
                 "WHERE pubkey IN (:pubkeys)"
     )
-    suspend fun internalGetNewestCreatedAt(pubkeys: Collection<PubkeyHex>):
+    suspend fun internalGetNewestCreatedAt(pubkeys: Collection<String>):
             Map<@MapColumn("pubkey") PubkeyHex,
                     @MapColumn("maxCreatedAt") Long>
 }

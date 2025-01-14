@@ -7,7 +7,6 @@ import androidx.room.MapColumn
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedContactList
 import com.fiatjaf.volare.data.room.entity.lists.WebOfTrustEntity
 
@@ -59,7 +58,7 @@ interface WebOfTrustUpsertDao {
                 "WHERE friendPubkey IN (:friendPubkeys) " +
                 "GROUP BY friendPubkey"
     )
-    suspend fun internalGetNewestCreatedAt(friendPubkeys: Collection<PubkeyHex>):
+    suspend fun internalGetNewestCreatedAt(friendPubkeys: Collection<String>):
             Map<@MapColumn("friendPubkey") PubkeyHex,
                     @MapColumn("maxCreatedAt") Long>
 
@@ -67,12 +66,12 @@ interface WebOfTrustUpsertDao {
     suspend fun internalUpsert(webOfTrustEntities: Collection<WebOfTrustEntity>)
 
     @Query("DELETE FROM weboftrust WHERE friendPubkey IN (:friendPubkeys)")
-    suspend fun internalDeleteLists(friendPubkeys: Collection<PubkeyHex>)
+    suspend fun internalDeleteLists(friendPubkeys: Collection<String>)
 
     @Query(
         "DELETE FROM weboftrust " +
                 "WHERE createdAt < :newestCreatedAt " +
                 "AND friendPubkey = :friendPubkey"
     )
-    suspend fun internalDeleteOutdated(newestCreatedAt: Long, friendPubkey: PubkeyHex)
+    suspend fun internalDeleteOutdated(newestCreatedAt: Long, friendPubkey: String)
 }

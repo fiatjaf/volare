@@ -2,10 +2,7 @@ package com.fiatjaf.volare.data.interactor
 
 import android.util.Log
 import com.fiatjaf.volare.core.FIATJAF_HEX
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.MAX_TOPICS
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.VOLARE
 import com.fiatjaf.volare.core.WEEK_IN_SECS
 import com.fiatjaf.volare.core.model.LabledGitIssue
@@ -22,7 +19,6 @@ import com.fiatjaf.volare.data.event.ValidatedLegacyReply
 import com.fiatjaf.volare.data.event.ValidatedPoll
 import com.fiatjaf.volare.data.event.ValidatedRootPost
 import com.fiatjaf.volare.data.nostr.NostrService
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.extractMentions
 import com.fiatjaf.volare.data.nostr.extractQuotes
 import com.fiatjaf.volare.data.nostr.getCurrentSecs
@@ -56,7 +52,7 @@ class PostSender(
     suspend fun sendPost(
         header: String,
         body: String,
-        topics: List<Topic>,
+        topics: List<String>,
         isAnon: Boolean,
     ): Result<Event> {
         val trimmedHeader = header.trim()
@@ -96,7 +92,7 @@ class PostSender(
     suspend fun sendPoll(
         question: String,
         options: List<String>,
-        topics: List<Topic>,
+        topics: List<String>,
         isAnon: Boolean,
     ): Result<Event> {
         if (options.size < 2) {
@@ -145,12 +141,12 @@ class PostSender(
     suspend fun sendReply(
         parent: Event,
         body: String,
-        relayHint: RelayUrl?,
+        relayHint: String?,
         isAnon: Boolean,
     ): Result<Event> {
         val trimmedBody = body.trim()
 
-        val mentions = mutableListOf<PubkeyHex>().apply {
+        val mentions = mutableListOf<String>().apply {
             addAll(extractMentionPubkeys(content = trimmedBody))
             mainEventDao.getParentAuthor(id = parent.id().toHex())?.let { grandparentAuthor ->
                 add(grandparentAuthor)
@@ -186,8 +182,8 @@ class PostSender(
     private suspend fun sendLegacyReply(
         content: String,
         parent: Event,
-        mentions: List<PubkeyHex>,
-        relayHint: RelayUrl?,
+        mentions: List<String>,
+        relayHint: String?,
         isAnon: Boolean
     ): Result<Event> {
         return nostrService.publishLegacyReply(
@@ -219,9 +215,9 @@ class PostSender(
     private suspend fun sendComment(
         content: String,
         parent: Event,
-        mentions: List<PubkeyHex>,
-        topics: List<Topic>,
-        relayHint: RelayUrl?,
+        mentions: List<String>,
+        topics: List<String>,
+        relayHint: String?,
         isAnon: Boolean
     ): Result<Event> {
         return nostrService.publishComment(
@@ -253,8 +249,8 @@ class PostSender(
     }
 
     suspend fun sendCrossPost(
-        id: EventIdHex,
-        topics: List<Topic>,
+        id: String,
+        topics: List<String>,
         isAnon: Boolean,
     ): Result<Event> {
         val post = mainEventDao.getPost(id = id)
@@ -338,7 +334,7 @@ class PostSender(
         )
     }
 
-    private fun extractMentionPubkeys(content: String): List<PubkeyHex> {
+    private fun extractMentionPubkeys(content: String): List<String> {
         return extractMentions(content = content)
             .mapNotNull {
                 runCatching { PublicKey.fromBech32(it).toHex() }.getOrNull()
@@ -347,7 +343,7 @@ class PostSender(
             }.distinct()
     }
 
-    private fun extractMentionsFromString(content: String, isAnon: Boolean): List<PubkeyHex> {
+    private fun extractMentionsFromString(content: String, isAnon: Boolean): List<String> {
         return extractMentionPubkeys(content = content).let { pubkeys ->
             if (!isAnon) pubkeys.filter { it != accountManager.getPublicKeyHex() }
             else pubkeys

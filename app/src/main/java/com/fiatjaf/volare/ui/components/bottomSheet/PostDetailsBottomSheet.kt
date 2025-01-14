@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.ClosePostInfo
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.utils.getFullDateTime
 import com.fiatjaf.volare.data.model.PostDetails
 import com.fiatjaf.volare.ui.components.text.ClickableRelayUrl
@@ -28,7 +27,7 @@ import com.fiatjaf.volare.ui.theme.spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostDetailsBottomSheet(postDetails: PostDetails, onUpdate: OnUpdate) {
+fun PostDetailsBottomSheet(postDetails: PostDetails, onUpdate: (UIEvent) -> Unit) {
     val onDismiss = { onUpdate(ClosePostInfo) }
     ModalBottomSheet(onDismissRequest = onDismiss) {
         BottomSheetColumn(header = stringResource(id = R.string.post_details)) {

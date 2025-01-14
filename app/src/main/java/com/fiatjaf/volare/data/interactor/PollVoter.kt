@@ -4,8 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.OptionId
 import com.fiatjaf.volare.core.VotePollOption
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
@@ -37,7 +35,7 @@ class PollVoter(
         }
     }
 
-    private suspend fun vote(pollId: EventIdHex, optionId: OptionId) {
+    private suspend fun vote(pollId: String, optionId: String) {
         val pollRelays = pollDao.getPollRelays(pollId = pollId)?.toList().orEmpty()
         val myRelays = relayProvider.getPublishRelays()
         nostrService.publishPollResponse(

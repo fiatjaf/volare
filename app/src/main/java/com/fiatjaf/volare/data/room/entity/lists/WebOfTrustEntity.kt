@@ -3,7 +3,6 @@ package com.fiatjaf.volare.data.room.entity.lists
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedContactList
 
 @Entity(
@@ -19,8 +18,8 @@ import com.fiatjaf.volare.data.event.ValidatedContactList
     indices = [Index(value = ["friendPubkey"], unique = false)], // ksp suggestion: "Highly advised"
 )
 data class WebOfTrustEntity(
-    val friendPubkey: PubkeyHex,
-    val webOfTrustPubkey: PubkeyHex,
+    val friendPubkey: String,
+    val webOfTrustPubkey: String,
     val createdAt: Long
 ) {
     companion object {

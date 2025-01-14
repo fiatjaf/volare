@@ -20,7 +20,6 @@ import androidx.compose.ui.text.input.ImeAction
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.EditListViewSave
 import com.fiatjaf.volare.core.GoBack
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.ui.components.button.GoBackIconButton
 import com.fiatjaf.volare.ui.components.button.SaveIconButton
 import com.fiatjaf.volare.ui.components.indicator.SmallCircleProgressIndicator
@@ -32,7 +31,7 @@ fun EditListTopAppBar(
     title: MutableState<String>,
     isSaving: Boolean,
     focusRequester: FocusRequester,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     TopAppBar(
         title = {

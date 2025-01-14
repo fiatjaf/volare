@@ -2,9 +2,6 @@ package com.fiatjaf.volare.ui.components.scaffold
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.Fn
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.ui.components.bar.ContentCreationTopAppBar
 
 
@@ -14,10 +11,10 @@ fun ContentCreationScaffold(
     isSendingContent: Boolean,
     snackbar: SnackbarHostState,
     title: String? = null,
-    typeIcon: ComposableContent = {},
-    onSend: Fn,
-    onUpdate: OnUpdate,
-    content: ComposableContent,
+    typeIcon:  () -> Unit = {},
+    onSend: () -> Unit,
+    onUpdate: (UIEvent) -> Unit,
+    content:  () -> Unit,
 ) {
     VolareScaffold(
         snackbar = snackbar,

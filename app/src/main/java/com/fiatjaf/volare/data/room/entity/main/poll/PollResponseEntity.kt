@@ -2,8 +2,6 @@ package com.fiatjaf.volare.data.room.entity.main.poll
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedPollResponse
 
 @Entity(
@@ -20,9 +18,9 @@ import com.fiatjaf.volare.data.event.ValidatedPollResponse
     ],
 )
 data class PollResponseEntity(
-    val pollId: EventIdHex,
+    val pollId: String,
     val optionId: String,
-    val pubkey: PubkeyHex,
+    val pubkey: String,
     val createdAt: Long,
 ) {
     companion object {

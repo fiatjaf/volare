@@ -5,7 +5,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.mutableStateOf
 import androidx.room.Room
 import com.anggrayudi.storage.SimpleStorageHelper
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.model.ConnectionStatus
 import com.fiatjaf.volare.data.BackendDatabase
 import com.fiatjaf.volare.data.account.AccountManager

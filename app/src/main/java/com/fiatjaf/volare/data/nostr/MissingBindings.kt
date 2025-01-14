@@ -1,8 +1,6 @@
 package com.fiatjaf.volare.data.nostr
 
 import androidx.core.text.isDigitsOnly
-import com.fiatjaf.volare.core.Label
-import com.fiatjaf.volare.core.OptionId
 import rust.nostr.sdk.Alphabet
 import rust.nostr.sdk.Coordinate
 import rust.nostr.sdk.Event
@@ -63,7 +61,7 @@ fun extractQuotes(content: String) = nostrQuotePattern.findAll(content)
 
 fun createLegacyReplyTag(
     parentEventId: EventId,
-    relayHint: RelayUrl,
+    relayHint: String,
     pubkeyHint: String,
 ): Tag {
     return Tag.parse(listOf("e", parentEventId.toHex(), relayHint, "reply", pubkeyHint))
@@ -71,7 +69,7 @@ fun createLegacyReplyTag(
 
 fun createCommentETag(
     parentEventId: EventId,
-    relayHint: RelayUrl,
+    relayHint: String,
     pubkeyHint: String,
 ): Tag {
     return Tag.parse(listOf("e", parentEventId.toHex(), relayHint, pubkeyHint))
@@ -166,7 +164,7 @@ fun Event.getNip65s(): List<Nip65Relay> {
         .distinctBy { it.url }.toList()
 }
 
-fun Event.getPollRelays(): List<RelayUrl> {
+fun Event.getPollRelays(): List<String> {
     return this.tags()
         .toVec()
         .asSequence()
@@ -195,7 +193,7 @@ fun Event.getPollOptions(): List<Pair<OptionId, Label>> {
         .map { Pair(it[1].trim(), it.getOrNull(2).orEmpty().trim()) }
 }
 
-fun Event.getPollResponse(): OptionId? {
+fun Event.getPollResponse(): String? {
     return this.tags()
         .toVec()
         .map { it.asVec() }

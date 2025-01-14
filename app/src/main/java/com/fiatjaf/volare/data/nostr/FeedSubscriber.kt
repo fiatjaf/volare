@@ -2,7 +2,6 @@ package com.fiatjaf.volare.data.nostr
 
 import com.fiatjaf.volare.core.MAX_EVENTS_TO_SUB
 import com.fiatjaf.volare.core.MAX_KEYS
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.utils.genericRepost
 import com.fiatjaf.volare.core.utils.limitRestricted
 import com.fiatjaf.volare.core.utils.replyKinds
@@ -43,7 +42,7 @@ class FeedSubscriber(
         until: ULong,
         since: ULong,
         limit: ULong
-    ): Map<RelayUrl, List<Filter>> {
+    ): Map<String, List<Filter>> {
         return getPeopleAndTopicFeed(
             pubkeySelection = setting.pubkeySelection,
             topicSelection = setting.topicSelection,
@@ -58,7 +57,7 @@ class FeedSubscriber(
         until: ULong,
         since: ULong,
         limit: ULong
-    ): Map<RelayUrl, List<Filter>> {
+    ): Map<String, List<Filter>> {
         return getPeopleAndTopicFeed(
             pubkeySelection = ListPubkeys(identifier = identifier),
             topicSelection = ListTopics(identifier = identifier),
@@ -74,10 +73,10 @@ class FeedSubscriber(
         until: ULong,
         since: ULong,
         limit: ULong
-    ): Map<RelayUrl, List<Filter>> {
+    ): Map<String, List<Filter>> {
         if (limit <= 0u || since >= until) return emptyMap()
 
-        val result = mutableMapOf<RelayUrl, MutableList<Filter>>()
+        val result = mutableMapOf<String, MutableList<Filter>>()
 
         val sinceTimestamp = Timestamp.fromSecs(since)
         val untilTimestamp = Timestamp.fromSecs(until)
@@ -126,14 +125,14 @@ class FeedSubscriber(
     }
 
     fun getTopicFeedSubscription(
-        topic: Topic,
+        topic: String,
         until: ULong,
         since: ULong,
         limit: ULong
-    ): Map<RelayUrl, List<Filter>> {
+    ): Map<String, List<Filter>> {
         if (limit <= 0u || topic.isBlank() || since >= until) return emptyMap()
 
-        val result = mutableMapOf<RelayUrl, MutableList<Filter>>()
+        val result = mutableMapOf<String, MutableList<Filter>>()
 
         val topicedNoteFilter = Filter()
             .kinds(kinds = rootFeedableKindsNoKTag)
@@ -161,7 +160,7 @@ class FeedSubscriber(
         until: ULong,
         since: ULong,
         limit: ULong
-    ): Map<RelayUrl, List<Filter>> {
+    ): Map<String, List<Filter>> {
         return getPubkeyFeedSubscription(
             nprofile = nprofile,
             feedKind = MainFeed,
@@ -176,7 +175,7 @@ class FeedSubscriber(
         until: ULong,
         since: ULong,
         limit: ULong
-    ): Map<RelayUrl, List<Filter>> {
+    ): Map<String, List<Filter>> {
         return getPubkeyFeedSubscription(
             nprofile = nprofile,
             feedKind = ReplyFeed,
@@ -196,10 +195,10 @@ class FeedSubscriber(
         until: ULong,
         since: ULong,
         limit: ULong
-    ): Map<RelayUrl, List<Filter>> {
+    ): Map<String, List<Filter>> {
         if (limit <= 0u || since >= until) return emptyMap()
 
-        val result = mutableMapOf<RelayUrl, MutableList<Filter>>()
+        val result = mutableMapOf<String, MutableList<Filter>>()
 
         val createBaseFilter = {
             Filter()
@@ -237,7 +236,7 @@ class FeedSubscriber(
         until: ULong,
         since: ULong,
         limit: ULong
-    ): Map<RelayUrl, List<Filter>> {
+    ): Map<String, List<Filter>> {
         if (limit <= 0u || since >= until) return emptyMap()
 
         val pubkeys = when (setting.pubkeySelection) {
@@ -268,7 +267,7 @@ class FeedSubscriber(
         until: ULong,
         since: ULong,
         limit: ULong
-    ): Map<RelayUrl, List<Filter>> {
+    ): Map<String, List<Filter>> {
         if (limit <= 0u) return emptyMap()
 
         val ids = bookmarkDao.getUnknownBookmarks()

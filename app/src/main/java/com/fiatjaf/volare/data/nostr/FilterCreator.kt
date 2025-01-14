@@ -1,6 +1,5 @@
 package com.fiatjaf.volare.data.nostr
 
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.MAX_EVENTS_TO_SUB
 import com.fiatjaf.volare.core.utils.limitRestricted
 import com.fiatjaf.volare.core.utils.replyKinds
@@ -190,7 +189,7 @@ class FilterCreator(
     }
 
     fun getPollResponseFilter(
-        pollIds: List<EventIdHex>,
+        pollIds: List<String>,
         since: Timestamp,
         until: Timestamp
     ): Filter {

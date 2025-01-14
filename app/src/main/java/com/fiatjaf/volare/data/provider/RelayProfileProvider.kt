@@ -1,7 +1,6 @@
 package com.fiatjaf.volare.data.provider
 
 import android.util.Log
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import rust.nostr.sdk.RelayInformationDocument
 import rust.nostr.sdk.nip11GetInformationDocument
 import java.util.Collections
@@ -10,7 +9,7 @@ private const val TAG = "RelayProfileProvider"
 
 class RelayProfileProvider {
     private val cache =
-        Collections.synchronizedMap(mutableMapOf<RelayUrl, RelayInformationDocument>())
+        Collections.synchronizedMap(mutableMapOf<String, RelayInformationDocument>())
 
     suspend fun getRelayProfile(url: String): RelayInformationDocument? {
         val cached = cache[url]

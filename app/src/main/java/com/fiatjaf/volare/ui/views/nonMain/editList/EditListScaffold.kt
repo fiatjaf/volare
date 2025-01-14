@@ -6,8 +6,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusRequester
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.ui.components.scaffold.VolareScaffold
 
 @Composable
@@ -15,8 +13,8 @@ fun EditListScaffold(
     title: MutableState<String>,
     isSaving: Boolean,
     snackbar: SnackbarHostState,
-    onUpdate: OnUpdate,
-    content: ComposableContent
+    onUpdate: (UIEvent) -> Unit,
+    content:  () -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(key1 = Unit) {

@@ -1,8 +1,6 @@
 package com.fiatjaf.volare.data.room.view
 
 import androidx.room.DatabaseView
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 
 @DatabaseView(
     "SELECT mainEvent.id, " +
@@ -17,8 +15,8 @@ import com.fiatjaf.volare.core.PubkeyHex
             "LEFT JOIN rootPost ON rootPost.eventId = mainEvent.id"
 )
 data class SimplePostView(
-    val id: EventIdHex,
-    val pubkey: PubkeyHex,
+    val id: String,
+    val pubkey: String,
     val subject: String?,
     val content: String,
     val authorIsFriend: Boolean,

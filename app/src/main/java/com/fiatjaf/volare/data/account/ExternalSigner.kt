@@ -6,7 +6,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.core.app.ActivityOptionsCompat
-import com.fiatjaf.volare.core.ManagedLauncher
 import kotlinx.coroutines.channels.Channel
 import rust.nostr.sdk.Event
 import rust.nostr.sdk.PublicKey
@@ -87,15 +86,15 @@ private const val PERMISSIONS = """
 """
 
 class ExternalSignerHandler {
-    private var reqAccountLauncher: ManagedLauncher? = null
-    private var signerLauncher: ManagedLauncher? = null
+    private var reqAccountLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>? = null
+    private var signerLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>? = null
     private val signatureChannel = Channel<String?>()
 
-    fun setRequester(req: ManagedLauncher) {
+    fun setRequester(req: ManagedActivityResultLauncher<Intent, ActivityResult>) {
         this.reqAccountLauncher = req
     }
 
-    fun setLauncher(lch: ManagedLauncher) {
+    fun setLauncher(lch: ManagedActivityResultLauncher<Intent, ActivityResult>) {
         this.signerLauncher = lch
     }
 

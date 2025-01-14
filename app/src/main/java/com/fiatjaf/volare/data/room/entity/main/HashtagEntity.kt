@@ -2,7 +2,6 @@ package com.fiatjaf.volare.data.room.entity.main
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.fiatjaf.volare.core.EventIdHex
 
 @Entity(
     tableName = "hashtag",
@@ -16,6 +15,6 @@ import com.fiatjaf.volare.core.EventIdHex
     )],
 )
 data class HashtagEntity(
-    val eventId: EventIdHex,
+    val eventId: String,
     val hashtag: String,
 )

@@ -7,7 +7,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedProfileSet
 import com.fiatjaf.volare.data.room.entity.sets.ProfileSetEntity
 import com.fiatjaf.volare.data.room.entity.sets.ProfileSetItemEntity
@@ -54,5 +53,5 @@ interface ProfileSetUpsertDao {
     suspend fun internalGetNewestCreatedAt(identifier: String): Long?
 
     @Query("SELECT pubkey FROM profileSetItem WHERE identifier = :identifier")
-    suspend fun internalGetPubkeys(identifier: String): List<PubkeyHex>
+    suspend fun internalGetPubkeys(identifier: String): List<String>
 }

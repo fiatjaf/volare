@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.State
 import com.fiatjaf.volare.core.DEBOUNCE
 import com.fiatjaf.volare.core.DELAY_1SEC
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.SHORT_DEBOUNCE
 import com.fiatjaf.volare.core.model.Comment
 import com.fiatjaf.volare.core.utils.containsNoneIgnoreCase
@@ -41,7 +39,7 @@ class ThreadProvider(
     private val nostrSubscriber: NostrSubscriber,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
     private val room: AppDatabase,
-    private val collapsedIds: Flow<Set<EventIdHex>>,
+    private val collapsedIds: Flow<Set<String>>,
     private val annotatedStringProvider: AnnotatedStringProvider,
     private val oldestUsedEvent: OldestUsedEvent,
 ) {
@@ -130,7 +128,7 @@ class ThreadProvider(
         }
     }
 
-    fun getParentIsAvailableFlow(scope: CoroutineScope, replyId: EventIdHex): Flow<Boolean> {
+    fun getParentIsAvailableFlow(scope: CoroutineScope, replyId: String): Flow<Boolean> {
         scope.launchIO {
             val parentId = room.someReplyDao().getParentId(id = replyId) ?: return@launchIO
             if (!room.existsDao().postExists(id = parentId)) {
@@ -143,15 +141,15 @@ class ThreadProvider(
     }
 
     // Unfiltered count for ProgressBar purpose
-    fun getTotalReplyCount(rootId: EventIdHex): Flow<Int> {
+    fun getTotalReplyCount(rootId: String): Flow<Int> {
         return room.someReplyDao().getReplyCountFlow(parentId = rootId)
             .firstThenDistinctDebounce(SHORT_DEBOUNCE)
     }
 
     // Don't update oldestCreatedAt in replies. They are always younger than root
     fun getReplyCtxs(
-        rootId: EventIdHex,
-        parentIds: Set<EventIdHex>,
+        rootId: String,
+        parentIds: Set<String>,
     ): Flow<List<ThreadReplyCtx>> {
         // TODO: Only comments when opening poll
         val allIds = parentIds + rootId

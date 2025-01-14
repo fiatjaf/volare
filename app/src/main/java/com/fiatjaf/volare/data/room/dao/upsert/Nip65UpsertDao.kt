@@ -6,7 +6,6 @@ import androidx.room.MapColumn
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedNip65
 import com.fiatjaf.volare.data.room.entity.lists.Nip65Entity
 
@@ -35,7 +34,7 @@ interface Nip65UpsertDao {
                 "FROM nip65 " +
                 "WHERE pubkey IN (:pubkeys)"
     )
-    suspend fun internalGetNewestCreatedAt(pubkeys: Collection<PubkeyHex>):
+    suspend fun internalGetNewestCreatedAt(pubkeys: Collection<String>):
             Map<@MapColumn("pubkey") PubkeyHex,
                     @MapColumn("maxCreatedAt") Long>
 
@@ -43,5 +42,5 @@ interface Nip65UpsertDao {
     suspend fun internalUpsert(nip65Entities: Collection<Nip65Entity>)
 
     @Query("DELETE FROM nip65 WHERE createdAt < :newestCreatedAt AND pubkey = :pubkey")
-    suspend fun internalDeleteOutdated(newestCreatedAt: Long, pubkey: PubkeyHex)
+    suspend fun internalDeleteOutdated(newestCreatedAt: Long, pubkey: String)
 }

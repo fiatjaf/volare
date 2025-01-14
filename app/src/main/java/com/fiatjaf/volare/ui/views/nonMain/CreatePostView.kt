@@ -35,10 +35,8 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.GoBack
 import com.fiatjaf.volare.core.MAX_POLL_OPTIONS
 import com.fiatjaf.volare.core.MAX_SUBJECT_LINES
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.SendPoll
 import com.fiatjaf.volare.core.SendPost
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.viewModel.CreatePostViewModel
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.ui.components.row.PollOptionAddRow
@@ -57,16 +55,16 @@ import com.fiatjaf.volare.ui.theme.spacing
 fun CreatePostView(
     vm: CreatePostViewModel,
     searchSuggestions: State<List<AdvancedProfileView>>,
-    topicSuggestions: State<List<Topic>>,
+    topicSuggestions: State<List<String>>,
     snackbar: SnackbarHostState,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val isPoll = remember { mutableStateOf(false) }
     val options = remember { mutableStateOf((0..1).map { mutableStateOf(TextFieldValue()) }) }
     val header = remember { mutableStateOf(TextFieldValue()) }
     val body = remember { mutableStateOf(TextFieldValue()) }
     val isAnon = remember { mutableStateOf(false) }
-    val topics = remember { mutableStateOf(emptyList<Topic>()) }
+    val topics = remember { mutableStateOf(emptyList<String>()) }
     val context = LocalContext.current
 
     val focusRequester = remember { FocusRequester() }
@@ -135,12 +133,12 @@ private fun CreatePostContent(
     header: MutableState<TextFieldValue>,
     body: MutableState<TextFieldValue>,
     options: MutableState<List<MutableState<TextFieldValue>>>,
-    topicSuggestions: List<Topic>,
-    selectedTopics: MutableState<List<Topic>>,
+    topicSuggestions: List<String>,
+    selectedTopics: MutableState<List<String>>,
     searchSuggestions: List<AdvancedProfileView>,
     isAnon: MutableState<Boolean>,
     focusRequester: FocusRequester,
-    onUpdate: OnUpdate,
+    onUpdate: (UIEvent) -> Unit,
 ) {
     InputWithSuggestions(
         body = body,

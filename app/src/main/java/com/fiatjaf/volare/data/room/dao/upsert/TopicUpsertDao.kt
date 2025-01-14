@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedTopicList
 import com.fiatjaf.volare.data.room.entity.lists.TopicEntity
 
@@ -37,13 +36,13 @@ interface TopicUpsertDao {
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun internalUpsert(topicEntities: Collection<TopicEntity>)
+    suspend fun internalUpsert(topicEntities: Collection<StringEntity>)
 
     @Query("SELECT MAX(createdAt) FROM topic WHERE myPubkey = :myPubkey")
-    suspend fun internalGetNewestCreatedAt(myPubkey: PubkeyHex): Long?
+    suspend fun internalGetNewestCreatedAt(myPubkey: String): Long?
 
     @Query("DELETE FROM topic WHERE myPubkey = :myPubkey")
-    suspend fun internalDeleteList(myPubkey: PubkeyHex)
+    suspend fun internalDeleteList(myPubkey: String)
 
     @Query("DELETE FROM topic WHERE createdAt < :newestCreatedAt")
     suspend fun internalDeleteOutdated(newestCreatedAt: Long)

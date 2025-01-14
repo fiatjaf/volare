@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.SearchText
 import com.fiatjaf.volare.core.UpdateSearchText
 import com.fiatjaf.volare.ui.components.button.GoBackIconButton
@@ -28,7 +27,7 @@ import com.fiatjaf.volare.ui.theme.RoundedChip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchTopAppBar(focusRequester: FocusRequester, onUpdate: OnUpdate) {
+fun SearchTopAppBar(focusRequester: FocusRequester, onUpdate: (UIEvent) -> Unit) {
     val text = remember {
         mutableStateOf("")
     }

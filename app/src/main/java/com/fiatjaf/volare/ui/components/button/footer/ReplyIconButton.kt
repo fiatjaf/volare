@@ -4,13 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenReplyCreation
 import com.fiatjaf.volare.ui.components.row.mainEvent.MainEventCtx
 import com.fiatjaf.volare.ui.theme.ReplyIcon
 
 @Composable
-fun ReplyIconButton(ctx: MainEventCtx, modifier: Modifier = Modifier, onUpdate: OnUpdate) {
+fun ReplyIconButton(ctx: MainEventCtx, modifier: Modifier = Modifier, onUpdate: (UIEvent) -> Unit) {
     FooterIconButton(
         modifier = modifier,
         icon = ReplyIcon,

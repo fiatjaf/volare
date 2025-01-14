@@ -7,8 +7,6 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.ClickNeutralizeVote
 import com.fiatjaf.volare.core.ClickUpvote
 import com.fiatjaf.volare.core.DEBOUNCE
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.VoteEvent
 import com.fiatjaf.volare.core.utils.showToast
 import com.fiatjaf.volare.data.account.AccountManager
@@ -44,7 +42,7 @@ class PostVoter(
     private val eventPreferences: EventPreferences,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
-    private val _forcedVotes = MutableStateFlow(mapOf<EventIdHex, Boolean>())
+    private val _forcedVotes = MutableStateFlow(mapOf<String, Boolean>())
 
     val forcedVotes = _forcedVotes
         .stateIn(scope, SharingStarted.Eagerly, _forcedVotes.value)
@@ -62,7 +60,7 @@ class PostVoter(
         )
     }
 
-    private fun updateForcedVote(postId: EventIdHex, newVote: Boolean) {
+    private fun updateForcedVote(postId: String, newVote: Boolean) {
         _forcedVotes.update {
             val mutable = it.toMutableMap()
             mutable[postId] = newVote
@@ -70,10 +68,10 @@ class PostVoter(
         }
     }
 
-    private val jobs: MutableMap<EventIdHex, Job?> = mutableMapOf()
+    private val jobs: MutableMap<String, Job?> = mutableMapOf()
     private fun vote(
-        postId: EventIdHex,
-        mention: PubkeyHex,
+        postId: String,
+        mention: String,
         isUpvote: Boolean,
     ) {
         jobs[postId]?.cancel(null) // CancellationException doesn't compile
@@ -99,8 +97,8 @@ class PostVoter(
 
     private suspend fun upvote(
         currentVote: VoteEntity?,
-        postId: EventIdHex,
-        mention: PubkeyHex,
+        postId: String,
+        mention: String,
     ) {
         if (currentVote != null) {
             eventDeletor.deleteVote(voteId = currentVote.id)

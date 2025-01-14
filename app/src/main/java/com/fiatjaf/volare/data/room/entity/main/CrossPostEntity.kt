@@ -3,7 +3,6 @@ package com.fiatjaf.volare.data.room.entity.main
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.data.event.ValidatedCrossPost
 
 @Entity(
@@ -21,8 +20,8 @@ import com.fiatjaf.volare.data.event.ValidatedCrossPost
     ],
 )
 data class CrossPostEntity(
-    val eventId: EventIdHex,
-    val crossPostedId: EventIdHex,
+    val eventId: String,
+    val crossPostedId: String,
 ) {
     companion object {
         fun from(crossPost: ValidatedCrossPost): CrossPostEntity {

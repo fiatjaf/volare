@@ -2,8 +2,6 @@ package com.fiatjaf.volare.data.interactor
 
 import android.util.Log
 import com.fiatjaf.volare.core.MAX_KEYS_SQL
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.model.ItemSetItem
 import com.fiatjaf.volare.core.model.ItemSetProfile
 import com.fiatjaf.volare.core.model.ItemSetTopic
@@ -31,7 +29,7 @@ class ItemSetEditor(
         identifier: String,
         title: String,
         description: String,
-        pubkeys: List<PubkeyHex>
+        pubkeys: List<String>
     ): Result<Event> {
         return nostrService.publishProfileSet(
             identifier = identifier,
@@ -56,7 +54,7 @@ class ItemSetEditor(
         identifier: String,
         title: String,
         description: String,
-        topics: List<Topic>
+        topics: List<String>
     ): Result<Event> {
         return nostrService.publishTopicSet(
             identifier = identifier,

@@ -20,8 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.ui.theme.spacing
 
 @Composable
@@ -30,8 +28,8 @@ fun ClickableRow(
     text: String? = null,
     leadingIcon: ImageVector?,
     iconTint: Color = LocalContentColor.current,
-    onClick: Fn = {},
-    additionalContent: ComposableContent = {},
+    onClick: () -> Unit = {},
+    additionalContent:  () -> Unit = {},
 ) {
     val icon = @Composable {
         if (leadingIcon != null) Icon(
@@ -54,11 +52,11 @@ fun ClickableRow(
     header: String,
     modifier: Modifier = Modifier,
     text: String? = null,
-    leadingContent: ComposableContent? = null,
-    trailingContent: ComposableContent? = null,
-    onClick: Fn = {},
-    onLongClick: Fn = {},
-    additionalContent: ComposableContent = {},
+    leadingContent:  () -> Unit? = null,
+    trailingContent:  () -> Unit? = null,
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
+    additionalContent:  () -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         ClickableBaseRow(
@@ -77,11 +75,11 @@ fun ClickableRow(
 @Composable
 private fun ClickableBaseRow(
     header: String,
-    leadingContent: ComposableContent? = null,
-    trailingContent: ComposableContent? = null,
+    leadingContent:  () -> Unit? = null,
+    trailingContent:  () -> Unit? = null,
     text: String? = null,
-    onClick: Fn = {},
-    onLongClick: Fn = {},
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier

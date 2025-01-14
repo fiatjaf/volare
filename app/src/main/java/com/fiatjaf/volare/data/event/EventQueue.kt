@@ -3,8 +3,6 @@ package com.fiatjaf.volare.data.event
 import android.util.Log
 import com.fiatjaf.volare.core.DEBOUNCE
 import com.fiatjaf.volare.core.utils.launchIO
-import com.fiatjaf.volare.data.nostr.RelayUrl
-import com.fiatjaf.volare.data.nostr.SubId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -28,7 +26,7 @@ class EventQueue(
         startProcessingJob()
     }
 
-    fun submit(event: Event, subId: SubId, relayUrl: RelayUrl?) {
+    fun submit(event: Event, subId: String, relayUrl: String?) {
         if (relayUrl == null) {
             Log.w(TAG, "Unknown relay origin of eventId ${event.id().toHex()} of subId $subId")
             return

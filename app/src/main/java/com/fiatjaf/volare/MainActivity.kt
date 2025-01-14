@@ -15,7 +15,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.anggrayudi.storage.SimpleStorageHelper
 import com.fiatjaf.volare.core.Core
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.viewModel.BookmarksViewModel
 import com.fiatjaf.volare.core.viewModel.CreateCrossPostViewModel
 import com.fiatjaf.volare.core.viewModel.CreateGitIssueViewModel
@@ -59,7 +58,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val context = (LocalContext.current as? Activity)
-            val closeApp: Fn = { context?.finish() }
+            val closeApp: () -> Unit = { context?.finish() }
             val vmContainer = createVMContainer(appContainer = appContainer)
             val core = viewModel {
                 Core(

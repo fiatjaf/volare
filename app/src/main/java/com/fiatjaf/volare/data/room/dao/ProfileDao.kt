@@ -2,7 +2,6 @@ package com.fiatjaf.volare.data.room.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.room.entity.ProfileEntity
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import kotlinx.coroutines.flow.Flow
@@ -10,14 +9,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ProfileDao {
     @Query("SELECT * FROM AdvancedProfileView WHERE pubkey = :pubkey")
-    fun getAdvancedProfileFlow(pubkey: PubkeyHex): Flow<AdvancedProfileView?>
+    fun getAdvancedProfileFlow(pubkey: String): Flow<AdvancedProfileView?>
 
     @Query(
         "SELECT * " +
                 "FROM AdvancedProfileView " +
                 "WHERE pubkey = (SELECT friendPubkey FROM weboftrust WHERE webOfTrustPubkey = :pubkey)"
     )
-    fun getAdvancedProfileTrustedByFlow(pubkey: PubkeyHex): Flow<AdvancedProfileView?>
+    fun getAdvancedProfileTrustedByFlow(pubkey: String): Flow<AdvancedProfileView?>
 
     @Query(
         "SELECT pubkey, IFNULL(name, '') name, IFNULL(createdAt, 0) createdAt " +
@@ -28,7 +27,7 @@ interface ProfileDao {
     suspend fun getPersonalProfile(ourPubkey: String): ProfileEntity?
 
     @Query("SELECT * FROM AdvancedProfileView WHERE pubkey IN (:pubkeys)")
-    fun getAdvancedProfilesFlow(pubkeys: Collection<PubkeyHex>): Flow<List<AdvancedProfileView>>
+    fun getAdvancedProfilesFlow(pubkeys: Collection<String>): Flow<List<AdvancedProfileView>>
 
     @Query("SELECT * FROM AdvancedProfileView WHERE pubkey IN (SELECT friendPubkey FROM friend)")
     suspend fun getAdvancedProfilesOfFriends(): List<AdvancedProfileView>
@@ -49,13 +48,13 @@ interface ProfileDao {
                 "WHERE identifier = :identifier " +
                 "AND pubkey NOT IN (SELECT pubkey FROM profile)"
     )
-    suspend fun getUnknownPubkeysFromList(identifier: String): List<PubkeyHex>
+    suspend fun getUnknownPubkeysFromList(identifier: String): List<String>
 
     @Query("SELECT name FROM profile WHERE pubkey = :pubkey")
-    suspend fun getName(pubkey: PubkeyHex): String?
+    suspend fun getName(pubkey: String): String?
 
     @Query("SELECT createdAt FROM profile WHERE pubkey = :pubkey")
-    suspend fun getMaxCreatedAt(pubkey: PubkeyHex): Long?
+    suspend fun getMaxCreatedAt(pubkey: String): Long?
 
     suspend fun getProfilesByName(name: String, limit: Int): List<AdvancedProfileView> {
         if (limit <= 0) return emptyList()
@@ -75,21 +74,21 @@ interface ProfileDao {
                 "ORDER BY COUNT(pk) DESC " +
                 "LIMIT :limit"
     )
-    suspend fun getPopularUnfollowedPubkeys(ourPubkey: String, limit: Int): List<PubkeyHex>
+    suspend fun getPopularUnfollowedPubkeys(ourPubkey: String, limit: Int): List<String>
 
     @Query(
         "SELECT DISTINCT pubkey " +
                 "FROM profile " +
                 "WHERE pubkey IN (:pubkeys)"
     )
-    suspend fun filterKnownProfiles(pubkeys: Collection<PubkeyHex>): List<PubkeyHex>
+    suspend fun filterKnownProfiles(pubkeys: Collection<String>): List<String>
 
     @Query(
         "SELECT friendPubkey " +
                 "FROM friend " +
                 "WHERE friendPubkey NOT IN (SELECT pubkey FROM profile)"
     )
-    suspend fun getUnknownFriends(): List<PubkeyHex>
+    suspend fun getUnknownFriends(): List<String>
 
     @Query(
         "SELECT mutedItem " +
@@ -97,7 +96,7 @@ interface ProfileDao {
                 "WHERE mutedItem NOT IN (SELECT pubkey FROM profile) " +
                 "AND tag = 'p'"
     )
-    suspend fun getUnknownMutes(): List<PubkeyHex>
+    suspend fun getUnknownMutes(): List<String>
 
     @Query(
         "SELECT * " +

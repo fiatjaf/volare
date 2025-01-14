@@ -9,10 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.MuteProfile
 import com.fiatjaf.volare.core.MuteTopic
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.ProfileViewLoadLists
 import com.fiatjaf.volare.core.TopicViewLoadLists
 import com.fiatjaf.volare.core.UnmuteProfile
@@ -33,7 +31,7 @@ fun ProfileOrTopicOptionButton(
     addableLists: List<ItemSetMeta>,
     nonAddableLists: List<ItemSetMeta>,
     scope: CoroutineScope,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val showMenu = remember { mutableStateOf(false) }
 
@@ -72,8 +70,8 @@ private fun ActionMenu(
     addableLists: List<ItemSetMeta>,
     nonAddableLists: List<ItemSetMeta>,
     scope: CoroutineScope,
-    onUpdate: OnUpdate,
-    onDismiss: Fn
+    onUpdate: (UIEvent) -> Unit,
+    onDismiss: () -> Unit
 ) {
     val showAddToList = remember { mutableStateOf(false) }
     if (showAddToList.value) AddToListDialog(

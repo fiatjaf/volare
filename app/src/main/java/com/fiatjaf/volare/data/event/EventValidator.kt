@@ -13,8 +13,6 @@ import com.fiatjaf.volare.core.utils.getTrimmedSubject
 import com.fiatjaf.volare.core.utils.takeRandom
 import com.fiatjaf.volare.core.utils.BlurHashDef
 import com.fiatjaf.volare.data.account.AccountManager
-import com.fiatjaf.volare.data.nostr.RelayUrl
-import com.fiatjaf.volare.data.nostr.SubId
 import com.fiatjaf.volare.data.nostr.getEndsAt
 import com.fiatjaf.volare.data.nostr.getKindTag
 import com.fiatjaf.volare.data.nostr.getLegacyReplyToId
@@ -52,15 +50,15 @@ val POLL_U16: UShort = 1068u
 val POLL_RESPONSE_U16: UShort = 1018u
 
 class EventValidator(
-    private val syncedFilterCache: Map<SubId, List<Filter>>,
+    private val syncedFilterCache: Map<String, List<Filter>>,
     private val syncedIdCache: MutableSet<EventId>,
     private val accountManager: AccountManager,
 ) {
 
     fun getValidatedEvent(
         event: Event,
-        subId: SubId,
-        relayUrl: RelayUrl
+        subId: String,
+        relayUrl: String
     ): ValidatedEvent? {
         val id = event.id()
         if (syncedIdCache.contains(id)) return null
@@ -81,7 +79,7 @@ class EventValidator(
         return validatedEvent
     }
 
-    private fun matchesFilter(subId: SubId, event: Event): Boolean {
+    private fun matchesFilter(subId: String, event: Event): Boolean {
         val filters = syncedFilterCache.getOrDefault(subId, emptyList()).toList()
         if (filters.isEmpty()) {
             Log.w(TAG, "Filter is empty")
@@ -91,7 +89,7 @@ class EventValidator(
         return filters.any { it.matchEvent(event = event) }
     }
 
-    private fun validate(event: Event, relayUrl: RelayUrl): ValidatedEvent? {
+    private fun validate(event: Event, relayUrl: String): ValidatedEvent? {
         // Match against enum once included in rust-nostr
         val validatedEvent = when (event.kind().asU16()) {
             TEXT_NOTE_U16 -> createValidatedTextNote(
@@ -252,7 +250,7 @@ class EventValidator(
         return validatedEvent
     }
 
-    private fun createValidatedCrosspost(event: Event, relayUrl: RelayUrl): ValidatedCrossPost? {
+    private fun createValidatedCrosspost(event: Event, relayUrl: String): ValidatedCrossPost? {
         val crossPostedId = event.tags().eventIds().firstOrNull()?.toHex() ?: return null
         val crossPostedKind = when (event.kind().asU16()) {
             REPOST_U16 -> TEXT_NOTE_U16
@@ -303,7 +301,7 @@ class EventValidator(
     companion object {
         fun createValidatedTextNote(
             event: Event,
-            relayUrl: RelayUrl,
+            relayUrl: String,
             myPubkey: PublicKey,
         ): ValidatedTextNote? {
             if (!event.isTextNote()) return null
@@ -342,7 +340,7 @@ class EventValidator(
 
         fun createValidatedComment(
             event: Event,
-            relayUrl: RelayUrl,
+            relayUrl: String,
             myPubkey: PublicKey,
         ): ValidatedComment? {
             if (event.kind().asU16() != COMMENT_U16) return null

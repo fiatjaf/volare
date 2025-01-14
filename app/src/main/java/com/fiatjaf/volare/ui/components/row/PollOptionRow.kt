@@ -25,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.ui.components.FullHorizontalDivider
 import com.fiatjaf.volare.ui.components.button.RemoveIconButton
 import com.fiatjaf.volare.ui.components.text.TextInput
@@ -42,7 +41,7 @@ fun PollOptionRow(
     isRevealed: Boolean,
     percentage: Int,
     progress: Float,
-    onClick: Fn,
+    onClick: () -> Unit,
 ) {
     val isRevealedSelection = remember(isSelected, isRevealed) {
         isSelected && isRevealed
@@ -89,7 +88,7 @@ fun PollOptionRow(
 }
 
 @Composable
-fun PollOptionInputRow(input: MutableState<TextFieldValue>, onRemove: Fn) {
+fun PollOptionInputRow(input: MutableState<TextFieldValue>, onRemove: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -117,7 +116,7 @@ fun PollOptionInputRow(input: MutableState<TextFieldValue>, onRemove: Fn) {
 }
 
 @Composable
-fun PollOptionAddRow(onClick: Fn) {
+fun PollOptionAddRow(onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

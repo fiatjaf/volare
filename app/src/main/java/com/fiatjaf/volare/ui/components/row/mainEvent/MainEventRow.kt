@@ -26,11 +26,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.MAX_CONTENT_LINES
 import com.fiatjaf.volare.core.MAX_SUBJECT_LINES
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenThread
 import com.fiatjaf.volare.core.OpenThreadRaw
 import com.fiatjaf.volare.core.ThreadViewShowReplies
@@ -53,7 +50,7 @@ import com.fiatjaf.volare.ui.views.nonMain.MoreRepliesTextButton
 @Composable
 fun MainEventRow(
     ctx: NoteCtx,
-    onUpdate: OnUpdate,
+    onUpdate: (UIEvent) -> Unit,
     isFocused: Boolean = false,
 ) {
     when (ctx) {
@@ -96,7 +93,7 @@ fun MainEventRow(
 @Composable
 private fun NoteMainRow(
     ctx: NoteCtx,
-    onUpdate: OnUpdate,
+    onUpdate: (UIEvent) -> Unit,
     isFocused: Boolean = false
 ) {
     val onClickRow = {
@@ -211,7 +208,7 @@ private fun NoteMainRow(
 }
 
 @Composable
-private fun RowWithDivider(level: Int, content: ComposableContent) {
+private fun RowWithDivider(level: Int, content:  () -> Unit) {
     Row(modifier = Modifier.height(IntrinsicSize.Min)) {
         repeat(times = level) {
             VerticalDivider(
@@ -225,7 +222,7 @@ private fun RowWithDivider(level: Int, content: ComposableContent) {
 }
 
 @Composable
-private fun PollColumn(poll: Poll, onUpdate: OnUpdate, onClickRow: Fn) {
+private fun PollColumn(poll: Poll, onUpdate: (UIEvent) -> Unit, onClickRow: () -> Unit) {
     val myVote: String? = null // TODO: somehow figure this out
     val isExpired = remember(poll.endsAt) {
         poll.endsAt != null && poll.endsAt <= getCurrentSecs()

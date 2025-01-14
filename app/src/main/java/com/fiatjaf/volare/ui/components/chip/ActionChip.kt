@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.ui.theme.RoundedChip
 import com.fiatjaf.volare.ui.theme.spacing
 
@@ -26,7 +25,7 @@ fun ActionChip(
     description: String,
     count: Int = 0,
     tint: Color = MaterialTheme.colorScheme.primary,
-    onClick: Fn,
+    onClick: () -> Unit,
     topPadding: Dp = 0.dp
 ) {
     Row(

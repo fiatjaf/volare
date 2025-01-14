@@ -8,7 +8,6 @@ import com.fiatjaf.volare.core.FollowProfile
 import com.fiatjaf.volare.core.LIST_CHANGE_DEBOUNCE
 import com.fiatjaf.volare.core.MAX_KEYS_SQL
 import com.fiatjaf.volare.core.ProfileEvent
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.UnfollowProfile
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
@@ -37,7 +36,7 @@ class ProfileFollower(
     private val friendUpsertDao: FriendUpsertDao,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
-    private val _forcedFollows = MutableStateFlow(mapOf<PubkeyHex, Boolean>())
+    private val _forcedFollows = MutableStateFlow(mapOf<String, Boolean>())
     val forcedFollowsFlow = _forcedFollows.stateIn(
         scope,
         SharingStarted.Eagerly,
@@ -59,14 +58,14 @@ class ProfileFollower(
     }
 
     private fun handleAction(
-        pubkey: PubkeyHex,
+        pubkey: String,
         isFollowed: Boolean,
     ) {
         updateForcedFollows(pubkey = pubkey, isFollowed = isFollowed)
         handleFollowsInBackground()
     }
 
-    private fun updateForcedFollows(pubkey: PubkeyHex, isFollowed: Boolean) {
+    private fun updateForcedFollows(pubkey: String, isFollowed: Boolean) {
         synchronized(_forcedFollows) {
             val mutable = _forcedFollows.value.toMutableMap()
             mutable[pubkey] = isFollowed
@@ -80,7 +79,7 @@ class ProfileFollower(
         job = scope.launchIO {
             delay(LIST_CHANGE_DEBOUNCE)
 
-            val toHandle: Map<PubkeyHex, Boolean>
+            val toHandle: Map<String, Boolean>
             synchronized(_forcedFollows) {
                 toHandle = _forcedFollows.value.toMap()
             }

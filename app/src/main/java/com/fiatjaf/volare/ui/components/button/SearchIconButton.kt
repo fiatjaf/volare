@@ -6,11 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.ClickSearch
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.ui.theme.SearchIcon
 
 @Composable
-fun SearchIconButton(onUpdate: OnUpdate) {
+fun SearchIconButton(onUpdate: (UIEvent) -> Unit) {
     IconButton(onClick = { onUpdate(ClickSearch) }) {
         Icon(imageVector = SearchIcon, contentDescription = stringResource(id = R.string.search))
     }

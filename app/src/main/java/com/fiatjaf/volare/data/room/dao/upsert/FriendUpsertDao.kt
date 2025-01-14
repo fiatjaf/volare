@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedContactList
 import com.fiatjaf.volare.data.room.entity.lists.FriendEntity
 
@@ -42,16 +41,16 @@ interface FriendUpsertDao {
     }
 
     @Query("SELECT MAX(createdAt) FROM friend WHERE myPubkey = :myPubkey")
-    suspend fun internalGetNewestCreatedAt(myPubkey: PubkeyHex): Long?
+    suspend fun internalGetNewestCreatedAt(myPubkey: String): Long?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun internalInsertOrIgnore(friendEntities: Collection<FriendEntity>)
 
     @Query("UPDATE friend SET createdAt = :newCreatedAt WHERE friendPubkey IN (:friendPubkeys)")
-    suspend fun internalUpdateCreatedAt(friendPubkeys: Collection<PubkeyHex>, newCreatedAt: Long)
+    suspend fun internalUpdateCreatedAt(friendPubkeys: Collection<String>, newCreatedAt: Long)
 
     @Query("DELETE FROM friend WHERE myPubkey = :myPubkey")
-    suspend fun internalDeleteList(myPubkey: PubkeyHex)
+    suspend fun internalDeleteList(myPubkey: String)
 
     @Query("DELETE FROM friend WHERE createdAt < :newestCreatedAt")
     suspend fun internalDeleteOutdated(newestCreatedAt: Long)

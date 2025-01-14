@@ -17,10 +17,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.SearchTopicSuggestion
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.utils.isBareTopicStr
 import com.fiatjaf.volare.core.utils.normalizeTopic
 import com.fiatjaf.volare.ui.components.row.ClickableRow
@@ -29,11 +26,11 @@ import com.fiatjaf.volare.ui.theme.sizing
 
 @Composable
 fun AddTopicDialog(
-    topicSuggestions: List<Topic>,
+    topicSuggestions: List<String>,
     showNext: Boolean,
-    onAdd: (Topic) -> Unit,
-    onDismiss: Fn,
-    onUpdate: OnUpdate
+    onAdd: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onUpdate: (UIEvent) -> Unit
 ) {
     val input = remember { mutableStateOf(TextFieldValue("")) }
     val cleanInput = remember(input.value) {
@@ -92,10 +89,10 @@ fun AddTopicDialog(
 @Composable
 private fun Input(
     input: MutableState<TextFieldValue>,
-    topicSuggestions: List<Topic>,
+    topicSuggestions: List<String>,
     focusRequester: FocusRequester,
-    onAdd: (Topic) -> Unit,
-    onUpdate: OnUpdate
+    onAdd: (String) -> Unit,
+    onUpdate: (UIEvent) -> Unit
 ) {
     Column {
         TextField(
@@ -120,8 +117,8 @@ private fun Input(
 
 @Composable
 private fun TopicSuggestions(
-    suggestions: List<Topic>,
-    onClickSuggestion: (Topic) -> Unit,
+    suggestions: List<String>,
+    onClickSuggestion: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {

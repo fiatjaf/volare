@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.event.ValidatedProfileSet
 
 @Entity(
@@ -14,7 +13,7 @@ import com.fiatjaf.volare.data.event.ValidatedProfileSet
 )
 data class ProfileSetEntity(
     val identifier: String,
-    val myPubkey: PubkeyHex,
+    val myPubkey: String,
     val title: String,
     @ColumnInfo(defaultValue = "") val description: String,
     val createdAt: Long,

@@ -1,6 +1,5 @@
 package com.fiatjaf.volare.data.provider
 
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.takeRandom
 import com.fiatjaf.volare.data.room.dao.WebOfTrustDao
 import kotlinx.coroutines.CoroutineScope
@@ -19,8 +18,8 @@ class WebOfTrustProvider(
     fun getFriendsAndWebOfTrustPubkeys(
         max: Int = Int.MAX_VALUE,
         friendsFirst: Boolean = true,
-    ): List<PubkeyHex> {
-        val result = mutableListOf<PubkeyHex>()
+    ): List<String> {
+        val result = mutableListOf<String>()
 
         result.addAll(friendProvider.getFriendPubkeys(max = max))
         result.addAll(webOfTrust.value.minus(result.toSet()).takeRandom(max))

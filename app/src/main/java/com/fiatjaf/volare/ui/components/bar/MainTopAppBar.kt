@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextOverflow
 import com.fiatjaf.volare.core.HomeViewOpenFilter
 import com.fiatjaf.volare.core.InboxViewOpenFilter
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.navigator.DiscoverNavView
 import com.fiatjaf.volare.core.navigator.HomeNavView
 import com.fiatjaf.volare.core.navigator.InboxNavView
@@ -20,7 +19,7 @@ import com.fiatjaf.volare.ui.components.button.MenuIconButton
 @Composable
 fun MainTopAppBar(
     currentView: MainNavView,
-    onUpdate: OnUpdate = {}
+    onUpdate: (UIEvent) -> Unit = {}
 ) {
     TopAppBar(
         title = {
@@ -40,7 +39,7 @@ fun MainTopAppBar(
 }
 
 @Composable
-private fun MainFilter(currentView: MainNavView, onUpdate: OnUpdate) {
+private fun MainFilter(currentView: MainNavView, onUpdate: (UIEvent) -> Unit) {
     when (currentView) {
         HomeNavView -> FilterIconButton(onClick = { onUpdate(HomeViewOpenFilter) })
 

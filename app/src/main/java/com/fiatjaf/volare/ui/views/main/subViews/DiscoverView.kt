@@ -22,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.DiscoverViewInit
 import com.fiatjaf.volare.core.DiscoverViewRefresh
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.viewModel.DiscoverViewModel
 import com.fiatjaf.volare.ui.components.chip.FollowChip
 import com.fiatjaf.volare.ui.components.indicator.BaseHint
@@ -33,7 +32,7 @@ import com.fiatjaf.volare.ui.model.FollowableTopicItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DiscoverView(vm: DiscoverViewModel, onUpdate: OnUpdate) {
+fun DiscoverView(vm: DiscoverViewModel, onUpdate: (UIEvent) -> Unit) {
     val isRefreshing by vm.isRefreshing
     val topics by vm.popularTopics.value.collectAsState()
     val profiles by vm.popularProfiles.value.collectAsState()

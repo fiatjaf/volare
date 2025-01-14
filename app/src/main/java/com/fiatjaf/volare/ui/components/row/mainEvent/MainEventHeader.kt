@@ -25,11 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenProfile
 import com.fiatjaf.volare.core.OpenTopic
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.model.Comment
 import com.fiatjaf.volare.core.model.CrossPost
 import com.fiatjaf.volare.core.model.LegacyReply
@@ -50,7 +47,7 @@ import com.fiatjaf.volare.ui.theme.spacing
 @Composable
 fun MainEventHeader(
     ctx: MainEventCtx,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -93,7 +90,7 @@ fun MainEventHeader(
 @Composable
 private fun MainEventHeaderIconsAndName(
     ctx: MainEventCtx,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         when (val mainEvent = ctx.mainEvent) {
@@ -123,7 +120,7 @@ private fun MainEventHeaderIconsAndName(
 }
 
 @Composable
-private fun CrossPostIcon(crossPost: CrossPost, onUpdate: OnUpdate) {
+private fun CrossPostIcon(crossPost: CrossPost, onUpdate: (UIEvent) -> Unit) {
     ClickableTrustIcon(
         trustType = crossPost.crossPostedTrustType,
         authorName = getUiAuthorName(
@@ -145,7 +142,7 @@ private fun CrossPostIcon(crossPost: CrossPost, onUpdate: OnUpdate) {
 }
 
 @Composable
-private fun BorderedTopic(topic: Topic, onUpdate: OnUpdate) {
+private fun BorderedTopic(topic: String, onUpdate: (UIEvent) -> Unit) {
     Box(
         modifier = Modifier
             .border(
@@ -169,6 +166,6 @@ private fun BorderedTopic(topic: Topic, onUpdate: OnUpdate) {
 
 @Stable
 @Composable
-private fun getUiAuthorName(name: String?, pubkey: PubkeyHex): String {
+private fun getUiAuthorName(name: String?, pubkey: String): String {
     return name.orEmpty().ifEmpty { pubkey.toShortenedBech32() }
 }

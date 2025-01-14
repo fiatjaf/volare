@@ -3,16 +3,15 @@ package com.fiatjaf.volare.data.room.dao.util
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import com.fiatjaf.volare.core.EventIdHex
 
 @Dao
 interface DeleteDao {
 
     @Query("DELETE FROM vote WHERE id = :voteId")
-    suspend fun deleteVote(voteId: EventIdHex)
+    suspend fun deleteVote(voteId: String)
 
     @Query("DELETE FROM mainEvent WHERE id = :id")
-    suspend fun deleteMainEvent(id: EventIdHex)
+    suspend fun deleteMainEvent(id: String)
 
     @Query("DELETE FROM mainEvent")
     suspend fun deleteAllPost()

@@ -9,8 +9,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.AddItemToList
-import com.fiatjaf.volare.core.Fn
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.model.ItemSetItem
 import com.fiatjaf.volare.data.model.ItemSetMeta
 import com.fiatjaf.volare.ui.components.selection.NamedCheckbox
@@ -22,8 +20,8 @@ fun AddToListDialog(
     addableLists: List<ItemSetMeta>,
     nonAddableLists: List<ItemSetMeta>,
     scope: CoroutineScope,
-    onUpdate: OnUpdate,
-    onDismiss: Fn
+    onUpdate: (UIEvent) -> Unit,
+    onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
     AlertDialog(

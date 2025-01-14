@@ -25,9 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.Fn
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenThreadRaw
 import com.fiatjaf.volare.core.ThreadViewRefresh
 import com.fiatjaf.volare.core.model.Comment
@@ -49,7 +46,7 @@ import com.fiatjaf.volare.ui.theme.sizing
 import com.fiatjaf.volare.ui.theme.spacing
 
 @Composable
-fun ThreadView(vm: ThreadViewModel, snackbar: SnackbarHostState, onUpdate: OnUpdate) {
+fun ThreadView(vm: ThreadViewModel, snackbar: SnackbarHostState, onUpdate: (UIEvent) -> Unit) {
     SimpleGoBackScaffold(
         header = stringResource(id = R.string.thread),
         snackbar = snackbar,
@@ -84,7 +81,7 @@ private fun ThreadViewContent(
     parentIsAvailable: Boolean,
     isRefreshing: Boolean,
     state: LazyListState,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val adjustedReplies = remember(localRoot, replies) {
         when (localRoot.threadableMainEvent) {
@@ -163,7 +160,7 @@ private fun ThreadViewContent(
 }
 
 @Composable
-fun MoreRepliesTextButton(replyCount: Int, onShowReplies: Fn) {
+fun MoreRepliesTextButton(replyCount: Int, onShowReplies: () -> Unit) {
     val isLoading = remember { mutableStateOf(false) }
     Row(
         modifier = Modifier.height(IntrinsicSize.Min),
@@ -186,8 +183,8 @@ fun MoreRepliesTextButton(replyCount: Int, onShowReplies: Fn) {
 @Composable
 private fun OpenParentButton(
     modifier: Modifier = Modifier,
-    parentId: EventIdHex,
-    onUpdate: OnUpdate
+    parentId: String,
+    onUpdate: (UIEvent) -> Unit
 ) {
     TextButton(
         modifier = modifier,

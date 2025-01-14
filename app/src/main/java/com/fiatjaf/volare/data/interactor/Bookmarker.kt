@@ -6,7 +6,6 @@ import androidx.compose.material3.SnackbarHostState
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.BookmarkEvent
 import com.fiatjaf.volare.core.BookmarkPost
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.MAX_KEYS_SQL
 import com.fiatjaf.volare.core.UnbookmarkPost
 import com.fiatjaf.volare.core.utils.launchIO
@@ -41,7 +40,7 @@ class Bookmarker(
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    private val _forcedBookmarks = MutableStateFlow(mapOf<EventIdHex, Boolean>())
+    private val _forcedBookmarks = MutableStateFlow(mapOf<String, Boolean>())
     val forcedBookmarksFlow = _forcedBookmarks.stateIn(
         scope,
         SharingStarted.Eagerly,
@@ -62,12 +61,12 @@ class Bookmarker(
         }
     }
 
-    private fun handleAction(postId: EventIdHex, isBookmarked: Boolean) {
+    private fun handleAction(postId: String, isBookmarked: Boolean) {
         updateForcedStates(postId = postId, isBookmarked = isBookmarked)
         handleBookmark()
     }
 
-    private fun updateForcedStates(postId: EventIdHex, isBookmarked: Boolean) {
+    private fun updateForcedStates(postId: String, isBookmarked: Boolean) {
         _forcedBookmarks.update {
             val mutable = it.toMutableMap()
             mutable[postId] = isBookmarked

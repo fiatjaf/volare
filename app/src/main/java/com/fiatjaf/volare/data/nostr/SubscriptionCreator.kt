@@ -7,9 +7,9 @@ private const val TAG = "SubscriptionCreator"
 
 class SubscriptionCreator(
     private val nostrClient: NostrClient,
-    private val syncedFilterCache: MutableMap<SubId, List<Filter>>,
+    private val syncedFilterCache: MutableMap<String, List<Filter>>,
 ) {
-    fun subscribe(relayUrl: RelayUrl, filters: List<Filter>): SubId? {
+    fun subscribe(relayUrl: String, filters: List<Filter>): String? {
         if (filters.isEmpty()) return null
         Log.d(TAG, "Subscribe ${filters.size} in $relayUrl")
 

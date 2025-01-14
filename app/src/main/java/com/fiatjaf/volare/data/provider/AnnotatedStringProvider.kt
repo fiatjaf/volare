@@ -46,13 +46,13 @@ class AnnotatedStringProvider(private val backendDB: BackendDatabase) {
     }
 
     private var uriHandler: UriHandler? = null
-    private var onUpdate: OnUpdate? = null
+    private var onUpdate: (UIEvent) -> Unit? = null
 
     fun setUriHandler(uriHandler: UriHandler) {
         this.uriHandler = uriHandler
     }
 
-    fun setOnUpdate(onUpdate: OnUpdate) {
+    fun setOnUpdate(onUpdate: (UIEvent) -> Unit) {
         this.onUpdate = onUpdate
     }
 

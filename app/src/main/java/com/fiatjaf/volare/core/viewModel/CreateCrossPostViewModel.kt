@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.CreateCrossPostViewAction
 import com.fiatjaf.volare.core.DELAY_1SEC
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.SendCrossPost
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
@@ -23,9 +22,9 @@ class CreateCrossPostViewModel(
     private val snackbar: SnackbarHostState,
 ) : ViewModel() {
     val isSending = mutableStateOf(false)
-    private val id: MutableState<EventIdHex?> = mutableStateOf(null)
+    private val id: MutableState<String?> = mutableStateOf(null)
 
-    fun prepareCrossPost(id: EventIdHex) {
+    fun prepareCrossPost(id: String) {
         this.id.value = id
     }
 

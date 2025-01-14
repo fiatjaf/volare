@@ -1,13 +1,9 @@
 package com.fiatjaf.volare.data.room.view
 
 import androidx.room.DatabaseView
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.utils.BlurHashDef
 import com.fiatjaf.volare.core.model.CrossPost
 import com.fiatjaf.volare.core.model.TrustType
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.provider.AnnotatedStringProvider
 
 @DatabaseView(
@@ -75,14 +71,14 @@ import com.fiatjaf.volare.data.provider.AnnotatedStringProvider
 """
 )
 data class CrossPostView(
-    val id: EventIdHex,
-    val pubkey: PubkeyHex,
+    val id: String,
+    val pubkey: String,
     val authorName: String?,
     val authorIsFriend: Boolean,
     val authorIsTrusted: Boolean,
     val authorIsMuted: Boolean,
     val authorIsInList: Boolean,
-    val myTopic: Topic?,
+    val myTopic: String?,
     val createdAt: Long,
     val blurhashes: List<BlurHashDef>?,
     val crossPostedSubject: String?,
@@ -90,9 +86,9 @@ data class CrossPostView(
     val crossPostedUpvoteCount: Int,
     val crossPostedLegacyReplyCount: Int,
     val crossPostedCommentCount: Int,
-    val crossPostedRelayUrl: RelayUrl,
-    val crossPostedId: EventIdHex,
-    val crossPostedPubkey: PubkeyHex,
+    val crossPostedRelayUrl: String,
+    val crossPostedId: String,
+    val crossPostedPubkey: String,
     val crossPostedAuthorName: String?,
     val crossPostedAuthorIsFriend: Boolean,
     val crossPostedAuthorIsTrusted: Boolean,
@@ -101,9 +97,9 @@ data class CrossPostView(
     val crossPostedIsBookmarked: Boolean,
 ) {
     fun mapToCrossPostUI(
-        forcedVotes: Map<EventIdHex, Boolean>,
-        forcedFollows: Map<PubkeyHex, Boolean>,
-        forcedBookmarks: Map<EventIdHex, Boolean>,
+        forcedVotes: Map<String, Boolean>,
+        forcedFollows: Map<String, Boolean>,
+        forcedBookmarks: Map<String, Boolean>,
         ourPubKey: String,
         annotatedStringProvider: AnnotatedStringProvider,
     ): CrossPost {

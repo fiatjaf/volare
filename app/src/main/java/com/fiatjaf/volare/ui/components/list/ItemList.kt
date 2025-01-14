@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.ComposableContent
 import com.fiatjaf.volare.ui.components.button.RemoveIconButton
 import com.fiatjaf.volare.ui.components.indicator.BaseHint
 import com.fiatjaf.volare.ui.components.row.ClickableRow
@@ -23,8 +22,8 @@ fun ItemList(
     state: LazyListState,
     isRemovable: Boolean,
     modifier: Modifier = Modifier,
-    firstRow: ComposableContent = {},
-    lastRow: ComposableContent = {},
+    firstRow:  () -> Unit = {},
+    lastRow:  () -> Unit = {},
     onRemove: (Int) -> Unit = {},
     onClick: (Int) -> Unit = {},
 ) {

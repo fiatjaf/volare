@@ -2,16 +2,12 @@ package com.fiatjaf.volare.ui.model
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.FollowProfile
 import com.fiatjaf.volare.core.FollowTopic
 import com.fiatjaf.volare.core.MuteProfile
 import com.fiatjaf.volare.core.MuteTopic
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenProfile
 import com.fiatjaf.volare.core.OpenTopic
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.UnfollowProfile
 import com.fiatjaf.volare.core.UnfollowTopic
 import com.fiatjaf.volare.core.UnmuteProfile
@@ -26,16 +22,16 @@ import com.fiatjaf.volare.ui.theme.getTrustColor
 
 sealed class FollowableOrMutableItem(
     open val label: String,
-    open val icon: ComposableContent,
-    open val button: ComposableContent,
-    open val onOpen: Fn,
+    open val icon:  () -> Unit,
+    open val button:  () -> Unit,
+    open val onOpen: () -> Unit,
 )
 
 sealed class FollowableItem(
     override val label: String,
-    override val icon: ComposableContent,
-    override val button: ComposableContent,
-    override val onOpen: Fn,
+    override val icon:  () -> Unit,
+    override val button:  () -> Unit,
+    override val onOpen: () -> Unit,
 ) : FollowableOrMutableItem(
     label = label,
     icon = icon,
@@ -45,7 +41,7 @@ sealed class FollowableItem(
 
 data class FollowableProfileItem(
     val profile: AdvancedProfileView,
-    val onUpdate: OnUpdate,
+    val onUpdate: (UIEvent) -> Unit,
 ) : FollowableItem(
     label = profile.name,
     icon = { TrustIcon(profile = profile) },
@@ -60,9 +56,9 @@ data class FollowableProfileItem(
 )
 
 data class FollowableTopicItem(
-    val topic: Topic,
+    val topic: String,
     val isFollowed: Boolean,
-    val onUpdate: OnUpdate,
+    val onUpdate: (UIEvent) -> Unit,
 ) : FollowableItem(
     label = topic,
     icon = { Icon(imageVector = HashtagIcon, contentDescription = null) },
@@ -78,7 +74,7 @@ data class FollowableTopicItem(
 
 data class MutableProfileItem(
     val profile: AdvancedProfileView,
-    val onUpdate: OnUpdate,
+    val onUpdate: (UIEvent) -> Unit,
 ) : FollowableOrMutableItem(
     label = profile.name,
     icon = { TrustIcon(profile = profile) },
@@ -93,9 +89,9 @@ data class MutableProfileItem(
 )
 
 data class MutableTopicItem(
-    val topic: Topic,
+    val topic: String,
     val isMuted: Boolean,
-    val onUpdate: OnUpdate,
+    val onUpdate: (UIEvent) -> Unit,
 ) : FollowableOrMutableItem(
     label = topic,
     icon = {

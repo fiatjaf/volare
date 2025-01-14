@@ -2,11 +2,9 @@ package com.fiatjaf.volare.data.nostr
 
 import android.util.Log
 import com.fiatjaf.volare.core.DELAY_1SEC
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.LAZY_RND_RESUB_LIMIT
 import com.fiatjaf.volare.core.MAX_KEYS
 import com.fiatjaf.volare.core.MAX_KEYS_SQL
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.mergeRelayFilters
 import com.fiatjaf.volare.core.utils.takeRandom
 import com.fiatjaf.volare.data.account.AccountManager
@@ -145,7 +143,7 @@ class LazyNostrSubscriber(
         }
     }
 
-    suspend fun lazySubRepliesAndVotes(parentId: EventIdHex) {
+    suspend fun lazySubRepliesAndVotes(parentId: String) {
         Log.d(TAG, "lazySubRepliesAndVotes for parent $parentId")
 
         val id = EventId.fromHex(parentId)
@@ -168,7 +166,7 @@ class LazyNostrSubscriber(
     }
 
     suspend fun lazySubUnknownProfiles() {
-        val pubkeys = mutableListOf<PubkeyHex>()
+        val pubkeys = mutableListOf<String>()
         pubkeys.addAll(friendProvider.getFriendsWithMissingProfile())
         pubkeys.addAll(webOfTrustProvider.getWotWithMissingProfile().minus(pubkeys.toSet()))
 
@@ -263,8 +261,8 @@ class LazyNostrSubscriber(
 
     private suspend fun getNewestNip65sFilters(
         selection: PubkeySelection,
-        excludePubkeys: Set<PubkeyHex> = emptySet()
-    ): Map<RelayUrl, List<Filter>> {
+        excludePubkeys: Set<String> = emptySet()
+    ): Map<String, List<Filter>> {
         val pubkeys = pubkeyProvider.getPubkeys(selection = selection)
             .minus(excludePubkeys)
             .map { PublicKey.fromHex(it) }
@@ -299,7 +297,7 @@ class LazyNostrSubscriber(
         }
     }
 
-    private suspend fun getNewestWotPubkeysFilters(until: Timestamp): Map<RelayUrl, List<Filter>> {
+    private suspend fun getNewestWotPubkeysFilters(until: Timestamp): Map<String, List<Filter>> {
         val newestCreatedAt = webOfTrustProvider.getNewestCreatedAt()?.toULong()
             ?: return emptyMap()
         if (newestCreatedAt >= until.asSecs()) return emptyMap()

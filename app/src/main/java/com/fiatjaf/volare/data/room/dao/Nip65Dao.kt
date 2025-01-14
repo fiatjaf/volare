@@ -2,29 +2,27 @@ package com.fiatjaf.volare.data.room.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.nostr.Nip65Relay
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.room.entity.lists.Nip65Entity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface Nip65Dao {
     @Query("SELECT * FROM nip65 WHERE pubkey = :pubkey")
-    fun getNip65EntityFlow(pubkey: PubkeyHex): Flow<List<Nip65Entity>>
+    fun getNip65EntityFlow(pubkey: String): Flow<List<Nip65Entity>>
 
     @Query(
         "SELECT url, isRead, isWrite " +
                 "FROM nip65 " +
                 "WHERE pubkey = :pubkey"
     )
-    fun getNip65Flow(pubkey: PubkeyHex): Flow<List<Nip65Relay>>
+    fun getNip65Flow(pubkey: String): Flow<List<Nip65Relay>>
 
     @Query("SELECT * FROM nip65 WHERE pubkey IN (:pubkeys) AND isRead = 1")
-    suspend fun getReadRelays(pubkeys: Collection<PubkeyHex>): List<Nip65Entity>
+    suspend fun getReadRelays(pubkeys: Collection<String>): List<Nip65Entity>
 
     @Query("SELECT DISTINCT * FROM nip65 WHERE pubkey IN (:pubkeys) AND isWrite = 1")
-    suspend fun getWriteRelays(pubkeys: Collection<PubkeyHex>): List<Nip65Entity>
+    suspend fun getWriteRelays(pubkeys: Collection<String>): List<Nip65Entity>
 
     @Query(
         "SELECT DISTINCT * " +
@@ -46,7 +44,7 @@ interface Nip65Dao {
     suspend fun getNewestCreatedAt(): Long?
 
     @Query("SELECT MAX(createdAt) FROM nip65 WHERE pubkey = :pubkey")
-    suspend fun getNewestCreatedAt(pubkey: PubkeyHex): Long?
+    suspend fun getNewestCreatedAt(pubkey: String): Long?
 
     @Query(
         "SELECT url " +
@@ -56,12 +54,12 @@ interface Nip65Dao {
                 "ORDER BY COUNT(url) DESC " +
                 "LIMIT :limit"
     )
-    suspend fun getPopularRelays(limit: Int): List<RelayUrl>
+    suspend fun getPopularRelays(limit: Int): List<String>
 
     @Query(
         "SELECT DISTINCT pubkey " +
                 "FROM nip65 " +
                 "WHERE pubkey IN (:pubkeys) "
     )
-    suspend fun filterKnownPubkeys(pubkeys: List<PubkeyHex>): List<PubkeyHex>
+    suspend fun filterKnownPubkeys(pubkeys: List<String>): List<String>
 }

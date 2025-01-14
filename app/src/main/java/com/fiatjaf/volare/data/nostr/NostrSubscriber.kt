@@ -3,8 +3,6 @@ package com.fiatjaf.volare.data.nostr
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableLongStateOf
 import com.fiatjaf.volare.core.DEBOUNCE
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.RESUB_TIMEOUT
 import com.fiatjaf.volare.core.model.Poll
 import com.fiatjaf.volare.data.account.AccountManager
@@ -139,8 +137,8 @@ class NostrSubscriber(
 
     private val isSubbingVotes = AtomicBoolean(false)
     private val lastVoteUpdate = mutableLongStateOf(System.currentTimeMillis())
-    private val voteCache = mutableSetOf<EventIdHex>()
-    fun subVotes(parentIds: Collection<EventIdHex>) {
+    private val voteCache = mutableSetOf<String>()
+    fun subVotes(parentIds: Collection<String>) {
         subReactoryEvents(
             parentIds = parentIds,
             isSubbing = isSubbingVotes,
@@ -153,8 +151,8 @@ class NostrSubscriber(
 
     private val isSubbingReplies = AtomicBoolean(false)
     private val lastReplyUpdate = mutableLongStateOf(System.currentTimeMillis())
-    private val replyCache = mutableSetOf<EventIdHex>()
-    fun subReplies(parentIds: Collection<EventIdHex>) {
+    private val replyCache = mutableSetOf<String>()
+    fun subReplies(parentIds: Collection<String>) {
         subReactoryEvents(
             parentIds = parentIds,
             isSubbing = isSubbingReplies,
@@ -166,10 +164,10 @@ class NostrSubscriber(
     }
 
     private fun subReactoryEvents(
-        parentIds: Collection<EventIdHex>,
+        parentIds: Collection<String>,
         isSubbing: AtomicBoolean,
         lastUpdate: MutableState<Long>,
-        cache: MutableSet<EventIdHex>,
+        cache: MutableSet<String>,
         isVote: Boolean,
         isReply: Boolean,
     ) {
@@ -198,7 +196,7 @@ class NostrSubscriber(
     }
 
 
-    private val pollCache = mutableSetOf<EventIdHex>()
+    private val pollCache = mutableSetOf<String>()
     private var lastPollUpdate = System.currentTimeMillis()
     private val isSubbingPolls = AtomicBoolean(false)
 
@@ -265,9 +263,9 @@ class NostrSubscriber(
         }
     }
 
-    private val pubkeyCache = mutableSetOf<PubkeyHex>()
+    private val pubkeyCache = mutableSetOf<String>()
     private val isSubbingProfiles = AtomicBoolean(false)
-    fun subProfiles(pubkeys: Collection<PubkeyHex>) {
+    fun subProfiles(pubkeys: Collection<String>) {
         if (pubkeys.isEmpty()) return
 
         val newPubkeys = pubkeys - pubkeyCache

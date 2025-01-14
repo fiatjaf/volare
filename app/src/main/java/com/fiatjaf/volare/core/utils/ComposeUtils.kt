@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.MAX_TOPICS
-import com.fiatjaf.volare.core.ManagedLauncher
 
 
 @Composable
@@ -50,7 +49,7 @@ fun canAddAnotherTopic(selectedItemLength: Int, maxItems: Int = MAX_TOPICS): Boo
 }
 
 @Composable
-fun getSimpleLauncher(): ManagedLauncher {
+fun getSimpleLauncher(): ManagedActivityResultLauncher<Intent, ActivityResult> {
     return rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
         onResult = {}

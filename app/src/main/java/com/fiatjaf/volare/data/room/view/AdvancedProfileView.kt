@@ -1,7 +1,6 @@
 package com.fiatjaf.volare.data.room.view
 
 import androidx.room.DatabaseView
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.toShortenedBech32
 import com.fiatjaf.volare.data.nostr.createNprofile
 import rust.nostr.sdk.Nip19Profile
@@ -16,7 +15,7 @@ import rust.nostr.sdk.Nip19Profile
             "FROM profile "
 )
 data class AdvancedProfileView(
-    val pubkey: PubkeyHex = "",
+    val pubkey: String = "",
     val name: String = pubkey.toShortenedBech32(),
     val isFriend: Boolean = false,
     val isWebOfTrust: Boolean = false,

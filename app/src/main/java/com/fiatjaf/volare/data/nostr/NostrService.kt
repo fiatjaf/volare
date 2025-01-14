@@ -3,11 +3,7 @@ package com.fiatjaf.volare.data.nostr
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import com.fiatjaf.volare.core.AUTH_TIMEOUT
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.MAX_KEYS_SQL
-import com.fiatjaf.volare.core.OptionId
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.model.BadConnection
 import com.fiatjaf.volare.core.model.Connected
 import com.fiatjaf.volare.core.model.ConnectionStatus
@@ -32,19 +28,19 @@ class NostrService(
     private val nostrClient: NostrClient,
     private val eventQueue: EventQueue,
     private val eventMaker: EventMaker,
-    private val filterCache: MutableMap<SubId, List<Filter>>,
+    private val filterCache: MutableMap<String, List<Filter>>,
     private val relayPreferences: RelayPreferences,
-    private val connectionStatuses: MutableState<Map<RelayUrl, ConnectionStatus>>,
+    private val connectionStatuses: MutableState<Map<String, ConnectionStatus>>,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private val listener = object : INostrListener {
-        override fun onOpen(relayUrl: RelayUrl, msg: String) {
+        override fun onOpen(relayUrl: String, msg: String) {
             Log.i(TAG, "OnOpen($relayUrl): $msg")
             addConnectionStatus(relayUrl = relayUrl, status = Connected)
         }
 
-        override fun onEvent(subId: SubId, event: Event, relayUrl: RelayUrl?) {
+        override fun onEvent(subId: String, event: Event, relayUrl: String?) {
             if (!relayUrl.isNullOrEmpty() && /*eventCounter.isExceedingLimit(subId = subId)*/) {
                 nostrClient.removeRelay(
                     relayUrl = relayUrl,
@@ -58,37 +54,37 @@ class NostrService(
             eventQueue.submit(event = event, subId = subId, relayUrl = relayUrl)
         }
 
-        override fun onError(relayUrl: RelayUrl, msg: String, throwable: Throwable?) {
+        override fun onError(relayUrl: String, msg: String, throwable: Throwable?) {
             Log.w(TAG, "OnError($relayUrl): $msg", throwable)
         }
 
-        override fun onEOSE(relayUrl: RelayUrl, subId: SubId) {
+        override fun onEOSE(relayUrl: String, subId: String) {
             Log.d(TAG, "OnEOSE($relayUrl): $subId")
             nostrClient.unsubscribe(subId)
         }
 
-        override fun onClosed(relayUrl: RelayUrl, subId: SubId, reason: String) {
+        override fun onClosed(relayUrl: String, subId: String, reason: String) {
             Log.d(TAG, "OnClosed($relayUrl): $subId, reason: $reason")
         }
 
-        override fun onClose(relayUrl: RelayUrl, reason: String) {
+        override fun onClose(relayUrl: String, reason: String) {
             Log.i(TAG, "OnClose($relayUrl): $reason")
             addConnectionStatus(relayUrl = relayUrl, status = BadConnection)
         }
 
-        override fun onFailure(relayUrl: RelayUrl, msg: String?, throwable: Throwable?) {
+        override fun onFailure(relayUrl: String, msg: String?, throwable: Throwable?) {
             Log.i(TAG, "OnFailure($relayUrl): $msg", throwable)
             addConnectionStatus(relayUrl = relayUrl, status = BadConnection)
         }
 
-        override fun onOk(relayUrl: RelayUrl, eventId: EventId, accepted: Boolean, msg: String) {
+        override fun onOk(relayUrl: String, eventId: EventId, accepted: Boolean, msg: String) {
             Log.d(
                 TAG,
                 "OnOk($relayUrl): ${eventId.toHex()}, accepted=$accepted, ${msg.ifBlank { "No message" }}"
             )
         }
 
-        override fun onAuth(relayUrl: RelayUrl, challenge: String) {
+        override fun onAuth(relayUrl: String, challenge: String) {
             Log.d(TAG, "OnAuth($relayUrl): challenge=$challenge")
 
             if (!relayPreferences.getSendAuth()) {
@@ -102,7 +98,7 @@ class NostrService(
         }
     }
 
-    fun initialize(initRelayUrls: Collection<RelayUrl>) {
+    fun initialize(initRelayUrls: Collection<String>) {
         nostrClient.setListener(listener)
         Log.i(TAG, "Add ${initRelayUrls.size} relays: $initRelayUrls")
 
@@ -111,7 +107,7 @@ class NostrService(
         }
     }
 
-    fun publishJson(eventJson: String, relayUrls: Collection<RelayUrl>): Result<Event> {
+    fun publishJson(eventJson: String, relayUrls: Collection<String>): Result<Event> {
         return runCatching { Event.fromJson(json = eventJson) }
             .onSuccess { event ->
                 nostrClient.publishToRelays(event = event, relayUrls = relayUrls)
@@ -124,10 +120,10 @@ class NostrService(
     suspend fun publishPost(
         subject: String,
         content: String,
-        topics: List<Topic>,
-        mentions: List<PubkeyHex>,
+        topics: List<String>,
+        mentions: List<String>,
         quotes: List<String>,
-        relayUrls: Collection<RelayUrl>,
+        relayUrls: Collection<String>,
         isAnon: Boolean,
     ): Result<Event> {
         return eventMaker.buildPost(
@@ -145,11 +141,11 @@ class NostrService(
         question: String,
         options: List<String>,
         endsAt: Long,
-        pollRelays: List<RelayUrl>,
-        topics: List<Topic>,
-        mentions: List<PubkeyHex>,
+        pollRelays: List<String>,
+        topics: List<String>,
+        mentions: List<String>,
         quotes: List<String>,
-        relayUrls: Collection<RelayUrl>,
+        relayUrls: Collection<String>,
         isAnon: Boolean,
     ): Result<Event> {
         return eventMaker.buildPoll(
@@ -168,10 +164,10 @@ class NostrService(
     suspend fun publishLegacyReply(
         content: String,
         parent: Event,
-        mentions: List<PubkeyHex>,
+        mentions: List<String>,
         quotes: List<String>,
-        relayHint: RelayUrl?,
-        relayUrls: Collection<RelayUrl>,
+        relayHint: String?,
+        relayUrls: Collection<String>,
         isAnon: Boolean,
     ): Result<Event> {
         return eventMaker.buildReply(
@@ -188,11 +184,11 @@ class NostrService(
     suspend fun publishComment(
         content: String,
         parent: Event,
-        mentions: List<PubkeyHex>,
+        mentions: List<String>,
         quotes: List<String>,
-        topics: List<Topic>,
-        relayHint: RelayUrl?,
-        relayUrls: Collection<RelayUrl>,
+        topics: List<String>,
+        relayHint: String?,
+        relayUrls: Collection<String>,
         isAnon: Boolean,
     ): Result<Event> {
         return eventMaker.buildComment(
@@ -209,9 +205,9 @@ class NostrService(
 
     suspend fun publishCrossPost(
         crossPostedEvent: Event,
-        topics: List<Topic>,
-        relayHint: RelayUrl,
-        relayUrls: Collection<RelayUrl>,
+        topics: List<String>,
+        relayHint: String,
+        relayUrls: Collection<String>,
         isAnon: Boolean,
     ): Result<Event> {
         return eventMaker.buildCrossPost(
@@ -227,7 +223,7 @@ class NostrService(
         eventId: EventId,
         content: String,
         mention: PublicKey,
-        relayUrls: Collection<RelayUrl>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         return eventMaker.buildVote(
             eventId = eventId,
@@ -239,8 +235,8 @@ class NostrService(
 
     suspend fun publishPollResponse(
         pollId: EventId,
-        optionId: OptionId,
-        relayUrls: Collection<RelayUrl>,
+        optionId: String,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         return eventMaker.buildPollResponse(pollId = pollId, optionId = optionId)
             .onSuccess { nostrClient.publishToRelays(event = it, relayUrls = relayUrls) }
@@ -248,7 +244,7 @@ class NostrService(
 
     suspend fun publishDelete(
         eventId: EventId,
-        relayUrls: Collection<RelayUrl>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         return eventMaker.buildDelete(eventId = eventId)
             .onSuccess { nostrClient.publishToRelays(event = it, relayUrls = relayUrls) }
@@ -256,15 +252,15 @@ class NostrService(
 
     suspend fun publishListDeletion(
         identifier: String,
-        relayUrls: Collection<RelayUrl>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         return eventMaker.buildListDelete(identifier = identifier)
             .onSuccess { nostrClient.publishToRelays(event = it, relayUrls = relayUrls) }
     }
 
     suspend fun publishTopicList(
-        topics: List<Topic>,
-        relayUrls: Collection<RelayUrl>,
+        topics: List<String>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         if (topics.size > MAX_KEYS_SQL) {
             return Result.failure(IllegalArgumentException("Too many topics"))
@@ -275,8 +271,8 @@ class NostrService(
     }
 
     suspend fun publishBookmarkList(
-        postIds: List<EventIdHex>,
-        relayUrls: Collection<RelayUrl>,
+        postIds: List<String>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         if (postIds.size > MAX_KEYS_SQL) {
             return Result.failure(IllegalArgumentException("Too many bookmarks"))
@@ -287,10 +283,10 @@ class NostrService(
     }
 
     suspend fun publishMuteList(
-        pubkeys: List<PubkeyHex>,
-        topics: List<Topic>,
+        pubkeys: List<String>,
+        topics: List<String>,
         words: List<String>,
-        relayUrls: Collection<RelayUrl>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         if (pubkeys.size + topics.size + words.size > MAX_KEYS_SQL) {
             return Result.failure(IllegalArgumentException("Too many mutes"))
@@ -301,8 +297,8 @@ class NostrService(
     }
 
     suspend fun publishContactList(
-        pubkeys: List<PubkeyHex>,
-        relayUrls: Collection<RelayUrl>,
+        pubkeys: List<String>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         if (pubkeys.size > MAX_KEYS_SQL) {
             return Result.failure(IllegalArgumentException("Too many contacts"))
@@ -314,7 +310,7 @@ class NostrService(
 
     suspend fun publishNip65(
         relays: List<Nip65Relay>,
-        relayUrls: Collection<RelayUrl>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         return eventMaker.buildNip65(relays = relays)
             .onSuccess { nostrClient.publishToRelays(event = it, relayUrls = relayUrls) }
@@ -325,7 +321,7 @@ class NostrService(
         title: String,
         description: String,
         pubkeys: List<PublicKey>,
-        relayUrls: Collection<RelayUrl>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         if (pubkeys.size > MAX_KEYS_SQL) {
             return Result.failure(IllegalArgumentException("Too many profiles"))
@@ -344,8 +340,8 @@ class NostrService(
         identifier: String,
         title: String,
         description: String,
-        topics: List<Topic>,
-        relayUrls: Collection<RelayUrl>,
+        topics: List<String>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         if (topics.size > MAX_KEYS_SQL) {
             return Result.failure(IllegalArgumentException("Too many topics"))
@@ -362,7 +358,7 @@ class NostrService(
 
     suspend fun publishProfile(
         metadata: Metadata,
-        relayUrls: Collection<RelayUrl>,
+        relayUrls: Collection<String>,
     ): Result<Event> {
         return eventMaker.buildProfile(metadata = metadata)
             .onSuccess { nostrClient.publishToRelays(event = it, relayUrls = relayUrls) }
@@ -373,9 +369,9 @@ class NostrService(
         subject: String,
         content: String,
         label: String,
-        mentions: List<PubkeyHex>,
+        mentions: List<String>,
         quotes: List<String>,
-        relayUrls: Collection<RelayUrl>,
+        relayUrls: Collection<String>,
         isAnon: Boolean,
     ): Result<Event> {
         return eventMaker.buildGitIssue(
@@ -399,8 +395,8 @@ class NostrService(
         nostrClient.close()
     }
 
-    private val lastAuths = mutableMapOf<RelayUrl, Long>()
-    private suspend fun sendAuth(relayUrl: RelayUrl, challenge: String) {
+    private val lastAuths = mutableMapOf<String, Long>()
+    private suspend fun sendAuth(relayUrl: String, challenge: String) {
         val current = System.currentTimeMillis()
         synchronized(lastAuths) {
             val last = lastAuths.putIfAbsent(relayUrl, current)
@@ -419,7 +415,7 @@ class NostrService(
             .onFailure { Log.w(TAG, "Failed to sign AUTH event for $relayUrl") }
     }
 
-    private fun addConnectionStatus(relayUrl: RelayUrl, status: ConnectionStatus) {
+    private fun addConnectionStatus(relayUrl: String, status: ConnectionStatus) {
         synchronized(connectionStatuses) {
             connectionStatuses.value = connectionStatuses.value.let {
                 val mutable = it.toMutableMap()

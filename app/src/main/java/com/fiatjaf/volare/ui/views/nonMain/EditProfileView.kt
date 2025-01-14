@@ -24,7 +24,6 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.GoBack
 import com.fiatjaf.volare.core.LoadFullProfile
 import com.fiatjaf.volare.core.MAX_SUBJECT_LINES
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.SaveProfile
 import com.fiatjaf.volare.core.utils.normalizeName
 import com.fiatjaf.volare.core.viewModel.EditProfileViewModel
@@ -39,7 +38,7 @@ import rust.nostr.sdk.MetadataRecord
 fun EditProfileView(
     vm: EditProfileViewModel,
     snackbar: SnackbarHostState,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val isSaving by vm.isSaving
     val fullProfile by vm.fullProfile

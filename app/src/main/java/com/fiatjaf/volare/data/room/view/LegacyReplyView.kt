@@ -1,12 +1,9 @@
 package com.fiatjaf.volare.data.room.view
 
 import androidx.room.DatabaseView
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.BlurHashDef
 import com.fiatjaf.volare.core.model.LegacyReply
 import com.fiatjaf.volare.core.model.TrustType
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.provider.AnnotatedStringProvider
 import com.fiatjaf.volare.ui.components.row.mainEvent.ThreadReplyCtx
 
@@ -37,9 +34,9 @@ private const val COMMENT_COUNT =
             "JOIN mainEvent ON mainEvent.id = legacyReply.eventId"
 )
 data class LegacyReplyView(
-    val id: EventIdHex,
-    val parentId: EventIdHex,
-    val pubkey: PubkeyHex,
+    val id: String,
+    val parentId: String,
+    val pubkey: String,
     val authorName: String?,
     val content: String,
     val createdAt: Long,
@@ -50,7 +47,7 @@ data class LegacyReplyView(
     val upvoteCount: Int,
     val legacyReplyCount: Int,
     val commentCount: Int,
-    val relayUrl: RelayUrl,
+    val relayUrl: String,
     val isBookmarked: Boolean,
     val isMentioningMe: Boolean,
     val blurhashes: List<BlurHashDef>?,
@@ -58,11 +55,11 @@ data class LegacyReplyView(
     fun mapToThreadReplyCtx(
         level: Int,
         isOp: Boolean,
-        forcedVotes: Map<EventIdHex, Boolean>,
-        forcedFollows: Map<PubkeyHex, Boolean>,
-        forcedBookmarks: Map<EventIdHex, Boolean>,
-        collapsedIds: Set<EventIdHex>,
-        parentIds: Set<EventIdHex>,
+        forcedVotes: Map<String, Boolean>,
+        forcedFollows: Map<String, Boolean>,
+        forcedBookmarks: Map<String, Boolean>,
+        collapsedIds: Set<String>,
+        parentIds: Set<String>,
         ourPubKey: String,
         annotatedStringProvider: AnnotatedStringProvider,
     ): ThreadReplyCtx {
@@ -82,9 +79,9 @@ data class LegacyReplyView(
     }
 
     fun mapToLegacyReplyUI(
-        forcedVotes: Map<EventIdHex, Boolean>,
-        forcedFollows: Map<PubkeyHex, Boolean>,
-        forcedBookmarks: Map<EventIdHex, Boolean>,
+        forcedVotes: Map<String, Boolean>,
+        forcedFollows: Map<String, Boolean>,
+        forcedBookmarks: Map<String, Boolean>,
         ourPubKey: String,
         annotatedStringProvider: AnnotatedStringProvider
     ): LegacyReply {

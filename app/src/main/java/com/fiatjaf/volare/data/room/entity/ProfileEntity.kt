@@ -3,7 +3,6 @@ package com.fiatjaf.volare.data.room.entity
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.getNormalizedName
 import com.fiatjaf.volare.data.event.ValidatedProfile
 
@@ -14,7 +13,7 @@ import com.fiatjaf.volare.data.event.ValidatedProfile
     ]
 )
 data class ProfileEntity(
-    @PrimaryKey val pubkey: PubkeyHex,
+    @PrimaryKey val pubkey: String,
     val name: String,
     val createdAt: Long,
 ) {

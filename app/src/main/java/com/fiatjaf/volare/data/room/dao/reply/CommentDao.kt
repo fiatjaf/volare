@@ -2,8 +2,6 @@ package com.fiatjaf.volare.data.room.dao.reply
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.room.view.CommentView
 import kotlinx.coroutines.flow.Flow
 
@@ -22,14 +20,14 @@ interface CommentDao {
         ORDER BY createdAt ASC
     """
     )
-    fun getCommentsFlow(parentIds: Collection<EventIdHex>): Flow<List<CommentView>>
+    fun getCommentsFlow(parentIds: Collection<String>): Flow<List<CommentView>>
 
     @Query("SELECT * FROM CommentView WHERE id = :id")
-    fun getCommentFlow(id: EventIdHex): Flow<CommentView?>
+    fun getCommentFlow(id: String): Flow<CommentView?>
 
     @Query(PROFILE_COMMENT_FEED_QUERY)
-    fun getProfileCommentFlow(pubkey: PubkeyHex, until: Long, size: Int): Flow<List<CommentView>>
+    fun getProfileCommentFlow(pubkey: String, until: Long, size: Int): Flow<List<CommentView>>
 
     @Query(PROFILE_COMMENT_FEED_QUERY)
-    suspend fun getProfileComments(pubkey: PubkeyHex, until: Long, size: Int): List<CommentView>
+    suspend fun getProfileComments(pubkey: String, until: Long, size: Int): List<CommentView>
 }

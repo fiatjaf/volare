@@ -2,7 +2,6 @@ package com.fiatjaf.volare.data.room.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.data.room.view.CommentView
 import com.fiatjaf.volare.data.room.view.LegacyReplyView
 import com.fiatjaf.volare.data.room.view.PollOptionView
@@ -38,10 +37,10 @@ interface BookmarkDao {
     suspend fun getMaxCreatedAt(): Long?
 
     @Query("SELECT eventId FROM bookmark")
-    suspend fun getMyBookmarks(): List<EventIdHex>
+    suspend fun getMyBookmarks(): List<String>
 
     @Query("SELECT eventId FROM bookmark WHERE eventId NOT IN (SELECT id FROM mainEvent)")
-    suspend fun getUnknownBookmarks(): List<EventIdHex>
+    suspend fun getUnknownBookmarks(): List<String>
 
     @Query(ROOT_QUERY)
     fun getRootPostsFlow(until: Long, size: Int): Flow<List<RootPostView>>

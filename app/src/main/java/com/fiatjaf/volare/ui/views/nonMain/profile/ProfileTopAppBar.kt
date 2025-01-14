@@ -8,7 +8,6 @@ import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.ClickEditProfile
 import com.fiatjaf.volare.core.FollowProfile
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.UnfollowProfile
 import com.fiatjaf.volare.core.model.ItemSetProfile
 import com.fiatjaf.volare.data.model.FullProfileUI
@@ -24,7 +23,7 @@ fun ProfileTopAppBar(
     profile: FullProfileUI,
     addableLists: List<ItemSetMeta>,
     nonAddableLists: List<ItemSetMeta>,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     SimpleGoBackTopAppBar(
         title = profile.inner.name,

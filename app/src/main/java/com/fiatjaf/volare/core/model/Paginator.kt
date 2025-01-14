@@ -5,7 +5,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.fiatjaf.volare.core.DELAY_1SEC
 import com.fiatjaf.volare.core.FEED_PAGE_SIZE
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.SHORT_DEBOUNCE
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.data.model.FeedSetting
@@ -69,7 +68,7 @@ class Paginator(
         }
     }
 
-    fun refresh(onSub: Fn? = null) {
+    fun refresh(onSub: () -> Unit? = null) {
         if (isRefreshing.value) return
 
         isRefreshing.value = true

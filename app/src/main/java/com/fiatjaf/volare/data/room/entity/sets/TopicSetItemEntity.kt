@@ -2,7 +2,6 @@ package com.fiatjaf.volare.data.room.entity.sets
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.fiatjaf.volare.core.Topic
 
 @Entity(
     tableName = "topicSetItem",
@@ -17,5 +16,5 @@ import com.fiatjaf.volare.core.Topic
 )
 data class TopicSetItemEntity(
     val identifier: String,
-    val topic: Topic,
+    val topic: String,
 )

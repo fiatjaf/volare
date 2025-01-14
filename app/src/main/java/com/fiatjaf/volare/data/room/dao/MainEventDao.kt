@@ -3,8 +3,6 @@ package com.fiatjaf.volare.data.room.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.data.model.PostDetailsBase
 import com.fiatjaf.volare.data.room.entity.main.MainEventEntity
 import com.fiatjaf.volare.data.room.view.SimplePostView
@@ -15,13 +13,13 @@ import rust.nostr.sdk.PublicKey
 @Dao
 interface MainEventDao {
     @Query("SELECT * FROM mainEvent WHERE id = :id")
-    suspend fun getPost(id: EventIdHex): MainEventEntity?
+    suspend fun getPost(id: String): MainEventEntity?
 
     @Query("SELECT pubkey FROM mainEvent WHERE id = :id")
-    suspend fun getAuthor(id: EventIdHex): PubkeyHex?
+    suspend fun getAuthor(id: String): String?
 
     @Query("SELECT pubkey FROM mainEvent WHERE id = :id")
-    fun getAuthorFlow(id: EventIdHex): Flow<PubkeyHex?>
+    fun getAuthorFlow(id: String): Flow<String?>
 
     @Query(
         "SELECT pubkey " +
@@ -29,13 +27,13 @@ interface MainEventDao {
                 "WHERE id = (SELECT parentId FROM legacyReply WHERE eventId = :id) " +
                 "OR id = (SELECT parentId FROM comment WHERE eventId = :id)"
     )
-    suspend fun getParentAuthor(id: EventIdHex): PubkeyHex?
+    suspend fun getParentAuthor(id: String): String?
 
     @Query("SELECT json FROM mainEvent WHERE id = :id")
-    suspend fun getJson(id: EventIdHex): String?
+    suspend fun getJson(id: String): String?
 
     @Query("SELECT id, relayUrl AS firstSeenIn, createdAt, json FROM mainEvent WHERE id = :id")
-    suspend fun getPostDetails(id: EventIdHex): PostDetailsBase?
+    suspend fun getPostDetails(id: String): PostDetailsBase?
 
     suspend fun getPostsByContent(content: String, limit: Int): List<SimplePostView> {
         if (limit <= 0) return emptyList()
@@ -51,7 +49,7 @@ interface MainEventDao {
                 "AND json IS NOT NULL " +
                 "ORDER BY createdAt ASC"
     )
-    suspend fun getBookmarkedAndMyPostIds(ourPubKey: String): List<EventIdHex>
+    suspend fun getBookmarkedAndMyPostIds(ourPubKey: String): List<String>
 
     @Transaction
     suspend fun reindexMentions(newPubkey: PublicKey) {
@@ -73,11 +71,11 @@ interface MainEventDao {
     suspend fun internalResetAllMentions()
 
     @Query("UPDATE mainEvent SET isMentioningMe = 1 WHERE id = :id")
-    suspend fun internalSetMentioningMe(id: EventIdHex)
+    suspend fun internalSetMentioningMe(id: String)
 
     // Limit by 1500 or else it might take too long
     @Query("SELECT id FROM mainEvent WHERE json IS NOT NULL ORDER BY createdAt DESC LIMIT 1500")
-    suspend fun internalGetIndexableIds(): List<EventIdHex>
+    suspend fun internalGetIndexableIds(): List<String>
 
     @Query(
         "SELECT * FROM SimplePostView " +

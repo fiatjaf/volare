@@ -33,10 +33,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Bech32
-import com.fiatjaf.volare.core.ComposableContent
 import com.fiatjaf.volare.core.MAX_RELAYS
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenLightningWallet
 import com.fiatjaf.volare.core.OpenProfile
 import com.fiatjaf.volare.core.OpenRelayProfile
@@ -51,7 +48,6 @@ import com.fiatjaf.volare.core.utils.takeRandom
 import com.fiatjaf.volare.core.utils.toBech32
 import com.fiatjaf.volare.core.viewModel.ProfileViewModel
 import com.fiatjaf.volare.data.nostr.Nip65Relay
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.createNprofile
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.ui.components.Feed
@@ -71,7 +67,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileView(vm: ProfileViewModel, snackbar: SnackbarHostState, onUpdate: OnUpdate) {
+fun ProfileView(vm: ProfileViewModel, snackbar: SnackbarHostState, onUpdate: (UIEvent) -> Unit) {
     val profile by vm.profile.value.collectAsState()
     val nip65Relays by vm.nip65Relays.value.collectAsState()
     val ourPubKey by vm.ourPubKey.collectAsState("")
@@ -181,8 +177,8 @@ fun ProfileView(vm: ProfileViewModel, snackbar: SnackbarHostState, onUpdate: OnU
 
 @Composable
 private fun AboutPage(
-    npub: Bech32,
-    nprofile: Bech32,
+    npub: String,
+    nprofile: String,
     lightning: String?,
     trustedBy: AdvancedProfileView?,
     about: AnnotatedString?,
@@ -190,7 +186,7 @@ private fun AboutPage(
     state: LazyListState,
     scope: CoroutineScope,
     modifier: Modifier = Modifier,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     ProfileViewPage(isRefreshing = isRefreshing, onUpdate = onUpdate) {
         LazyColumn(modifier = modifier, state = state) {
@@ -273,7 +269,7 @@ private fun AboutPageTextRow(
     text: String,
     shortenedText: String = text,
     description: String,
-    trailingIcon: ComposableContent = {},
+    trailingIcon:  () -> Unit = {},
 ) {
     val context = LocalContext.current
     val clip = LocalClipboardManager.current
@@ -303,14 +299,14 @@ private fun AboutPageTextRow(
 
 @Composable
 fun RelayPage(
-    nip65Relays: List<RelayUrl>,
-    readOnlyRelays: List<RelayUrl>,
-    writeOnlyRelays: List<RelayUrl>,
-    seenInRelays: List<RelayUrl>,
+    nip65Relays: List<String>,
+    readOnlyRelays: List<String>,
+    writeOnlyRelays: List<String>,
+    seenInRelays: List<String>,
     isRefreshing: Boolean,
     state: LazyListState,
     modifier: Modifier = Modifier,
-    onUpdate: OnUpdate,
+    onUpdate: (UIEvent) -> Unit,
 ) {
     ProfileViewPage(isRefreshing = isRefreshing, onUpdate = onUpdate) {
         if (nip65Relays.isEmpty() &&
@@ -362,8 +358,8 @@ fun RelayPage(
 @Composable
 private fun RelaySection(
     header: String,
-    relays: List<RelayUrl>,
-    onUpdate: OnUpdate
+    relays: List<String>,
+    onUpdate: (UIEvent) -> Unit
 ) {
     Text(text = header, fontWeight = FontWeight.SemiBold)
     Spacer(modifier = Modifier.height(spacing.small))
@@ -382,7 +378,7 @@ private fun RelaySection(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProfileViewPage(isRefreshing: Boolean, onUpdate: OnUpdate, content: ComposableContent) {
+private fun ProfileViewPage(isRefreshing: Boolean, onUpdate: (UIEvent) -> Unit, content:  () -> Unit) {
     PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = { onUpdate(ProfileViewRefresh) }) {
         content()
     }

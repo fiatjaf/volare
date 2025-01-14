@@ -7,7 +7,6 @@ import com.fiatjaf.volare.core.MAX_POLL_OPTIONS
 import com.fiatjaf.volare.core.MAX_POLL_OPTION_LEN
 import com.fiatjaf.volare.core.MAX_SUBJECT_LEN
 import com.fiatjaf.volare.core.MAX_TOPIC_LEN
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.data.nostr.getDescription
 import com.fiatjaf.volare.data.nostr.getMuteWords
 import com.fiatjaf.volare.data.nostr.getPollOptions
@@ -23,20 +22,20 @@ fun Event.getNormalizedTitle() = this.getTitle()?.normalizeTitle().orEmpty()
 
 fun Event.getNormalizedDescription() = this.getDescription()?.normalizeDescription().orEmpty()
 
-fun Topic.normalizeTopic(): Topic {
+fun String.normalizeTopic(): String {
     return this.trim()
         .dropWhile { it == '#' || it.isWhitespace() }
         .take(MAX_TOPIC_LEN)
         .lowercase()
 }
 
-private fun List<Topic>.normalizeTopics(): List<Topic> {
+private fun List<String>.normalizeTopics(): List<String> {
     return this.map { it.normalizeTopic() }
         .filter { it.isBareTopicStr() }
         .distinct()
 }
 
-fun Event.getNormalizedTopics(limit: Int = Int.MAX_VALUE): List<Topic> {
+fun Event.getNormalizedTopics(limit: Int = Int.MAX_VALUE): List<String> {
     return this.tags()
         .hashtags()
         .normalizeTopics()
@@ -56,6 +55,6 @@ fun Metadata.getNormalizedName(): String {
 
 fun String.normalizeMuteWord() = this.lowercase().take(MAX_MUTE_WORD_LEN)
 
-fun Event.getNormalizedMuteWords(limit: Int = Int.MAX_VALUE): List<Topic> {
+fun Event.getNormalizedMuteWords(limit: Int = Int.MAX_VALUE): List<String> {
     return this.getMuteWords().map { it.normalizeMuteWord() }.distinct().take(limit)
 }

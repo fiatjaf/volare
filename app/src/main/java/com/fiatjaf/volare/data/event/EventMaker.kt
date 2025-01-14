@@ -1,15 +1,9 @@
 package com.fiatjaf.volare.data.event
 
 import android.util.Log
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.Label
-import com.fiatjaf.volare.core.OptionId
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.utils.createVolareClientTag
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.nostr.Nip65Relay
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.createDescriptionTag
 import com.fiatjaf.volare.data.nostr.createMentionTags
 import com.fiatjaf.volare.data.nostr.createQuoteTags
@@ -42,8 +36,8 @@ class EventMaker(
     suspend fun buildPost(
         subject: String,
         content: String,
-        topics: List<Topic>,
-        mentions: List<PubkeyHex>,
+        topics: List<String>,
+        mentions: List<String>,
         quotes: List<String>,
         isAnon: Boolean,
     ): Result<Event> {
@@ -64,9 +58,9 @@ class EventMaker(
         question: String,
         options: List<Pair<OptionId, Label>>,
         endsAt: Long,
-        pollRelays: List<RelayUrl>,
-        topics: List<Topic>,
-        mentions: List<PubkeyHex>,
+        pollRelays: List<String>,
+        topics: List<String>,
+        mentions: List<String>,
         quotes: List<String>,
         isAnon: Boolean,
     ): Result<Event> {
@@ -88,9 +82,9 @@ class EventMaker(
 
     suspend fun buildReply(
         parent: Event,
-        mentions: List<PubkeyHex>,
+        mentions: List<String>,
         quotes: List<String>,
-        relayHint: RelayUrl?,
+        relayHint: String?,
         content: String,
         isAnon: Boolean,
     ): Result<Event> {
@@ -112,10 +106,10 @@ class EventMaker(
 
     suspend fun buildComment(
         parent: Event,
-        mentions: List<PubkeyHex>,
+        mentions: List<String>,
         quotes: List<String>,
-        topics: List<Topic>,
-        relayHint: RelayUrl?,
+        topics: List<String>,
+        relayHint: String?,
         content: String,
         isAnon: Boolean,
     ): Result<Event> {
@@ -138,8 +132,8 @@ class EventMaker(
 
     suspend fun buildCrossPost(
         crossPostedEvent: Event,
-        topics: List<Topic>,
-        relayHint: RelayUrl,
+        topics: List<String>,
+        relayHint: String,
         isAnon: Boolean,
     ): Result<Event> {
         val tags = topics.map { Tag.hashtag(hashtag = it) }.toMutableList()
@@ -163,7 +157,7 @@ class EventMaker(
         return accountManager.signEvent(unsignedEvent)
     }
 
-    suspend fun buildPollResponse(pollId: EventId, optionId: OptionId): Result<Event> {
+    suspend fun buildPollResponse(pollId: EventId, optionId: String): Result<Event> {
         val unsignedEvent = EventBuilder(
             kind = Kind(kind = POLL_RESPONSE_U16),
             content = ""
@@ -197,7 +191,7 @@ class EventMaker(
         return accountManager.signEvent(unsignedEvent)
     }
 
-    suspend fun buildTopicList(topics: List<Topic>): Result<Event> {
+    suspend fun buildTopicList(topics: List<String>): Result<Event> {
         val interests = Interests(hashtags = topics)
         val unsignedEvent = EventBuilder.interests(list = interests)
             .build(accountManager.getPublicKey())
@@ -205,7 +199,7 @@ class EventMaker(
         return accountManager.signEvent(unsignedEvent)
     }
 
-    suspend fun buildBookmarkList(postIds: List<EventIdHex>): Result<Event> {
+    suspend fun buildBookmarkList(postIds: List<String>): Result<Event> {
         val bookmarks = Bookmarks(eventIds = postIds.map { EventId.fromHex(it) })
         val unsignedEvent = EventBuilder.bookmarks(list = bookmarks)
             .build(accountManager.getPublicKey())
@@ -214,8 +208,8 @@ class EventMaker(
     }
 
     suspend fun buildMuteList(
-        pubkeys: List<PubkeyHex>,
-        topics: List<Topic>,
+        pubkeys: List<String>,
+        topics: List<String>,
         words: List<String>
     ): Result<Event> {
         val mutes = MuteList(
@@ -229,7 +223,7 @@ class EventMaker(
         return accountManager.signEvent(unsignedEvent)
     }
 
-    suspend fun buildContactList(pubkeys: List<PubkeyHex>): Result<Event> {
+    suspend fun buildContactList(pubkeys: List<String>): Result<Event> {
         val contacts = pubkeys.map { Contact(pk = PublicKey.fromHex(it)) }
         val unsignedEvent = EventBuilder.contactList(list = contacts)
             .build(accountManager.getPublicKey())
@@ -238,7 +232,7 @@ class EventMaker(
     }
 
     suspend fun buildNip65(relays: List<Nip65Relay>): Result<Event> {
-        val metadata = mutableMapOf<RelayUrl, RelayMetadata?>()
+        val metadata = mutableMapOf<String, RelayMetadata?>()
 
         relays.forEach {
             if (it.isRead && it.isWrite) metadata[it.url] = null
@@ -259,7 +253,7 @@ class EventMaker(
         return accountManager.signEvent(unsignedEvent)
     }
 
-    suspend fun buildAuth(relayUrl: RelayUrl, challenge: String): Result<Event> {
+    suspend fun buildAuth(relayUrl: String, challenge: String): Result<Event> {
         Log.d(TAG, "Build AUTH for $relayUrl")
         val unsignedEvent = runCatching {
             EventBuilder.auth(challenge = challenge, relayUrl = relayUrl)
@@ -293,7 +287,7 @@ class EventMaker(
         identifier: String,
         title: String,
         description: String,
-        topics: List<Topic>
+        topics: List<String>
     ): Result<Event> {
         return buildSet(
             title = title,
@@ -307,7 +301,7 @@ class EventMaker(
         subject: String,
         content: String,
         label: String,
-        mentions: List<PubkeyHex>,
+        mentions: List<String>,
         quotes: List<String>,
         isAnon: Boolean,
     ): Result<Event> {

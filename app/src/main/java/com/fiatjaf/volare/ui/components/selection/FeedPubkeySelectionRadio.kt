@@ -3,7 +3,6 @@ package com.fiatjaf.volare.ui.components.selection
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.data.model.FeedPubkeySelection
 import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
@@ -14,7 +13,7 @@ import com.fiatjaf.volare.data.model.WebOfTrustPubkeys
 fun FeedPubkeySelectionRadio(
     current: FeedPubkeySelection,
     target: FeedPubkeySelection,
-    onClick: Fn
+    onClick: () -> Unit
 ) {
     NamedRadio(
         isSelected = current == target,

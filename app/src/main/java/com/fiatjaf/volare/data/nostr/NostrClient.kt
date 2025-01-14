@@ -18,9 +18,9 @@ private const val TAG = "Client"
 
 class NostrClient {
     private val httpClient = OkHttpClient()
-    private val sockets: MutableMap<RelayUrl, WebSocket> =
+    private val sockets: MutableMap<String, WebSocket> =
         Collections.synchronizedMap(mutableMapOf())
-    private val subscriptions: MutableMap<SubId, WebSocket> =
+    private val subscriptions: MutableMap<String, WebSocket> =
         Collections.synchronizedMap(mutableMapOf())
 
     private var nostrListener: INostrListener? = null
@@ -112,7 +112,7 @@ class NostrClient {
         nostrListener = listener
     }
 
-    fun subscribe(filters: List<Filter>, relayUrl: RelayUrl): SubId? {
+    fun subscribe(filters: List<Filter>, relayUrl: String): String? {
         if (filters.isEmpty()) return null
 
         addRelay(relayUrl)
@@ -130,7 +130,7 @@ class NostrClient {
         return subId
     }
 
-    fun unsubscribe(subId: SubId) {
+    fun unsubscribe(subId: String) {
         subscriptions[subId]?.let { socket ->
             Log.d(TAG, "Unsubscribe from $subId")
             val closeRequest = ClientMessage.close(subscriptionId = subId).asJson()
@@ -150,7 +150,7 @@ class NostrClient {
         }
     }
 
-    fun publishToRelays(event: Event, relayUrls: Collection<RelayUrl>) {
+    fun publishToRelays(event: Event, relayUrls: Collection<String>) {
         addRelays(relayUrls)
         val filteredRelays = filterSocketsByRelays(relays = relayUrls)
         val eventMessage = ClientMessage.event(event = event).asJson()
@@ -158,18 +158,18 @@ class NostrClient {
         filteredRelays.forEach { it.value.send(eventMessage) }
     }
 
-    fun addRelays(relayUrls: Collection<RelayUrl>) {
+    fun addRelays(relayUrls: Collection<String>) {
         relayUrls.forEach { addRelay(it) }
     }
 
-    fun getAllConnectedUrls(): List<RelayUrl> {
+    fun getAllConnectedUrls(): List<String> {
         val allUrls = sockets.keys
         synchronized(allUrls) {
             return allUrls.toList()
         }
     }
 
-    fun publishAuth(authEvent: Event, relayUrl: RelayUrl) {
+    fun publishAuth(authEvent: Event, relayUrl: String) {
         addRelay(relayUrl)
         val socket = sockets.entries.find { (relay, _) -> relay == relayUrl }?.value
         if (socket == null) {
@@ -182,7 +182,7 @@ class NostrClient {
         socket.send(authMsg)
     }
 
-    fun addRelay(relayUrl: RelayUrl) {
+    fun addRelay(relayUrl: String) {
         if (sockets.containsKey(relayUrl)) return
 
         Log.i(TAG, "Add relay $relayUrl")
@@ -195,7 +195,7 @@ class NostrClient {
         }
     }
 
-    fun removeRelay(relayUrl: RelayUrl, reason: String = "Normal closure") {
+    fun removeRelay(relayUrl: String, reason: String = "Normal closure") {
         Log.i(TAG, "Remove relay $relayUrl")
         val removedSocket = sockets.remove(relayUrl)
         removedSocket?.close(code = 1000, reason = reason)
@@ -208,8 +208,8 @@ class NostrClient {
         httpClient.dispatcher.executorService.shutdown()
     }
 
-    private fun getRelayUrl(webSocket: WebSocket): RelayUrl? {
-        val snapshot: List<Pair<RelayUrl, WebSocket>>
+    private fun getRelayUrl(webSocket: WebSocket): String? {
+        val snapshot: List<Pair<String, WebSocket>>
         synchronized(sockets) {
             snapshot = sockets.entries.map { Pair(it.key, it.value) }
         }
@@ -229,7 +229,7 @@ class NostrClient {
         }
     }
 
-    private fun filterSocketsByRelays(relays: Collection<RelayUrl>): List<Map.Entry<RelayUrl, WebSocket>> {
+    private fun filterSocketsByRelays(relays: Collection<String>): List<Map.Entry<String, WebSocket>> {
         val snapshot = sockets.entries.toList()
         return snapshot.filter { relays.contains(it.key) }
     }

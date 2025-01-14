@@ -13,10 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.MAX_KEYS_SQL
 import com.fiatjaf.volare.core.MuteWord
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.UnmuteWord
 import com.fiatjaf.volare.core.model.Muted
 import com.fiatjaf.volare.ui.components.SimpleTabPager
@@ -40,8 +38,8 @@ fun ProfileAndTopicList(
     pagerState: PagerState,
     words: MutableState<List<String>>? = null,
     wordState: LazyListState? = null,
-    onRefresh: Fn,
-    onUpdate: OnUpdate,
+    onRefresh: () -> Unit,
+    onUpdate: (UIEvent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     SimpleTabPager(
@@ -100,8 +98,8 @@ private fun WordList(
     totalCount: Int,
     state: LazyListState,
     isRefreshing: Boolean,
-    onRefresh: Fn,
-    onUpdate: OnUpdate
+    onRefresh: () -> Unit,
+    onUpdate: (UIEvent) -> Unit
 ) {
     val showAddWordDialog = remember { mutableStateOf(false) }
 

@@ -16,7 +16,6 @@ import com.fiatjaf.volare.core.HomeViewApplyFilter
 import com.fiatjaf.volare.core.HomeViewDismissFilter
 import com.fiatjaf.volare.core.HomeViewRefresh
 import com.fiatjaf.volare.core.HomeViewSubAccountAndTrustData
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.viewModel.HomeViewModel
 import com.fiatjaf.volare.data.model.FriendPubkeys
 import com.fiatjaf.volare.data.model.Global
@@ -34,7 +33,7 @@ import com.fiatjaf.volare.ui.theme.spacing
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeView(vm: HomeViewModel, onUpdate: OnUpdate) {
+fun HomeView(vm: HomeViewModel, onUpdate: (UIEvent) -> Unit) {
     LaunchedEffect(key1 = Unit) {
         onUpdate(HomeViewSubAccountAndTrustData)
     }

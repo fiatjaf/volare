@@ -2,7 +2,6 @@ package com.fiatjaf.volare.data.room.entity.sets
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.fiatjaf.volare.core.PubkeyHex
 
 
 @Entity(
@@ -18,5 +17,5 @@ import com.fiatjaf.volare.core.PubkeyHex
 )
 data class ProfileSetItemEntity(
     val identifier: String,
-    val pubkey: PubkeyHex,
+    val pubkey: String,
 )

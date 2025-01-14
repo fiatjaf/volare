@@ -10,12 +10,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenProfile
 import com.fiatjaf.volare.core.OpenThreadRaw
 import com.fiatjaf.volare.core.OpenTopic
 import com.fiatjaf.volare.core.SubUnknownProfiles
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.model.TrustType
 import com.fiatjaf.volare.core.viewModel.SearchViewModel
 import com.fiatjaf.volare.data.nostr.createNevent
@@ -30,7 +28,7 @@ import com.fiatjaf.volare.ui.theme.HashtagIcon
 import com.fiatjaf.volare.ui.theme.spacing
 
 @Composable
-fun SearchView(vm: SearchViewModel, onUpdate: OnUpdate) {
+fun SearchView(vm: SearchViewModel, onUpdate: (UIEvent) -> Unit) {
     val topics by vm.topics
     val profiles by vm.profiles
     val posts by vm.posts
@@ -51,10 +49,10 @@ fun SearchView(vm: SearchViewModel, onUpdate: OnUpdate) {
 @Composable
 private fun SearchViewContent(
     ourPubkey: String,
-    topics: List<Topic>,
+    topics: List<String>,
     profiles: List<AdvancedProfileView>,
     posts: List<SimplePostView>,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

@@ -38,7 +38,7 @@ class MuteListViewModel(
     private val isLoading = mutableStateOf(false)
     val mutedProfiles: MutableState<StateFlow<List<AdvancedProfileView>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
-    val mutedTopics: MutableState<StateFlow<List<TopicMuteState>>> =
+    val mutedTopics: MutableState<StateFlow<List<StringMuteState>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
     val mutedWords: MutableState<List<String>> = mutableStateOf(emptyList())
 

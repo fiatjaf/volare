@@ -2,8 +2,6 @@ package com.fiatjaf.volare.data.room.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.data.model.ItemSetMeta
 import com.fiatjaf.volare.data.room.entity.helper.TitleAndDescription
 import kotlinx.coroutines.flow.Flow
@@ -41,7 +39,7 @@ interface ItemSetDao {
                 "AND identifier NOT IN (SELECT identifier FROM profileSetItem WHERE pubkey = :pubkey) " +
                 LIST_PAIR_NOT_EMPTY
     )
-    suspend fun getAddableProfileSets(pubkey: PubkeyHex): List<ItemSetMeta>
+    suspend fun getAddableProfileSets(pubkey: String): List<ItemSetMeta>
 
     @Query(
         "SELECT identifier, title " +
@@ -50,7 +48,7 @@ interface ItemSetDao {
                 "AND identifier IN (SELECT identifier FROM profileSetItem WHERE pubkey = :pubkey) " +
                 LIST_PAIR_NOT_EMPTY
     )
-    suspend fun getNonAddableProfileSets(pubkey: PubkeyHex): List<ItemSetMeta>
+    suspend fun getNonAddableProfileSets(pubkey: String): List<ItemSetMeta>
 
     @Query(
         "SELECT identifier, title " +
@@ -59,7 +57,7 @@ interface ItemSetDao {
                 "AND identifier NOT IN (SELECT identifier FROM topicSetItem WHERE topic = :topic) " +
                 LIST_PAIR_NOT_EMPTY
     )
-    suspend fun getAddableTopicSets(topic: Topic): List<ItemSetMeta>
+    suspend fun getAddableTopicSets(topic: String): List<ItemSetMeta>
 
     @Query(
         "SELECT identifier, title " +
@@ -68,7 +66,7 @@ interface ItemSetDao {
                 "AND identifier IN (SELECT identifier FROM topicSetItem WHERE topic = :topic) " +
                 LIST_PAIR_NOT_EMPTY
     )
-    suspend fun getNonAddableTopicSets(topic: Topic): List<ItemSetMeta>
+    suspend fun getNonAddableTopicSets(topic: String): List<ItemSetMeta>
 
     @Query("SELECT title, description FROM profileSet WHERE identifier = :identifier")
     suspend fun getProfileSetTitleAndDescription(identifier: String): TitleAndDescription?
@@ -77,10 +75,10 @@ interface ItemSetDao {
     suspend fun getTopicSetTitleAndDescription(identifier: String): TitleAndDescription?
 
     @Query("SELECT DISTINCT pubkey FROM profileSetItem WHERE identifier = :identifier LIMIT :limit")
-    suspend fun getPubkeys(identifier: String, limit: Int): List<PubkeyHex>
+    suspend fun getPubkeys(identifier: String, limit: Int): List<String>
 
     @Query("SELECT DISTINCT pubkey FROM profileSetItem")
-    fun getAllPubkeysFlow(): Flow<List<PubkeyHex>>
+    fun getAllPubkeysFlow(): Flow<List<String>>
 
     @Query(
         "SELECT pubkey " +
@@ -88,5 +86,5 @@ interface ItemSetDao {
                 "WHERE identifier = :identifier " +
                 "AND pubkey NOT IN (SELECT pubkey FROM nip65) "
     )
-    suspend fun getPubkeysWithMissingNip65(identifier: String): List<PubkeyHex>
+    suspend fun getPubkeysWithMissingNip65(identifier: String): List<String>
 }

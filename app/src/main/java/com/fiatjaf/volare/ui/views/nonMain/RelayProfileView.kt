@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.viewModel.RelayProfileViewModel
 import com.fiatjaf.volare.ui.components.indicator.BaseHint
 import com.fiatjaf.volare.ui.components.indicator.FullLinearProgressIndicator
@@ -28,7 +27,7 @@ import com.fiatjaf.volare.ui.theme.spacing
 import rust.nostr.sdk.RelayInformationDocument
 
 @Composable
-fun RelayProfileView(vm: RelayProfileViewModel, snackbar: SnackbarHostState, onUpdate: OnUpdate) {
+fun RelayProfileView(vm: RelayProfileViewModel, snackbar: SnackbarHostState, onUpdate: (UIEvent) -> Unit) {
     val header by vm.header
     val profile by vm.profile
     val isLoading by vm.isLoading

@@ -5,11 +5,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.ui.theme.RemoveIcon
 
 @Composable
-fun RemoveIconButton(onRemove: Fn, description: String, color: Color = LocalContentColor.current) {
+fun RemoveIconButton(onRemove: () -> Unit, description: String, color: Color = LocalContentColor.current) {
     IconButton(onClick = onRemove) {
         Icon(
             imageVector = RemoveIcon,

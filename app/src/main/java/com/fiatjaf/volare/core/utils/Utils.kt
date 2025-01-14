@@ -12,12 +12,8 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import com.fiatjaf.volare.core.Bech32
-import com.fiatjaf.volare.core.EventIdHex
 import com.fiatjaf.volare.core.MAX_EVENTS_TO_SUB
 import com.fiatjaf.volare.core.MAX_SUBJECT_LEN
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.VOLARE
 import com.fiatjaf.volare.core.model.MainEvent
 import com.fiatjaf.volare.core.model.SomeReply
@@ -25,7 +21,6 @@ import com.fiatjaf.volare.data.event.COMMENT_U16
 import com.fiatjaf.volare.data.event.POLL_U16
 import com.fiatjaf.volare.data.model.ForcedData
 import com.fiatjaf.volare.data.model.RelevantMetadata
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.nostr.getSubject
 import com.fiatjaf.volare.data.provider.AnnotatedStringProvider
 import com.fiatjaf.volare.data.provider.FriendProvider
@@ -66,18 +61,18 @@ fun PublicKey.toShortenedNpub(): String {
 
 fun Bech32.shortenBech32() = "${this.take(10)}…${this.takeLast(5)}"
 
-fun PubkeyHex.toShortenedBech32(): String {
+fun String.toShortenedBech32(): String {
     if (this.isEmpty()) return ""
     val pubkey = runCatching { PublicKey.fromHex(this) }.getOrNull() ?: return ""
     return pubkey.toShortenedNpub()
 }
 
-fun PubkeyHex.toBech32(): String {
+fun String.toBech32(): String {
     if (this.isEmpty()) return ""
     return runCatching { PublicKey.fromHex(this).toBech32() }.getOrNull() ?: ""
 }
 
-fun Metadata.toRelevantMetadata(pubkey: PubkeyHex, createdAt: Long): RelevantMetadata {
+fun Metadata.toRelevantMetadata(pubkey: String, createdAt: Long): RelevantMetadata {
     return RelevantMetadata(
         npub = pubkey.toBech32(),
         name = this.getNormalizedName(),
@@ -182,7 +177,7 @@ fun shortenUrl(url: String): String {
 private val bareTopicRegex = Regex("[^#\\s]+\$")
 private val hashtagRegex = Regex("""#\w+(-\w+)*""")
 
-fun extractCleanHashtags(content: String): List<Topic> {
+fun extractCleanHashtags(content: String): List<String> {
     return hashtagRegex.findAll(content)
         .map { it.value.normalizeTopic() }
         .distinct()
@@ -200,8 +195,8 @@ fun copyAndToast(text: AnnotatedString, toast: String, context: Context, clip: C
     Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
 }
 
-fun mergeRelayFilters(vararg maps: Map<RelayUrl, List<Filter>>): Map<RelayUrl, List<Filter>> {
-    val result = mutableMapOf<RelayUrl, MutableList<Filter>>()
+fun mergeRelayFilters(vararg maps: Map<String, List<Filter>>): Map<String, List<Filter>> {
+    val result = mutableMapOf<String, MutableList<Filter>>()
     for (map in maps) {
         map.forEach { (relay, filters) ->
             val present = result.putIfAbsent(relay, filters.toMutableList())
@@ -318,9 +313,9 @@ fun mergeToMainEventUIList(
     pollOptions: Collection<PollOptionView>,
     legacyReplies: Collection<LegacyReplyView>,
     comments: Collection<CommentView>,
-    votes: Map<EventIdHex, Boolean>,
-    follows: Map<PubkeyHex, Boolean>,
-    bookmarks: Map<EventIdHex, Boolean>,
+    votes: Map<String, Boolean>,
+    follows: Map<String, Boolean>,
+    bookmarks: Map<String, Boolean>,
     size: Int,
     ourPubKey: String,
     annotatedStringProvider: AnnotatedStringProvider,
@@ -399,9 +394,9 @@ fun mergeToMainEventUIList(
 fun mergeToSomeReplyUIList(
     legacyReplies: Collection<LegacyReplyView>,
     comments: Collection<CommentView>,
-    votes: Map<EventIdHex, Boolean>,
-    follows: Map<PubkeyHex, Boolean>,
-    bookmarks: Map<EventIdHex, Boolean>,
+    votes: Map<String, Boolean>,
+    follows: Map<String, Boolean>,
+    bookmarks: Map<String, Boolean>,
     size: Int,
     ourPubKey: String,
     annotatedStringProvider: AnnotatedStringProvider,
@@ -427,7 +422,7 @@ fun mergeToSomeReplyUIList(
 }
 
 fun createAdvancedProfile(
-    pubkey: PubkeyHex,
+    pubkey: String,
     dbProfile: AdvancedProfileView?,
     forcedFollowState: Boolean?,
     forcedMuteState: Boolean?,

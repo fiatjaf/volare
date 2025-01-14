@@ -14,7 +14,6 @@ import com.fiatjaf.volare.core.SHORT_DEBOUNCE
 import com.fiatjaf.volare.core.SearchText
 import com.fiatjaf.volare.core.SearchViewAction
 import com.fiatjaf.volare.core.SubUnknownProfiles
-import com.fiatjaf.volare.core.Topic
 import com.fiatjaf.volare.core.UpdateSearchText
 import com.fiatjaf.volare.core.utils.isBareTopicStr
 import com.fiatjaf.volare.core.utils.launchIO
@@ -42,7 +41,7 @@ class SearchViewModel(
     private val lazyNostrSubscriber: LazyNostrSubscriber,
     private val snackbar: SnackbarHostState,
 ) : ViewModel() {
-    val topics = mutableStateOf<List<Topic>>(emptyList())
+    val topics = mutableStateOf<List<String>>(emptyList())
     val profiles = mutableStateOf<List<AdvancedProfileView>>(emptyList())
     val posts = mutableStateOf<List<SimplePostView>>(emptyList())
     val ourPubkey = accountManager.getPublicKeyHex()

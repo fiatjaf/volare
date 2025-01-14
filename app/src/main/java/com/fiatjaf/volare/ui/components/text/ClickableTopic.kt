@@ -4,13 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.fiatjaf.volare.core.Fn
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenTopic
-import com.fiatjaf.volare.core.Topic
 
 @Composable
-fun ClickableTopic(topic: Topic, onUpdate: OnUpdate, onClickAddition: Fn = {}) {
+fun ClickableTopic(topic: String, onUpdate: (UIEvent) -> Unit, onClickAddition: () -> Unit = {}) {
     Text(
         modifier = Modifier.clickable {
             onUpdate(OpenTopic(topic = topic))

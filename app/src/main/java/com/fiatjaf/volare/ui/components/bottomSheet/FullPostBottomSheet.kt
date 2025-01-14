@@ -11,14 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.ui.components.text.AnnotatedText
 import com.fiatjaf.volare.ui.theme.spacing
 import com.fiatjaf.volare.data.provider.TextItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FullPostBottomSheet(content: List<TextItem>, onDismiss: Fn) {
+fun FullPostBottomSheet(content: List<TextItem>, onDismiss: () -> Unit) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         BottomSheetColumn(header = stringResource(id = R.string.original_post)) {
             Column(

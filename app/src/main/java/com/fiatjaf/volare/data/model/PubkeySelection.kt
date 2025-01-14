@@ -1,6 +1,5 @@
 package com.fiatjaf.volare.data.model
 
-import com.fiatjaf.volare.core.PubkeyHex
 
 sealed class PubkeySelection
 
@@ -11,8 +10,8 @@ data object FriendPubkeys : FeedPubkeySelection()
 data object WebOfTrustPubkeys : FeedPubkeySelection()
 data object Global : FeedPubkeySelection()
 
-data class CustomPubkeys(val pubkeys: Collection<PubkeyHex>) : PubkeySelection()
+data class CustomPubkeys(val pubkeys: Collection<String>) : PubkeySelection()
 data class ListPubkeys(val identifier: String) : PubkeySelection()
-data class SingularPubkey(val pubkey: PubkeyHex) : PubkeySelection() {
+data class SingularPubkey(val pubkey: String) : PubkeySelection() {
     fun asList() = listOf(pubkey)
 }

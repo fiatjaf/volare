@@ -2,8 +2,6 @@ package com.fiatjaf.volare.data.room.dao.reply
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -30,11 +28,11 @@ const val PROFILE_COMMENT_FEED_EXISTS_QUERY = "SELECT EXISTS(SELECT * " +
 @Dao
 interface SomeReplyDao {
 
-    suspend fun getParentId(id: EventIdHex): EventIdHex? {
+    suspend fun getParentId(id: String): String? {
         return internalGetLegacyReplyParentId(id = id) ?: internalGetCommentParentId(id = id)
     }
 
-    fun getReplyCountFlow(parentId: EventIdHex): Flow<Int> {
+    fun getReplyCountFlow(parentId: String): Flow<Int> {
         return combine(
             internalGetLegacyReplyCountFlow(parentId = parentId),
             internalGetCommentCountFlow(parentId = parentId),
@@ -52,20 +50,20 @@ interface SomeReplyDao {
     }
 
     @Query("SELECT parentId FROM legacyReply WHERE eventId = :id")
-    suspend fun internalGetLegacyReplyParentId(id: EventIdHex): EventIdHex?
+    suspend fun internalGetLegacyReplyParentId(id: String): String?
 
     @Query("SELECT parentId FROM comment WHERE eventId = :id")
-    suspend fun internalGetCommentParentId(id: EventIdHex): EventIdHex?
+    suspend fun internalGetCommentParentId(id: String): String?
 
     // Should be like LegacyReplyDao.getRepliesFlow
     @Query("SELECT COUNT(*) FROM LegacyReplyView WHERE parentId = :parentId")
-    fun internalGetLegacyReplyCountFlow(parentId: EventIdHex): Flow<Int>
+    fun internalGetLegacyReplyCountFlow(parentId: String): Flow<Int>
 
     // Should be like CommentDao.getCommentsFlow
     @Query("SELECT COUNT(*) FROM CommentView WHERE parentId = :parentId")
-    fun internalGetCommentCountFlow(parentId: EventIdHex): Flow<Int>
+    fun internalGetCommentCountFlow(parentId: String): Flow<Int>
 
-    suspend fun getProfileRepliesCreatedAt(pubkey: PubkeyHex, until: Long, size: Int): List<Long> {
+    suspend fun getProfileRepliesCreatedAt(pubkey: String, until: Long, size: Int): List<Long> {
         val legacy = internalGetProfileLegacyRepliesCreatedAt(
             pubkey = pubkey,
             until = until,
@@ -80,7 +78,7 @@ interface SomeReplyDao {
         return (legacy + comment).sortedDescending().take(size)
     }
 
-    fun hasProfileRepliesFlow(pubkey: PubkeyHex): Flow<Boolean> {
+    fun hasProfileRepliesFlow(pubkey: String): Flow<Boolean> {
         return combine(
             internalhasProfileLegacyRepliesFlow(pubkey = pubkey),
             internalHasProfileCommentsFlow(pubkey = pubkey),
@@ -94,7 +92,7 @@ interface SomeReplyDao {
                 "FROM mainEvent " +
                 "WHERE id IN (SELECT eventId FROM legacyReply WHERE parentId = :parentId)"
     )
-    suspend fun internalGetNewestLegacyReplyCreatedAt(parentId: EventIdHex): Long?
+    suspend fun internalGetNewestLegacyReplyCreatedAt(parentId: String): Long?
 
     @Query(
         "SELECT MAX(createdAt) " +
@@ -105,21 +103,21 @@ interface SomeReplyDao {
 
     @Query(PROFILE_REPLY_FEED_CREATED_AT_QUERY)
     suspend fun internalGetProfileLegacyRepliesCreatedAt(
-        pubkey: PubkeyHex,
+        pubkey: String,
         until: Long,
         size: Int
     ): List<Long>
 
     @Query(PROFILE_COMMENT_FEED_CREATED_AT_QUERY)
     suspend fun internalGetProfileCommentsCreatedAt(
-        pubkey: PubkeyHex,
+        pubkey: String,
         until: Long,
         size: Int
     ): List<Long>
 
     @Query(PROFILE_REPLY_FEED_EXISTS_QUERY)
-    fun internalhasProfileLegacyRepliesFlow(pubkey: PubkeyHex): Flow<Boolean>
+    fun internalhasProfileLegacyRepliesFlow(pubkey: String): Flow<Boolean>
 
     @Query(PROFILE_COMMENT_FEED_EXISTS_QUERY)
-    fun internalHasProfileCommentsFlow(pubkey: PubkeyHex): Flow<Boolean>
+    fun internalHasProfileCommentsFlow(pubkey: String): Flow<Boolean>
 }

@@ -2,13 +2,12 @@ package com.fiatjaf.volare.core.navigator
 
 import androidx.compose.runtime.mutableStateOf
 import com.fiatjaf.volare.VMContainer
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.NavEvent
 import com.fiatjaf.volare.core.PopNavEvent
 import com.fiatjaf.volare.core.PushNavEvent
 import com.fiatjaf.volare.data.nostr.createNevent
 
-class Navigator(private val vmContainer: VMContainer, private val closeApp: Fn) {
+class Navigator(private val vmContainer: VMContainer, private val closeApp: () -> Unit) {
     val stack = mutableStateOf<List<NavView>>(listOf(HomeNavView))
 
     fun handle(action: NavEvent) {

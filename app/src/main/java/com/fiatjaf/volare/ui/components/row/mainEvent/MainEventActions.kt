@@ -11,8 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.MaterialTheme
 import com.fiatjaf.volare.ui.theme.extendedColors
-import com.fiatjaf.volare.core.ComposableContent
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.model.Comment
 import com.fiatjaf.volare.core.model.CrossPost
 import com.fiatjaf.volare.core.model.LegacyReply
@@ -27,9 +25,9 @@ import com.fiatjaf.volare.ui.theme.spacing
 @Composable
 fun MainEventActions(
     mainEvent: MainEvent,
-    onUpdate: OnUpdate,
-    additionalStartAction: ComposableContent = {},
-    additionalEndAction: ComposableContent = {},
+    onUpdate: (UIEvent) -> Unit,
+    additionalStartAction:  () -> Unit = {},
+    additionalEndAction:  () -> Unit = {},
 ) {
     Row(
         modifier = Modifier

@@ -2,12 +2,9 @@ package com.fiatjaf.volare.core.model
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.AnnotatedString
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.commentableKinds
 import com.fiatjaf.volare.data.event.COMMENT_U16
 import com.fiatjaf.volare.data.event.POLL_U16
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.data.provider.AnnotatedStringProvider
 import com.fiatjaf.volare.data.provider.TextItem
 import com.fiatjaf.volare.data.room.view.CommentView
@@ -20,12 +17,12 @@ import rust.nostr.sdk.Kind
 import rust.nostr.sdk.KindEnum
 
 sealed class MainEvent(
-    open val id: EventIdHex,
-    open val pubkey: PubkeyHex,
+    open val id: String,
+    open val pubkey: String,
     open val content: List<TextItem>,
     open val authorName: String?,
     open val trustType: TrustType,
-    open val relayUrl: RelayUrl,
+    open val relayUrl: String,
     open val replyCount: Int,
     open val upvoteCount: Int,
     open val createdAt: Long,
@@ -59,12 +56,12 @@ sealed class MainEvent(
 }
 
 sealed class ThreadableMainEvent(
-    override val id: EventIdHex,
-    override val pubkey: PubkeyHex,
+    override val id: String,
+    override val pubkey: String,
     override val content: List<TextItem>,
     override val authorName: String?,
     override val trustType: TrustType,
-    override val relayUrl: RelayUrl,
+    override val relayUrl: String,
     override val replyCount: Int,
     override val upvoteCount: Int,
     override val createdAt: Long,
@@ -86,14 +83,14 @@ sealed class ThreadableMainEvent(
 
 @Immutable
 data class RootPost(
-    override val id: EventIdHex,
-    override val pubkey: PubkeyHex,
+    override val id: String,
+    override val pubkey: String,
     override val content: List<TextItem>,
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
     override val upvoteCount: Int,
-    override val relayUrl: RelayUrl,
+    override val relayUrl: String,
     override val isUpvoted: Boolean,
     override val isBookmarked: Boolean,
     val myTopic: String?,
@@ -141,14 +138,14 @@ data class RootPost(
 
 @Immutable
 data class Poll(
-    override val id: EventIdHex,
-    override val pubkey: PubkeyHex,
+    override val id: String,
+    override val pubkey: String,
     override val content: List<TextItem>,
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
     override val upvoteCount: Int,
-    override val relayUrl: RelayUrl,
+    override val relayUrl: String,
     override val isUpvoted: Boolean,
     override val isBookmarked: Boolean,
     val myTopic: String?,
@@ -198,15 +195,15 @@ data class Poll(
 }
 
 sealed class SomeReply(
-    override val id: EventIdHex,
-    override val pubkey: PubkeyHex,
+    override val id: String,
+    override val pubkey: String,
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
     override val content: List<TextItem>,
     override val upvoteCount: Int,
     override val replyCount: Int,
-    override val relayUrl: RelayUrl,
+    override val relayUrl: String,
     override val isUpvoted: Boolean,
     override val isBookmarked: Boolean,
 ) : ThreadableMainEvent(
@@ -225,17 +222,17 @@ sealed class SomeReply(
 
 @Immutable
 data class LegacyReply(
-    override val id: EventIdHex,
-    override val pubkey: PubkeyHex,
+    override val id: String,
+    override val pubkey: String,
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
     override val content: List<TextItem>,
     override val upvoteCount: Int,
-    override val relayUrl: RelayUrl,
+    override val relayUrl: String,
     override val isUpvoted: Boolean,
     override val isBookmarked: Boolean,
-    val parentId: EventIdHex,
+    val parentId: String,
     val legacyReplyCount: Int,
     val commentCount: Int,
 ) : SomeReply(
@@ -278,18 +275,18 @@ data class LegacyReply(
 
 @Immutable
 data class Comment(
-    override val id: EventIdHex,
-    override val pubkey: PubkeyHex,
+    override val id: String,
+    override val pubkey: String,
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
     override val content: List<TextItem>,
     override val upvoteCount: Int,
     override val replyCount: Int,
-    override val relayUrl: RelayUrl,
+    override val relayUrl: String,
     override val isUpvoted: Boolean,
     override val isBookmarked: Boolean,
-    val parentId: EventIdHex?,
+    val parentId: String?,
     val parentKind: Int?
 ) : SomeReply(
     id = id,
@@ -335,19 +332,19 @@ data class Comment(
 
 @Immutable
 data class CrossPost(
-    override val id: EventIdHex,
-    override val pubkey: PubkeyHex,
+    override val id: String,
+    override val pubkey: String,
     override val authorName: String?,
     override val trustType: TrustType,
     override val createdAt: Long,
     val myTopic: String?,
-    val crossPostedId: EventIdHex,
-    val crossPostedPubkey: PubkeyHex,
-    val crossPostedAuthorName: PubkeyHex?,
+    val crossPostedId: String,
+    val crossPostedPubkey: String,
+    val crossPostedAuthorName: String?,
     val crossPostedUpvoteCount: Int,
     val crossPostedLegacyReplyCount: Int,
     val crossPostedCommentCount: Int,
-    val crossPostedRelayUrl: RelayUrl,
+    val crossPostedRelayUrl: String,
     val crossPostedIsUpvoted: Boolean,
     val crossPostedIsBookmarked: Boolean,
     val crossPostedContent: List<TextItem>,

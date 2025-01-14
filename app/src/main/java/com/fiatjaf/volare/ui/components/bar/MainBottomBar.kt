@@ -22,7 +22,6 @@ import com.fiatjaf.volare.core.ClickDiscover
 import com.fiatjaf.volare.core.ClickHome
 import com.fiatjaf.volare.core.ClickInbox
 import com.fiatjaf.volare.core.ClickSearch
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.core.navigator.DiscoverNavView
 import com.fiatjaf.volare.core.navigator.HomeNavView
@@ -92,7 +91,7 @@ private fun RowScope.MainBottomBarItem(
     selected: Boolean,
     description: String,
     icon: ImageVector,
-    onClick: Fn
+    onClick: () -> Unit
 ) {
     NavigationBarItem(
         selected = selected,

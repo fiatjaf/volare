@@ -1,8 +1,6 @@
 package com.fiatjaf.volare.data.room.view
 
 import androidx.room.DatabaseView
-import com.fiatjaf.volare.core.PubkeyHex
-import com.fiatjaf.volare.data.nostr.RelayUrl
 
 
 @DatabaseView(
@@ -11,7 +9,7 @@ import com.fiatjaf.volare.data.nostr.RelayUrl
             "GROUP BY mainEvent.pubkey, mainEvent.relayUrl"
 )
 data class EventRelayAuthorView(
-    val pubkey: PubkeyHex,
-    val relayUrl: RelayUrl,
+    val pubkey: String,
+    val relayUrl: String,
     val relayCount: Int
 )

@@ -39,7 +39,6 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.AddRelay
 import com.fiatjaf.volare.core.GoBack
 import com.fiatjaf.volare.core.LoadRelays
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.RemoveRelay
 import com.fiatjaf.volare.core.SaveRelays
 import com.fiatjaf.volare.core.ToggleReadRelay
@@ -49,7 +48,6 @@ import com.fiatjaf.volare.core.model.ConnectionStatus
 import com.fiatjaf.volare.core.model.Waiting
 import com.fiatjaf.volare.core.viewModel.RelayEditorViewModel
 import com.fiatjaf.volare.data.nostr.Nip65Relay
-import com.fiatjaf.volare.data.nostr.RelayUrl
 import com.fiatjaf.volare.ui.components.ConnectionDot
 import com.fiatjaf.volare.ui.components.scaffold.SaveableScaffold
 import com.fiatjaf.volare.ui.components.selection.NamedCheckbox
@@ -62,7 +60,7 @@ import com.fiatjaf.volare.ui.theme.spacing
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-fun RelayEditorView(vm: RelayEditorViewModel, snackbar: SnackbarHostState, onUpdate: OnUpdate) {
+fun RelayEditorView(vm: RelayEditorViewModel, snackbar: SnackbarHostState, onUpdate: (UIEvent) -> Unit) {
     val myRelays by vm.myRelays
     val popularRelays by vm.popularRelays
     val addIsEnabled by vm.addIsEnabled
@@ -105,12 +103,12 @@ fun RelayEditorView(vm: RelayEditorViewModel, snackbar: SnackbarHostState, onUpd
 @Composable
 private fun RelayEditorViewContent(
     myRelays: List<Nip65Relay>,
-    popularRelays: List<RelayUrl>,
-    connectionStatuses: Map<RelayUrl, ConnectionStatus>,
+    popularRelays: List<String>,
+    connectionStatuses: Map<String, ConnectionStatus>,
     addIsEnabled: Boolean,
     state: LazyListState,
     scope: CoroutineScope,
-    onUpdate: OnUpdate,
+    onUpdate: (UIEvent) -> Unit,
 ) {
     val connectedRelays = remember(connectionStatuses) {
         connectionStatuses.filter { (_, status) -> status is Connected }.keys.toList()
@@ -161,13 +159,13 @@ private fun RelayEditorViewContent(
 
 private fun LazyListScope.addSection(
     titleId: Int,
-    relays: List<RelayUrl>,
+    relays: List<String>,
     addIsEnabled: Boolean,
     myRelays: List<Nip65Relay>,
-    connectionStatuses: Map<RelayUrl, ConnectionStatus>,
+    connectionStatuses: Map<String, ConnectionStatus>,
     scope: CoroutineScope,
     showCount: Boolean = false,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     if (relays.isNotEmpty()) {
         item { Spacer(modifier = Modifier.height(spacing.xxl)) }
@@ -193,7 +191,7 @@ private fun LazyListScope.addSection(
 }
 
 @Composable
-private fun AddRelayRow(scope: CoroutineScope, onUpdate: OnUpdate) {
+private fun AddRelayRow(scope: CoroutineScope, onUpdate: (UIEvent) -> Unit) {
     val input = remember { mutableStateOf("") }
     val focus = LocalFocusManager.current
     val context = LocalContext.current
@@ -226,11 +224,11 @@ private fun AddRelayRow(scope: CoroutineScope, onUpdate: OnUpdate) {
 
 @Composable
 private fun NormalRelayRow(
-    relayUrl: RelayUrl,
+    relayUrl: String,
     isAddable: Boolean,
     connectionStatus: ConnectionStatus?,
     scope: CoroutineScope,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     val context = LocalContext.current
     RelayRow(relayUrl = relayUrl, connectionStatus = connectionStatus, onUpdate = onUpdate) {
@@ -251,7 +249,7 @@ private fun MyRelayRow(
     relay: Nip65Relay,
     connectionStatus: ConnectionStatus,
     isDeletable: Boolean,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     RelayRow(
         relayUrl = relay.url,
@@ -292,8 +290,8 @@ private fun MyRelayRow(
 
 @Composable
 private fun RelayRow(
-    relayUrl: RelayUrl,
-    onUpdate: OnUpdate,
+    relayUrl: String,
+    onUpdate: (UIEvent) -> Unit,
     connectionStatus: ConnectionStatus?,
     secondRow: @Composable () -> Unit = {},
     trailingContent: @Composable () -> Unit = {},

@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalClipboardManager
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.utils.copyAndToast
 import com.fiatjaf.volare.ui.components.indicator.FullLinearProgressIndicator
 import com.fiatjaf.volare.ui.components.text.IndexedText
@@ -36,7 +35,7 @@ import com.fiatjaf.volare.ui.theme.KeyIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NsecBottomSheet(nsec: String, onLoadNsec: Fn, onDismiss: Fn) {
+fun NsecBottomSheet(nsec: String, onLoadNsec: () -> Unit, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val clip = LocalClipboardManager.current
     val toast = stringResource(id = R.string.value_copied)

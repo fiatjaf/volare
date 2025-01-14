@@ -16,8 +16,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.Fn
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.SearchProfileSuggestion
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.ui.components.row.ClickableProfileRow
@@ -27,8 +25,8 @@ import com.fiatjaf.volare.ui.theme.sizing
 fun AddProfileDialog(
     profileSuggestions: List<AdvancedProfileView>,
     onAdd: (AdvancedProfileView) -> Unit,
-    onDismiss: Fn,
-    onUpdate: OnUpdate
+    onDismiss: () -> Unit,
+    onUpdate: (UIEvent) -> Unit
 ) {
     val input = remember { mutableStateOf(TextFieldValue("")) }
     val focusRequester = remember { FocusRequester() }
@@ -55,7 +53,7 @@ private fun Input(
     profileSuggestions: List<AdvancedProfileView>,
     focusRequester: FocusRequester,
     onAdd: (AdvancedProfileView) -> Unit,
-    onUpdate: OnUpdate
+    onUpdate: (UIEvent) -> Unit
 ) {
     Column {
         TextField(

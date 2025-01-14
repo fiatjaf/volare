@@ -4,8 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import com.fiatjaf.volare.R
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.core.utils.showToast
 import com.fiatjaf.volare.data.nostr.NostrService
 import com.fiatjaf.volare.data.provider.RelayProvider
@@ -26,7 +24,7 @@ class EventDeletor(
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    suspend fun deletePost(postId: EventIdHex) {
+    suspend fun deletePost(postId: String) {
         deleteEvent(eventId = postId)
             .onFailure {
                 Log.w(TAG, "Failed to sign post deletion: ${it.message}", it)
@@ -40,7 +38,7 @@ class EventDeletor(
             }
     }
 
-    suspend fun deleteVote(voteId: EventIdHex) {
+    suspend fun deleteVote(voteId: String) {
         deleteEvent(eventId = voteId)
             .onFailure {
                 Log.w(TAG, "Failed to sign vote deletion: ${it.message}", it)
@@ -54,7 +52,7 @@ class EventDeletor(
             }
     }
 
-    suspend fun deleteList(identifier: String, onCloseDrawer: Fn) {
+    suspend fun deleteList(identifier: String, onCloseDrawer: () -> Unit) {
         deleteListEvent(identifier = identifier)
             .onFailure {
                 Log.w(TAG, "Failed to sign list deletion: ${it.message}", it)
@@ -69,7 +67,7 @@ class EventDeletor(
             }
     }
 
-    private suspend fun deleteEvent(eventId: EventIdHex): Result<Event> {
+    private suspend fun deleteEvent(eventId: String): Result<Event> {
         return nostrService.publishDelete(
             eventId = EventId.fromHex(eventId),
             relayUrls = relayProvider.getPublishRelays(),

@@ -37,12 +37,9 @@ import com.fiatjaf.volare.core.ClickMuteList
 import com.fiatjaf.volare.core.ClickRelayEditor
 import com.fiatjaf.volare.core.ClickSettings
 import com.fiatjaf.volare.core.CloseDrawer
-import com.fiatjaf.volare.core.ComposableContent
 import com.fiatjaf.volare.core.DeleteList
 import com.fiatjaf.volare.core.DrawerViewSubscribeSets
 import com.fiatjaf.volare.core.EditList
-import com.fiatjaf.volare.core.Fn
-import com.fiatjaf.volare.core.OnUpdate
 import com.fiatjaf.volare.core.OpenList
 import com.fiatjaf.volare.core.OpenProfile
 import com.fiatjaf.volare.core.viewModel.DrawerViewModel
@@ -64,8 +61,8 @@ import kotlinx.coroutines.CoroutineScope
 fun MainDrawer(
     vm: DrawerViewModel,
     scope: CoroutineScope,
-    onUpdate: OnUpdate,
-    content: ComposableContent
+    onUpdate: (UIEvent) -> Unit,
+    content:  () -> Unit
 ) {
     val personalProfile by vm.personalProfile.collectAsState()
     val itemSets by vm.itemSetMetas.collectAsState()
@@ -160,7 +157,7 @@ fun MainDrawer(
 }
 
 @Composable
-private fun DrawerListItem(meta: ItemSetMeta, scope: CoroutineScope, onUpdate: OnUpdate) {
+private fun DrawerListItem(meta: ItemSetMeta, scope: CoroutineScope, onUpdate: (UIEvent) -> Unit) {
     val showMenu = remember { mutableStateOf(false) }
     Box {
         ItemSetOptionsMenu(
@@ -189,8 +186,8 @@ private fun DrawerRow(
     icon: ImageVector,
     label: String,
     modifier: Modifier = Modifier,
-    onClick: Fn,
-    onLongClick: Fn = {}
+    onClick: () -> Unit,
+    onLongClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -219,8 +216,8 @@ private fun ItemSetOptionsMenu(
     identifier: String,
     scope: CoroutineScope,
     modifier: Modifier = Modifier,
-    onDismiss: Fn,
-    onUpdate: OnUpdate,
+    onDismiss: () -> Unit,
+    onUpdate: (UIEvent) -> Unit,
 ) {
     val onCloseDrawer = { onUpdate(CloseDrawer(scope = scope)) }
     DropdownMenu(

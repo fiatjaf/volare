@@ -1,6 +1,5 @@
 package com.fiatjaf.volare.data.provider
 
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.createAdvancedProfile
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.toShortenedBech32
@@ -24,8 +23,8 @@ import kotlinx.coroutines.flow.map
 import rust.nostr.sdk.Nip19Profile
 
 class ProfileProvider(
-    private val forcedFollowFlow: Flow<Map<PubkeyHex, Boolean>>,
-    private val forcedMuteFlow: Flow<Map<PubkeyHex, Boolean>>,
+    private val forcedFollowFlow: Flow<Map<String, Boolean>>,
+    private val forcedMuteFlow: Flow<Map<String, Boolean>>,
     private val accountManager: AccountManager,
     private val metadataInMemory: MetadataInMemory,
     private val profileDao: ProfileDao,
@@ -70,7 +69,7 @@ class ProfileProvider(
         }
     }
 
-    suspend fun getTrustedByFlow(pubkey: PubkeyHex): Flow<AdvancedProfileView?> {
+    suspend fun getTrustedByFlow(pubkey: String): Flow<AdvancedProfileView?> {
         val trustedBy = webOfTrustDao.getTrustedByPubkey(pubkey = pubkey)
             ?: return flowOf(null)
 
@@ -191,7 +190,7 @@ class ProfileProvider(
         }
     }
 
-    private fun getKnownProfilesFlow(pubkeys: Collection<PubkeyHex>): Flow<List<AdvancedProfileView>> {
+    private fun getKnownProfilesFlow(pubkeys: Collection<String>): Flow<List<AdvancedProfileView>> {
         if (pubkeys.isEmpty()) return flowOf(emptyList())
 
         return combine(
@@ -215,7 +214,7 @@ class ProfileProvider(
     }
 
     private fun createFullProfile(
-        pubkey: PubkeyHex,
+        pubkey: String,
         dbProfile: AdvancedProfileView?,
         forcedFollowState: Boolean?,
         forcedMuteState: Boolean?,

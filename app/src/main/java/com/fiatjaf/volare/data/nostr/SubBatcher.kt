@@ -2,8 +2,6 @@ package com.fiatjaf.volare.data.nostr
 
 import android.util.Log
 import com.fiatjaf.volare.core.DEBOUNCE
-import com.fiatjaf.volare.core.EventIdHex
-import com.fiatjaf.volare.core.PubkeyHex
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.reactionKind
 import com.fiatjaf.volare.core.utils.reactionaryKinds
@@ -21,8 +19,8 @@ private const val TAG = "SubBatcher"
 private const val BATCH_DELAY = 2 * DEBOUNCE
 
 class SubBatcher(private val subCreator: SubscriptionCreator) {
-    private val idVoteQueue = mutableMapOf<RelayUrl, MutableSet<EventIdHex>>()
-    private val idReplyQueue = mutableMapOf<RelayUrl, MutableSet<EventIdHex>>()
+    private val idVoteQueue = mutableMapOf<String, MutableSet<String>>()
+    private val idReplyQueue = mutableMapOf<String, MutableSet<String>>()
     private val isProcessingSubs = AtomicBoolean(false)
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -30,14 +28,14 @@ class SubBatcher(private val subCreator: SubscriptionCreator) {
         startProcessingJob()
     }
 
-    fun submitVotes(relayUrl: RelayUrl, eventIds: List<EventIdHex>) {
+    fun submitVotes(relayUrl: String, eventIds: List<String>) {
         if (eventIds.isEmpty()) return
 
         idVoteQueue.syncedPutOrAdd(relayUrl, eventIds)
         startProcessingJob()
     }
 
-    fun submitReplies(relayUrl: RelayUrl, eventIds: List<EventIdHex>) {
+    fun submitReplies(relayUrl: String, eventIds: List<String>) {
         if (eventIds.isEmpty()) return
 
         idReplyQueue.syncedPutOrAdd(relayUrl, eventIds)
@@ -51,13 +49,13 @@ class SubBatcher(private val subCreator: SubscriptionCreator) {
             while (true) {
                 delay(BATCH_DELAY)
 
-                val voteIdsByRelay = mutableMapOf<RelayUrl, Set<EventIdHex>>()
+                val voteIdsByRelay = mutableMapOf<String, Set<String>>()
                 synchronized(idVoteQueue) {
                     voteIdsByRelay.putAll(idVoteQueue)
                     idVoteQueue.clear()
                 }
 
-                val replyIdsByRelay = mutableMapOf<RelayUrl, Set<EventIdHex>>()
+                val replyIdsByRelay = mutableMapOf<String, Set<String>>()
                 synchronized(idReplyQueue) {
                     replyIdsByRelay.putAll(idReplyQueue)
                     idReplyQueue.clear()
@@ -81,11 +79,11 @@ class SubBatcher(private val subCreator: SubscriptionCreator) {
     }
 
     private fun getReplyAndVoteFilters(
-        voteIdsByRelay: Map<RelayUrl, Set<EventIdHex>>,
-        replyIdsByRelay: Map<RelayUrl, Set<EventIdHex>>,
+        voteIdsByRelay: Map<String, Set<String>>,
+        replyIdsByRelay: Map<String, Set<String>>,
         until: Timestamp,
-    ): Map<RelayUrl, List<Filter>> {
-        val convertedIds = mutableMapOf<EventIdHex, EventId>()
+    ): Map<String, List<Filter>> {
+        val convertedIds = mutableMapOf<String, EventId>()
         val allRelays = voteIdsByRelay.keys + replyIdsByRelay.keys
 
         return allRelays.associateWith { relay ->
@@ -121,7 +119,7 @@ class SubBatcher(private val subCreator: SubscriptionCreator) {
     }
 }
 
-private fun MutableMap<EventIdHex, EventId>.mapCachedEventId(hex: PubkeyHex): EventId {
+private fun MutableMap<String, EventId>.mapCachedEventId(hex: String): EventId {
     val id = this[hex] ?: EventId.fromHex(hex)
     return this.putIfAbsent(hex, id) ?: id
 }

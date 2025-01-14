@@ -10,13 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.fiatjaf.volare.core.Fn
 import com.fiatjaf.volare.ui.theme.FancyBrush
 
 @Composable
 fun TopicChip(
     topic: String,
-    onClick: Fn,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
     isSelected: Boolean = false,
