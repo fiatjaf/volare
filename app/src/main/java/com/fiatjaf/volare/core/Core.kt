@@ -17,14 +17,8 @@ import androidx.lifecycle.viewModelScope
 import com.fiatjaf.volare.AppContainer
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.VMContainer
-import com.fiatjaf.volare.core.model.CoordinateMention
 import com.fiatjaf.volare.core.model.ItemSetProfile
 import com.fiatjaf.volare.core.model.ItemSetTopic
-import com.fiatjaf.volare.core.model.NeventMention
-import com.fiatjaf.volare.core.model.NostrMention
-import com.fiatjaf.volare.core.model.NoteMention
-import com.fiatjaf.volare.core.model.NprofileMention
-import com.fiatjaf.volare.core.model.NpubMention
 import com.fiatjaf.volare.core.navigator.Navigator
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.normalizeTopic
@@ -42,7 +36,7 @@ private const val TAG = "Core"
 class Core(
     val vmContainer: VMContainer,
     val appContainer: AppContainer,
-    closeApp: Fn,
+    closeApp: () -> Unit,
 ) : ViewModel() {
     val navigator = Navigator(vmContainer = vmContainer, closeApp = closeApp)
 
@@ -60,7 +54,7 @@ class Core(
         // TODO: Support ncryptsec
         if (nostrString.startsWith("ncryptsec")) { return }
 
-        // Use LaunchedEffect just for the one-time processing
+        // use LaunchedEffect just for the one-time processing
         LaunchedEffect(nostrString) {
             if (intent.scheme == "nostr-login") {
                 if (Backend.isValidBunker(nostrString)) {

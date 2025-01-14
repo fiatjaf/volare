@@ -117,7 +117,7 @@ data class ClickNeutralizeVote(
     override val mentionedPubKey: String,
 ) : VoteEvent(targetId = targetId, mentionedPubKey = mentionedPubKey)
 
-data class VotePollOption(val pollId: EventIdHex, val optionId: OptionId) : UIEvent()
+data class VotePollOption(val pollId: String, val optionId: String) : UIEvent()
 
 sealed class MuteEvent : UIEvent()
 data class MuteProfile(val pubkey: String, val debounce: Boolean = true) : MuteEvent()
@@ -138,10 +138,10 @@ data class BookmarkPost(override val id: String) : BookmarkEvent(id = id)
 data class UnbookmarkPost(override val id: String) : BookmarkEvent(id = id)
 
 
-sealed class ProfileEvent(open val pubkey: PubkeyHex) : UIEvent()
+sealed class ProfileEvent(open val pubkey: String) : UIEvent()
 
-data class FollowProfile(override val pubkey: PubkeyHex) : ProfileEvent(pubkey = pubkey)
-data class UnfollowProfile(override val pubkey: PubkeyHex) : ProfileEvent(pubkey = pubkey)
+data class FollowProfile(override val pubkey: String) : ProfileEvent(pubkey = pubkey)
+data class UnfollowProfile(override val pubkey: String) : ProfileEvent(pubkey = pubkey)
 
 
 sealed class HomeViewAction : UIEvent()
@@ -155,8 +155,8 @@ data class HomeViewApplyFilter(val setting: HomeFeedSetting) : HomeViewAction()
 
 sealed class ThreadViewAction : UIEvent()
 data object ThreadViewRefresh : ThreadViewAction()
-data class ThreadViewToggleCollapse(val id: EventIdHex) : ThreadViewAction()
-data class ThreadViewShowReplies(val id: EventIdHex) : ThreadViewAction()
+data class ThreadViewToggleCollapse(val id: String) : ThreadViewAction()
+data class ThreadViewShowReplies(val id: String) : ThreadViewAction()
 
 
 sealed class InboxViewAction : UIEvent()

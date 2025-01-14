@@ -5,21 +5,14 @@ import android.util.Log
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import com.fiatjaf.volare.core.ClickClickableText
-import com.fiatjaf.volare.core.OnUpdate
-import com.fiatjaf.volare.core.model.CoordinateMention
-import com.fiatjaf.volare.core.model.NeventMention
-import com.fiatjaf.volare.core.model.NostrMention
-import com.fiatjaf.volare.core.model.NoteMention
-import com.fiatjaf.volare.core.model.NprofileMention
-import com.fiatjaf.volare.core.model.NpubMention
 import com.fiatjaf.volare.core.utils.shortenBech32
 import com.fiatjaf.volare.core.utils.shortenUrl
 import com.fiatjaf.volare.core.utils.BlurHashDef
+import com.fiatjaf.volare.data.BackendDatabase
 import com.fiatjaf.volare.data.nostr.createNprofile
 import com.fiatjaf.volare.ui.theme.HashtagStyle
 import com.fiatjaf.volare.ui.theme.MentionStyle
@@ -35,7 +28,7 @@ sealed class TextItem {
   data class VideoURL (val value: AnnotatedString, val short: String): TextItem()
 }
 
-class AnnotatedStringProvider(private val nameProvider: NameProvider) {
+class AnnotatedStringProvider(private val backendDB: BackendDatabase) {
     companion object {
         const val NEVENT_TAG = "NEVENT"
         const val NOTE1_TAG = "NOTE1"
@@ -256,7 +249,7 @@ class AnnotatedStringProvider(private val nameProvider: NameProvider) {
                 } else {
                     createNprofile(hex = nostrMention.hex)
                 }
-                val mentionedName = nameProvider.getName(nprofile = nprofile)
+                val mentionedName = backendDB.getName(nprofile = nprofile)
                 if (mentionedName == null) nameNotFound = true
                 val name = "@${
                     mentionedName.orEmpty()

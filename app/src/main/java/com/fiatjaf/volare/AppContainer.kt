@@ -32,9 +32,6 @@ import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.nostr.NostrClient
 import com.fiatjaf.volare.data.nostr.NostrService
 import com.fiatjaf.volare.data.nostr.NostrSubscriber
-import com.fiatjaf.volare.data.nostr.RelayUrl
-import com.fiatjaf.volare.data.nostr.SubBatcher
-import com.fiatjaf.volare.data.nostr.SubscriptionCreator
 import com.fiatjaf.volare.data.preferences.DatabasePreferences
 import com.fiatjaf.volare.data.preferences.EventPreferences
 import com.fiatjaf.volare.data.preferences.HomePreferences
@@ -45,7 +42,6 @@ import com.fiatjaf.volare.data.provider.DatabaseInteractor
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.data.provider.FriendProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
-import com.fiatjaf.volare.data.provider.NameProvider
 import com.fiatjaf.volare.data.provider.ProfileProvider
 import com.fiatjaf.volare.data.provider.PubkeyProvider
 import com.fiatjaf.volare.data.provider.RelayProfileProvider
@@ -71,10 +67,10 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
     private val nostrClient = NostrClient()
     val externalSignerHandler = ExternalSignerHandler()
 
-    val connectionStatuses = mutableStateOf(mapOf<RelayUrl, ConnectionStatus>())
+    val connectionStatuses = mutableStateOf(mapOf<String, ConnectionStatus>())
 
-    private val forcedFollowTopicStates = MutableStateFlow(emptyMap<Topic, Boolean>())
-    private val forcedMuteTopicStates = MutableStateFlow(emptyMap<Topic, Boolean>())
+    private val forcedFollowTopicStates = MutableStateFlow(emptyMap<String, Boolean>())
+    private val forcedMuteTopicStates = MutableStateFlow(emptyMap<String, Boolean>())
 
     val homePreferences = HomePreferences(context = context)
     val inboxPreferences = InboxPreferences(context = context)
@@ -92,11 +88,7 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         accountManager = accountManager,
     )
 
-    private val nameProvider = NameProvider(
-        profileDao = roomDb.profileDao(),
-    )
-
-    val annotatedStringProvider = AnnotatedStringProvider(nameProvider = nameProvider)
+    val annotatedStringProvider = AnnotatedStringProvider(backendDB = backendDB)
 
     private val webOfTrustProvider = WebOfTrustProvider(
         friendProvider = friendProvider,

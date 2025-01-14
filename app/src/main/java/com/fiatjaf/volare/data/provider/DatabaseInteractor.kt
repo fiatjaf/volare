@@ -33,9 +33,9 @@ class DatabaseInteractor(
 
     suspend fun exportMyPostsAndBookmarks(
         uiScope: CoroutineScope,
-        onStartExport: Fn,
+        onStartExport: () -> Unit,
         onSetExportCount: (Int) -> Unit,
-        onFinishExport: Fn,
+        onFinishExport: () -> Unit,
     ) {
         storageHelper.openFolderPicker()
         val ids = room.mainEventDao().getBookmarkedAndMyPostIds(accountManager.getPublicKeyHex())
