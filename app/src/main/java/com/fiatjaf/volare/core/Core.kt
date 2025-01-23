@@ -24,8 +24,6 @@ import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.normalizeTopic
 import com.fiatjaf.volare.core.utils.showToast
 import com.fiatjaf.volare.core.utils.threadableKinds
-import com.fiatjaf.volare.data.nostr.createNevent
-import com.fiatjaf.volare.data.nostr.createNprofile
 import kotlinx.coroutines.launch
 import rust.nostr.sdk.Nip19Event
 import rust.nostr.sdk.Nip19Profile
@@ -213,37 +211,16 @@ class Core(
             uriHandler?.openUri("https://njump.me/$nostrStr")
         }
 
-        when (val nostrMention = NostrMention.from(str)) {
-            is NprofileMention -> {
-                val nip19 = Nip19Profile.fromBech32(nostrMention.bech32)
-                onUpdate(OpenProfile(nprofile = nip19))
-            }
-
-            is NpubMention -> {
-                val nprofile = createNprofile(hex = nostrMention.hex)
-                onUpdate(OpenProfile(nprofile = nprofile))
-            }
-
-            is NeventMention -> {
-                val nevent = Nip19Event.fromBech32(nostrMention.bech32)
-                val kind = nevent.kind()
-                if (kind == null || threadableKinds.contains(kind)) {
-                    onUpdate(OpenThreadRaw(nevent = nevent))
-                } else {
-                    onHandleUri(nostrMention.bech32)
-                }
-            }
-
-            is NoteMention -> {
-                val nevent = createNevent(hex = nostrMention.hex)
-                onUpdate(OpenThreadRaw(nevent = nevent))
-            }
-
-            is CoordinateMention -> {
-                onHandleUri(nostrMention.bech32)
-            }
-
-            null -> Log.w(TAG, "Unknown clickable string $str")
+        if (str.startsWith("nprofile1")) {
+            onUpdate(OpenProfile(Backend.parseBech32(str)))
+        } else if (str.startsWith("npub1")) {
+            onUpdate(OpenProfile(Backend.parseBech32(str)))
+        } else if (str.startsWith("nevent1")) {
+            onUpdate(OpenThreadRaw(Backend.parseBech32(str)))
+        } else if (str.startsWith("naddr1")) {
+            onHandleUri(str)
+        } else {
+            Log.w(TAG, "Unknown clickable string '$str'")
         }
     }
 

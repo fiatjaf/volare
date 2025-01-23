@@ -18,22 +18,22 @@ import com.fiatjaf.volare.core.utils.isBareTopicStr
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.normalizeTopic
 import com.fiatjaf.volare.core.utils.showToast
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.interactor.ItemSetEditor
-import com.fiatjaf.volare.data.model.CustomPubkeys
-import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.provider.ItemSetProvider
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import kotlinx.coroutines.delay
 import java.util.UUID
 
 class EditListViewModel(
+    accountManager: AccountManager,
     private val itemSetEditor: ItemSetEditor,
     private val snackbar: SnackbarHostState,
     private val itemSetProvider: ItemSetProvider,
-    private val lazyNostrSubscriber: LazyNostrSubscriber,
 ) : ViewModel() {
     private val _identifier = mutableStateOf("")
 
+    val ourPubkey = accountManager.pubkeyHexFlow
     val isLoading = mutableStateOf(false)
     val isSaving = mutableStateOf(false)
     val title = mutableStateOf("")
@@ -71,8 +71,9 @@ class EditListViewModel(
         viewModelScope.launchIO {
             itemSetProvider.loadList(identifier = identifier)
 
-            val pubkeys = itemSetProvider.profiles.value.map { it.pubkey }
-            lazyNostrSubscriber.lazySubUnknownProfiles(selection = CustomPubkeys(pubkeys = pubkeys))
+            // TODO: call backend
+            /* val pubkeys = itemSetProvider.profiles.value.map { it.pubkey }
+            lazyNostrSubscriber.lazySubUnknownProfiles(selection = CustomPubkeys(pubkeys = pubkeys)) */
         }.invokeOnCompletion {
             title.value = itemSetProvider.title.value
             description.value = TextFieldValue(itemSetProvider.description.value.text)

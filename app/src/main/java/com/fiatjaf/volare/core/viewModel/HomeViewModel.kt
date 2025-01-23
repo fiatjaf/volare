@@ -24,7 +24,6 @@ import com.fiatjaf.volare.data.provider.FeedProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
-
 class HomeViewModel(
     feedProvider: FeedProvider,
     val postDetails: State<PostDetails?>,

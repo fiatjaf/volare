@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.stateIn
 import rust.nostr.sdk.Nip19Event
 import rust.nostr.sdk.Nip19Profile
 
-
 private const val TAG = "RelayProvider"
 
 class RelayProvider(
@@ -44,7 +43,6 @@ class RelayProvider(
 
     private val nip65Dao: Nip65Dao,
     private val eventRelayDao: EventRelayDao,
-    private val nostrClient: NostrClient,
     private val connectionStatuses: State<Map<String, ConnectionStatus>>,
     private val pubkeyProvider: PubkeyProvider,
     private val relayPreferences: RelayPreferences,

@@ -22,9 +22,6 @@ interface CommentDao {
     )
     fun getCommentsFlow(parentIds: Collection<String>): Flow<List<CommentView>>
 
-    @Query("SELECT * FROM CommentView WHERE id = :id")
-    fun getCommentFlow(id: String): Flow<CommentView?>
-
     @Query(PROFILE_COMMENT_FEED_QUERY)
     fun getProfileCommentFlow(pubkey: String, until: Long, size: Int): Flow<List<CommentView>>
 

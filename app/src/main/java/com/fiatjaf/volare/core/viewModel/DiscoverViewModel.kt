@@ -33,9 +33,9 @@ class DiscoverViewModel(
 ) : ViewModel() {
     private val maxCount = 75
     val isRefreshing = mutableStateOf(false)
-    val popularTopics: MutableState<StateFlow<List<StringFollowState>>> =
+    val popularTopics: MutableState<StateFlow<List<TopicFollowState>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
-    val popularProfiles: MutableState<StateFlow<List<AdvancedProfileView>>> =
+    val popularProfiles: MutableState<StateFlow<List<backend.Profile>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
 
     fun handle(action: DiscoverViewAction) {
@@ -70,7 +70,7 @@ class DiscoverViewModel(
         }
     }
 
-    private suspend fun getTopicFlow(): StateFlow<List<StringFollowState>> {
+    private suspend fun getTopicFlow(): StateFlow<List<TopicFollowState>> {
         val result = topicProvider.getPopularUnfollowedTopics(limit = maxCount)
         return topicProvider.forcedFollowStates.map { forcedStates ->
             result.map { TopicFollowState(topic = it, isFollowed = forcedStates[it] ?: false) }
@@ -83,7 +83,7 @@ class DiscoverViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun getProfileFlow(): StateFlow<List<AdvancedProfileView>> {
+    private suspend fun getProfileFlow(): StateFlow<List<backend.Profile>> {
         return accountManager.pubkeyHexFlow.flatMapLatest { pubkeyHex ->
             profileProvider.getPopularUnfollowedProfiles(pubkeyHex, limit = maxCount)
         }

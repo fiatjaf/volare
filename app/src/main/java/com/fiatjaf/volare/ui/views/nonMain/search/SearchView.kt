@@ -14,11 +14,11 @@ import com.fiatjaf.volare.core.OpenProfile
 import com.fiatjaf.volare.core.OpenThreadRaw
 import com.fiatjaf.volare.core.OpenTopic
 import com.fiatjaf.volare.core.SubUnknownProfiles
+import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.core.model.TrustType
 import com.fiatjaf.volare.core.viewModel.SearchViewModel
 import com.fiatjaf.volare.data.nostr.createNevent
 import com.fiatjaf.volare.data.nostr.createNprofile
-import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.data.room.view.SimplePostView
 import com.fiatjaf.volare.ui.components.row.ClickableProfileRow
 import com.fiatjaf.volare.ui.components.row.ClickableRow
@@ -50,7 +50,7 @@ fun SearchView(vm: SearchViewModel, onUpdate: (UIEvent) -> Unit) {
 private fun SearchViewContent(
     ourPubkey: String,
     topics: List<String>,
-    profiles: List<AdvancedProfileView>,
+    profiles: List<backend.Profile>,
     posts: List<SimplePostView>,
     onUpdate: (UIEvent) -> Unit
 ) {

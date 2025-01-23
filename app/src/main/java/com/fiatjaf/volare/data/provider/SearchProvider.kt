@@ -1,16 +1,13 @@
 package com.fiatjaf.volare.data.provider
 
 import com.fiatjaf.volare.data.room.dao.MainEventDao
-import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.data.room.view.SimplePostView
 
 class SearchProvider(
     private val topicProvider: TopicProvider,
-    private val profileProvider: ProfileProvider,
     private val mainEventDao: MainEventDao,
 ) {
     private val maxTopicSearchResult = 5
-    private val maxProfileSearchResult = 10
     private val maxPostSearchResult = 15
 
     suspend fun getTopicSuggestions(text: String): List<String> {
@@ -24,9 +21,12 @@ class SearchProvider(
             .toList()
     }
 
-    suspend fun getProfileSuggestions(text: String): List<AdvancedProfileView> {
-        val stripped = text.stripSearchText()
-        return profileProvider.getProfileByName(name = stripped, limit = maxProfileSearchResult)
+    suspend fun getProfileSuggestions(text: String): List<backend.Profile> {
+        val trimmed = text.trim()
+        // TODO: call backend (should be ok to just list everything and match by text (against name, nip05?)
+        //  -- but filter out muted profiles and sort by what?)
+        // limit to 10 results?
+        return listOf()
     }
 
     suspend fun getPostSuggestions(text: String): List<SimplePostView> {

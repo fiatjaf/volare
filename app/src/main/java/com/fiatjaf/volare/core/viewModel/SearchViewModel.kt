@@ -20,6 +20,7 @@ import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.normalizeTopic
 import com.fiatjaf.volare.core.utils.showToast
 import com.fiatjaf.volare.data.account.AccountManager
+import com.fiatjaf.volare.data.model.CustomPubkeys
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.nostr.createNevent
 import com.fiatjaf.volare.data.nostr.createNprofile
@@ -36,13 +37,12 @@ import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.PublicKey
 
 class SearchViewModel(
-    private val accountManager: AccountManager,
+    accountManager: AccountManager,
     private val searchProvider: SearchProvider,
-    private val lazyNostrSubscriber: LazyNostrSubscriber,
     private val snackbar: SnackbarHostState,
 ) : ViewModel() {
     val topics = mutableStateOf<List<String>>(emptyList())
-    val profiles = mutableStateOf<List<AdvancedProfileView>>(emptyList())
+    val profiles = mutableStateOf<List<backend.Profile>>(emptyList())
     val posts = mutableStateOf<List<SimplePostView>>(emptyList())
     val ourPubkey = accountManager.getPublicKeyHex()
 
@@ -59,8 +59,11 @@ class SearchViewModel(
         if (profileJob?.isActive == true) return
 
         profileJob = viewModelScope.launchIO {
-            lazyNostrSubscriber.lazySubUnknownProfiles()
-            delay(DELAY_10SEC)
+            // TODO: call backend
+            /* val pubkeys = mutableListOf<String>()
+            pubkeys.addAll(friendProvider.getFriendsWithMissingProfile())
+            pubkeys.addAll(webOfTrustProvider.getWotWithMissingProfile().minus(pubkeys.toSet()))
+            lazySubUnknownProfiles(selection = CustomPubkeys(pubkeys = pubkeys), checkDb = false) */
         }
     }
 

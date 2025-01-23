@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -37,8 +38,8 @@ import com.fiatjaf.volare.core.MAX_POLL_OPTIONS
 import com.fiatjaf.volare.core.MAX_SUBJECT_LINES
 import com.fiatjaf.volare.core.SendPoll
 import com.fiatjaf.volare.core.SendPost
+import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.core.viewModel.CreatePostViewModel
-import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.ui.components.row.PollOptionAddRow
 import com.fiatjaf.volare.ui.components.row.PollOptionInputRow
 import com.fiatjaf.volare.ui.components.row.TopicSelectionRow
@@ -54,11 +55,12 @@ import com.fiatjaf.volare.ui.theme.spacing
 @Composable
 fun CreatePostView(
     vm: CreatePostViewModel,
-    searchSuggestions: State<List<AdvancedProfileView>>,
+    searchSuggestions: State<List<backend.Profile>>,
     topicSuggestions: State<List<String>>,
     snackbar: SnackbarHostState,
     onUpdate: (UIEvent) -> Unit
 ) {
+    val ourPubkey = vm.ourPubkey.collectAsState()
     val isPoll = remember { mutableStateOf(false) }
     val options = remember { mutableStateOf((0..1).map { mutableStateOf(TextFieldValue()) }) }
     val header = remember { mutableStateOf(TextFieldValue()) }
@@ -113,6 +115,7 @@ fun CreatePostView(
         onUpdate = onUpdate,
     ) {
         CreatePostContent(
+            ourPubkey = ourPubkey,
             isPoll = isPoll.value,
             header = header,
             body = body,
@@ -129,18 +132,20 @@ fun CreatePostView(
 
 @Composable
 private fun CreatePostContent(
+    ourPubkey: String,
     isPoll: Boolean,
     header: MutableState<TextFieldValue>,
     body: MutableState<TextFieldValue>,
     options: MutableState<List<MutableState<TextFieldValue>>>,
     topicSuggestions: List<String>,
     selectedTopics: MutableState<List<String>>,
-    searchSuggestions: List<AdvancedProfileView>,
+    searchSuggestions: List<backend.Profile>,
     isAnon: MutableState<Boolean>,
     focusRequester: FocusRequester,
     onUpdate: (UIEvent) -> Unit,
 ) {
     InputWithSuggestions(
+        ourPubkey = ourPubkey,
         body = body,
         searchSuggestions = searchSuggestions,
         isAnon = isAnon,

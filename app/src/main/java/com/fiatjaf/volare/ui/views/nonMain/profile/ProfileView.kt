@@ -40,15 +40,12 @@ import com.fiatjaf.volare.core.OpenRelayProfile
 import com.fiatjaf.volare.core.ProfileViewRefresh
 import com.fiatjaf.volare.core.ProfileViewReplyAppend
 import com.fiatjaf.volare.core.ProfileViewRootAppend
+import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.core.model.FriendTrust
 import com.fiatjaf.volare.core.utils.copyAndToast
 import com.fiatjaf.volare.core.utils.getSimpleLauncher
-import com.fiatjaf.volare.core.utils.shortenBech32
 import com.fiatjaf.volare.core.utils.takeRandom
-import com.fiatjaf.volare.core.utils.toBech32
 import com.fiatjaf.volare.core.viewModel.ProfileViewModel
-import com.fiatjaf.volare.data.nostr.Nip65Relay
-import com.fiatjaf.volare.data.nostr.createNprofile
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.ui.components.Feed
 import com.fiatjaf.volare.ui.components.SimpleTabPager
@@ -69,7 +66,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileView(vm: ProfileViewModel, snackbar: SnackbarHostState, onUpdate: (UIEvent) -> Unit) {
     val profile by vm.profile.value.collectAsState()
-    val nip65Relays by vm.nip65Relays.value.collectAsState()
     val ourPubKey by vm.ourPubKey.collectAsState("")
     val headers = listOf(
         stringResource(id = R.string.posts),
@@ -125,14 +121,7 @@ fun ProfileView(vm: ProfileViewModel, snackbar: SnackbarHostState, onUpdate: (UI
                         .fillMaxSize()
                         .padding(horizontal = spacing.bigScreenEdge),
                     npub = remember(profile.inner.pubkey) { profile.inner.pubkey.toBech32() },
-                    nprofile = remember(profile.inner.pubkey, nip65Relays) {
-                        createNprofile(
-                            hex = profile.inner.pubkey,
-                            relays = nip65Relays.filter { relay -> relay.isWrite }
-                                .takeRandom(MAX_RELAYS)
-                                .map(Nip65Relay::url)
-                        ).toBech32()
-                    },
+                    nprofile = profile.inner.Nprofile(),
                     lightning = profile.lightning,
                     trustedBy = if (profile.inner.showTrustedBy(ourPubKey)) {
                         vm.trustedBy.value.collectAsState().value

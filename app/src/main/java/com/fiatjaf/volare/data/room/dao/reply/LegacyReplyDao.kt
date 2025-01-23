@@ -21,9 +21,6 @@ interface LegacyReplyDao {
     )
     fun getRepliesFlow(parentIds: Collection<String>): Flow<List<LegacyReplyView>>
 
-    @Query("SELECT * FROM LegacyReplyView WHERE id = :id")
-    fun getReplyFlow(id: String): Flow<LegacyReplyView?>
-
     @Query(PROFILE_REPLY_FEED_QUERY)
     fun getProfileReplyFlow(pubkey: String, until: Long, size: Int): Flow<List<LegacyReplyView>>
 

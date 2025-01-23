@@ -11,15 +11,6 @@ import kotlinx.coroutines.flow.combine
 
 @Dao
 interface PollDao {
-    fun getFullPollFlow(pollId: String): Flow<Pair<PollView, List<PollOptionView>>?> {
-        return combine(
-            internalGetPollFlow(pollId = pollId),
-            internalGetPollOptionsFlow(pollId = pollId)
-        ) { poll, options ->
-            poll?.let { Pair(it, options) }
-        }
-    }
-
     @Query("SELECT relay1, relay2 FROM poll WHERE eventId = :pollId")
     fun getPollRelays(pollId: String): PollRelays?
 

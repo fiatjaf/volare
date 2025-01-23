@@ -43,7 +43,3 @@ func (dbi DBInterface) augmentNote(ie nostr.RelayEvent) {
 	// fetch replies
 	// fetch poll responses -- ensure we don't write a new poll response from the same user if we already have one
 }
-
-func trackRelays(ie nostr.RelayEvent) {
-	// TODO
-}

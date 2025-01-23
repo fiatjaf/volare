@@ -8,7 +8,6 @@ import com.fiatjaf.volare.core.FEED_PAGE_SIZE
 import com.fiatjaf.volare.core.SHORT_DEBOUNCE
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.data.model.FeedSetting
-import com.fiatjaf.volare.data.nostr.SubscriptionCreator
 import com.fiatjaf.volare.data.nostr.getCurrentSecs
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.ui.components.row.mainEvent.FeedCtx
@@ -27,7 +26,6 @@ private const val TAG = "Paginator"
 
 class Paginator(
     private val feedProvider: FeedProvider,
-    private val subCreator: SubscriptionCreator,
     private val scope: CoroutineScope,
 ) : IPaginator {
     override val isInitialized = mutableStateOf(false)
@@ -68,7 +66,7 @@ class Paginator(
         }
     }
 
-    fun refresh(onSub: () -> Unit? = null) {
+    fun refresh(onSub: (() -> Unit)? = null) {
         if (isRefreshing.value) return
 
         isRefreshing.value = true
@@ -90,7 +88,6 @@ class Paginator(
     fun append() {
         if (isAppending.value || isRefreshing.value || pageTimestamps.value.isEmpty()) return
 
-        subCreator.unsubAll()
         isAppending.value = true
         hasMoreRecentItems.value = true
 

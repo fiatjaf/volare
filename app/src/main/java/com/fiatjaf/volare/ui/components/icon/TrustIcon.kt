@@ -43,14 +43,14 @@ fun TrustIcon(trustType: TrustType, size: Dp = sizing.trustIndicator) {
 
 @Stable
 @Composable
-fun TrustIcon(profile: AdvancedProfileView) {
+fun TrustIcon(ourPubkey: String, profile: backend.Profile) {
     TrustIcon(
         trustType = TrustType.from(
-            isOneself = false, // TODO: get this to work again
-            isFriend = profile.isFriend,
-            isWebOfTrust = profile.isWebOfTrust,
-            isMuted = profile.isMuted,
-            isInList = profile.isInList,
+            isOneself = profile.pubkey() == ourPubkey,
+            isFriend = profile.isFollowedBy(ourPubkey),
+            isWebOfTrust = profile.isInNetworkOf(ourPubkey),
+            isMuted = profile.isMutedBy(ourPubkey),
+            isInList = profile.isInFollowSetOf(ourPubkey),
         )
     )
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.SearchTopicSuggestion
+import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.core.utils.isBareTopicStr
 import com.fiatjaf.volare.core.utils.normalizeTopic
 import com.fiatjaf.volare.ui.components.row.ClickableRow

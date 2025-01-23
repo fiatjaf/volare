@@ -17,7 +17,6 @@ import com.fiatjaf.volare.core.utils.normalizeTopic
 import com.fiatjaf.volare.data.model.ItemSetMeta
 import com.fiatjaf.volare.data.model.PostDetails
 import com.fiatjaf.volare.data.model.TopicFeedSetting
-import com.fiatjaf.volare.data.nostr.SubscriptionCreator
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
 import com.fiatjaf.volare.data.provider.TopicProvider
@@ -30,7 +29,6 @@ class TopicViewModel(
     feedProvider: FeedProvider,
     val postDetails: State<PostDetails?>,
     val feedState: LazyListState,
-    private val subCreator: SubscriptionCreator,
     private val topicProvider: TopicProvider,
     private val itemSetProvider: ItemSetProvider,
 ) : ViewModel() {
@@ -42,12 +40,10 @@ class TopicViewModel(
     val paginator = Paginator(
         feedProvider = feedProvider,
         scope = viewModelScope,
-        subCreator = subCreator
     )
 
     fun openTopic(topicNavView: TopicNavView) {
         val stripped = topicNavView.topic.normalizeTopic()
-        subCreator.unsubAll()
         paginator.reinit(setting = TopicFeedSetting(topic = stripped))
 
         val initFollowVal = if (currentTopic.value == stripped) isFollowed.value else false
@@ -63,7 +59,6 @@ class TopicViewModel(
     fun handle(action: TopicViewAction) {
         when (action) {
             TopicViewRefresh -> {
-                subCreator.unsubAll()
                 paginator.refresh()
             }
 

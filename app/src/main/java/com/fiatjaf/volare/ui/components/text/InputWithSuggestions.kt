@@ -18,16 +18,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.ClickProfileSuggestion
 import com.fiatjaf.volare.core.SearchProfileSuggestion
+import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.data.nostr.NOSTR_URI
-import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.ui.components.row.ClickableProfileRow
 import com.fiatjaf.volare.ui.components.selection.NamedCheckbox
 import rust.nostr.sdk.PublicKey
 
 @Composable
 fun InputWithSuggestions(
+    ourPubkey: String,
     body: MutableState<TextFieldValue>,
-    searchSuggestions: List<AdvancedProfileView>,
+    searchSuggestions: List<backend.Profile>,
     isAnon: MutableState<Boolean>,
     onUpdate: (UIEvent) -> Unit,
     allowAnon: Boolean = false,
@@ -53,11 +54,12 @@ fun InputWithSuggestions(
         }
         if (showSuggestions.value && searchSuggestions.isNotEmpty()) {
             SearchSuggestions(
+                ourPubkey = ourPubkey,
                 modifier = Modifier.weight(0.4f),
                 suggestions = searchSuggestions,
                 onReplaceSuggestion = { profile ->
-                    body.value = body.value.replaceWithSuggestion(pubkey = profile.pubkey)
-                    onUpdate(ClickProfileSuggestion(pubkey = profile.pubkey))
+                    body.value = body.value.replaceWithSuggestion(pubkey = profile.pubkey())
+                    onUpdate(ClickProfileSuggestion(pubkey = profile.pubkey()))
                 }
             )
         } else if (allowAnon) {
@@ -71,8 +73,9 @@ fun InputWithSuggestions(
 
 @Composable
 private fun SearchSuggestions(
-    suggestions: List<AdvancedProfileView>,
-    onReplaceSuggestion: (AdvancedProfileView) -> Unit,
+    ourPubkey: String,
+    suggestions: List<backend.Profile>,
+    onReplaceSuggestion: (backend.Profile) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -82,6 +85,7 @@ private fun SearchSuggestions(
         items(suggestions) { profile ->
             Row(modifier = Modifier.fillMaxWidth()) {
                 ClickableProfileRow(
+                    ourPubkey = ourPubkey,
                     profile = profile,
                     onClick = { onReplaceSuggestion(profile) })
             }

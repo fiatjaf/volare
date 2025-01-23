@@ -16,13 +16,11 @@ import com.fiatjaf.volare.core.InboxViewRefresh
 import com.fiatjaf.volare.core.model.Paginator
 import com.fiatjaf.volare.data.model.InboxFeedSetting
 import com.fiatjaf.volare.data.model.PostDetails
-import com.fiatjaf.volare.data.nostr.SubscriptionCreator
 import com.fiatjaf.volare.data.preferences.InboxPreferences
 import com.fiatjaf.volare.data.provider.FeedProvider
 
 class InboxViewModel(
     feedProvider: FeedProvider,
-    subCreator: SubscriptionCreator,
     val postDetails: State<PostDetails?>,
     val feedState: LazyListState,
     private val inboxPreferences: InboxPreferences
@@ -33,7 +31,6 @@ class InboxViewModel(
     val paginator = Paginator(
         feedProvider = feedProvider,
         scope = viewModelScope,
-        subCreator = subCreator
     )
 
     fun handle(action: InboxViewAction) {

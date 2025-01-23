@@ -17,6 +17,7 @@ import com.fiatjaf.volare.core.model.Poll
 import com.fiatjaf.volare.core.model.RootPost
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.interactor.PostSender
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.nostr.createNprofile
@@ -26,12 +27,14 @@ import kotlinx.coroutines.delay
 import rust.nostr.sdk.Event
 
 class CreateReplyViewModel(
+    accountManager: AccountManager,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
     private val postSender: PostSender,
     private val snackbar: SnackbarHostState,
     private val eventRelayDao: EventRelayDao,
     private val mainEventDao: MainEventDao,
 ) : ViewModel() {
+    val ourPubkey = accountManager.pubkeyHexFlow
     val isSendingReply = mutableStateOf(false)
     val parent: MutableState<MainEvent?> = mutableStateOf(null)
 

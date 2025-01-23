@@ -8,23 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProfileDao {
-    @Query("SELECT * FROM AdvancedProfileView WHERE pubkey = :pubkey")
-    fun getAdvancedProfileFlow(pubkey: String): Flow<AdvancedProfileView?>
 
-    @Query(
-        "SELECT * " +
-                "FROM AdvancedProfileView " +
-                "WHERE pubkey = (SELECT friendPubkey FROM weboftrust WHERE webOfTrustPubkey = :pubkey)"
-    )
-    fun getAdvancedProfileTrustedByFlow(pubkey: String): Flow<AdvancedProfileView?>
-
-    @Query(
-        "SELECT pubkey, IFNULL(name, '') name, IFNULL(createdAt, 0) createdAt " +
-                "FROM profile " +
-                "WHERE pubkey = :ourPubkey " +
-                "LIMIT 1"
-    )
-    suspend fun getPersonalProfile(ourPubkey: String): ProfileEntity?
 
     @Query("SELECT * FROM AdvancedProfileView WHERE pubkey IN (:pubkeys)")
     fun getAdvancedProfilesFlow(pubkeys: Collection<String>): Flow<List<AdvancedProfileView>>
@@ -55,12 +39,6 @@ interface ProfileDao {
 
     @Query("SELECT createdAt FROM profile WHERE pubkey = :pubkey")
     suspend fun getMaxCreatedAt(pubkey: String): Long?
-
-    suspend fun getProfilesByName(name: String, limit: Int): List<AdvancedProfileView> {
-        if (limit <= 0) return emptyList()
-
-        return internalGetProfilesWithNameLike(name = name, somewhere = "%$name%", limit = limit)
-    }
 
     @Query(
         "SELECT DISTINCT pubkey AS pk " +
@@ -97,19 +75,4 @@ interface ProfileDao {
                 "AND tag = 'p'"
     )
     suspend fun getUnknownMutes(): List<String>
-
-    @Query(
-        "SELECT * " +
-                "FROM AdvancedProfileView " +
-                "WHERE (name = :name OR name LIKE :somewhere) " +
-                "AND name != '' " +
-                "AND pubkey NOT IN (SELECT mutedItem FROM mute WHERE tag = 'p') " +
-                "ORDER BY length(name) ASC " +
-                "LIMIT :limit"
-    )
-    suspend fun internalGetProfilesWithNameLike(
-        name: String,
-        somewhere: String,
-        limit: Int
-    ): List<AdvancedProfileView>
 }

@@ -50,9 +50,6 @@ data class CommentView(
     fun mapToThreadReplyCtx(
         level: Int,
         isOp: Boolean,
-        forcedVotes: Map<String, Boolean>,
-        forcedFollows: Map<String, Boolean>,
-        forcedBookmarks: Map<String, Boolean>,
         collapsedIds: Set<String>,
         parentIds: Set<String>,
         ourPubKey: String,
@@ -60,9 +57,6 @@ data class CommentView(
     ): ThreadReplyCtx {
         return ThreadReplyCtx(
             reply = this.mapToCommentUI(
-                forcedVotes = forcedVotes,
-                forcedFollows = forcedFollows,
-                forcedBookmarks = forcedBookmarks,
                 ourPubKey = ourPubKey,
                 annotatedStringProvider = annotatedStringProvider
             ),

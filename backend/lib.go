@@ -38,9 +38,8 @@ func Start(datadir string) {
 	sys = sdk.NewSystem(sdk.WithHintsDB(hints))
 	sys.Pool = nostr.NewSimplePool(context.Background(),
 		nostr.WithAuthorKindQueryMiddleware(sys.TrackQueryAttempts),
-		nostr.WithEventMiddleware(sys.TrackEventHints),
-		nostr.WithEventMiddleware(DBI.activateEmitters),
-		nostr.WithEventMiddleware(trackRelays),
+		nostr.WithEventMiddleware(sys.TrackEventHintsAndRelays),
+		nostr.WithDuplicateMiddleware(sys.TrackEventRelaysD),
 		nostr.WithPenaltyBox(),
 	)
 

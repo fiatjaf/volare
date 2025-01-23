@@ -17,11 +17,6 @@ import com.fiatjaf.volare.core.MAX_SUBJECT_LEN
 import com.fiatjaf.volare.core.VOLARE
 import com.fiatjaf.volare.core.model.MainEvent
 import com.fiatjaf.volare.core.model.SomeReply
-import com.fiatjaf.volare.data.event.COMMENT_U16
-import com.fiatjaf.volare.data.event.POLL_U16
-import com.fiatjaf.volare.data.model.ForcedData
-import com.fiatjaf.volare.data.model.RelevantMetadata
-import com.fiatjaf.volare.data.nostr.getSubject
 import com.fiatjaf.volare.data.provider.AnnotatedStringProvider
 import com.fiatjaf.volare.data.provider.FriendProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
@@ -50,37 +45,9 @@ import rust.nostr.sdk.Event
 import rust.nostr.sdk.Filter
 import rust.nostr.sdk.Kind
 import rust.nostr.sdk.KindEnum
-import rust.nostr.sdk.Metadata
 import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.SingleLetterTag
 import rust.nostr.sdk.Tag
-
-fun PublicKey.toShortenedNpub(): String {
-    return this.toBech32().shortenBech32()
-}
-
-fun Bech32.shortenBech32() = "${this.take(10)}…${this.takeLast(5)}"
-
-fun String.toShortenedBech32(): String {
-    if (this.isEmpty()) return ""
-    val pubkey = runCatching { PublicKey.fromHex(this) }.getOrNull() ?: return ""
-    return pubkey.toShortenedNpub()
-}
-
-fun String.toBech32(): String {
-    if (this.isEmpty()) return ""
-    return runCatching { PublicKey.fromHex(this).toBech32() }.getOrNull() ?: ""
-}
-
-fun Metadata.toRelevantMetadata(pubkey: String, createdAt: Long): RelevantMetadata {
-    return RelevantMetadata(
-        npub = pubkey.toBech32(),
-        name = this.getNormalizedName(),
-        about = this.getAbout()?.trim(),
-        lightning = this.getLud16().orEmpty().ifEmpty { this.getLud06() },
-        createdAt = createdAt
-    )
-}
 
 fun SnackbarHostState.showToast(scope: CoroutineScope, msg: String) {
     this.currentSnackbarData?.dismiss()
@@ -207,31 +174,10 @@ fun mergeRelayFilters(vararg maps: Map<String, List<Filter>>): Map<String, List<
     return result
 }
 
-val commentableKinds = listOf(
-    Kind.fromEnum(KindEnum.TextNote),
-    Kind(kind = COMMENT_U16),
-    Kind(kind = POLL_U16)
-)
-
 val crossPostableKinds = listOf(
     Kind.fromEnum(KindEnum.TextNote),
     Kind(kind = COMMENT_U16),
 )
-
-val rootFeedableKindsNoKTag = listOf(
-    Kind.fromEnum(KindEnum.TextNote),
-    Kind.fromEnum(KindEnum.Repost),
-    Kind(kind = POLL_U16)
-)
-
-val replyKinds = listOf(
-    Kind.fromEnum(KindEnum.TextNote),
-    Kind(kind = COMMENT_U16),
-)
-
-val reactionKind = Kind.fromEnum(KindEnum.Reaction)
-
-val reactionaryKinds = replyKinds + reactionKind
 
 val threadableKinds = listOf(
     Kind.fromEnum(KindEnum.TextNote),
@@ -285,7 +231,6 @@ fun mergeToMainEventUIList(
     pollOptions: Collection<PollOptionView>,
     legacyReplies: Collection<LegacyReplyView>,
     comments: Collection<CommentView>,
-    forcedData: ForcedData,
     size: Int,
     ourPubKey: String,
     annotatedStringProvider: AnnotatedStringProvider,
@@ -297,9 +242,6 @@ fun mergeToMainEventUIList(
         pollOptions = pollOptions,
         legacyReplies = legacyReplies,
         comments = comments,
-        votes = forcedData.votes,
-        follows = forcedData.follows,
-        bookmarks = forcedData.bookmarks,
         size = size,
         ourPubKey = ourPubKey,
         annotatedStringProvider = annotatedStringProvider
@@ -313,9 +255,6 @@ fun mergeToMainEventUIList(
     pollOptions: Collection<PollOptionView>,
     legacyReplies: Collection<LegacyReplyView>,
     comments: Collection<CommentView>,
-    votes: Map<String, Boolean>,
-    follows: Map<String, Boolean>,
-    bookmarks: Map<String, Boolean>,
     size: Int,
     ourPubKey: String,
     annotatedStringProvider: AnnotatedStringProvider,
@@ -335,9 +274,6 @@ fun mergeToMainEventUIList(
         if (!applicableTimestamps.contains(post.createdAt)) continue
         val mapped = post.mapToRootPostUI(
             ourPubKey = ourPubKey,
-            forcedVotes = votes,
-            forcedFollows = follows,
-            forcedBookmarks = bookmarks,
             annotatedStringProvider = annotatedStringProvider
         )
         result.add(mapped)
@@ -345,9 +281,6 @@ fun mergeToMainEventUIList(
     for (cross in crossPosts) {
         if (!applicableTimestamps.contains(cross.createdAt)) continue
         val mapped = cross.mapToCrossPostUI(
-            forcedVotes = votes,
-            forcedFollows = follows,
-            forcedBookmarks = bookmarks,
             ourPubKey = ourPubKey,
             annotatedStringProvider = annotatedStringProvider
         )
@@ -357,9 +290,6 @@ fun mergeToMainEventUIList(
         if (!applicableTimestamps.contains(poll.createdAt)) continue
         val mapped = poll.mapToPollUI(
             pollOptions = pollOptions.filter { it.pollId == poll.id },
-            forcedVotes = votes,
-            forcedFollows = follows,
-            forcedBookmarks = bookmarks,
             ourPubKey = ourPubKey,
             annotatedStringProvider = annotatedStringProvider
         )
@@ -368,9 +298,6 @@ fun mergeToMainEventUIList(
     for (reply in legacyReplies) {
         if (!applicableTimestamps.contains(reply.createdAt)) continue
         val mapped = reply.mapToLegacyReplyUI(
-            forcedVotes = votes,
-            forcedFollows = follows,
-            forcedBookmarks = bookmarks,
             ourPubKey = ourPubKey,
             annotatedStringProvider = annotatedStringProvider
         )
@@ -379,9 +306,6 @@ fun mergeToMainEventUIList(
     for (comment in comments) {
         if (!applicableTimestamps.contains(comment.createdAt)) continue
         val mapped = comment.mapToCommentUI(
-            forcedVotes = votes,
-            forcedFollows = follows,
-            forcedBookmarks = bookmarks,
             ourPubKey = ourPubKey,
             annotatedStringProvider = annotatedStringProvider
         )
@@ -426,7 +350,7 @@ fun createAdvancedProfile(
     dbProfile: AdvancedProfileView?,
     forcedFollowState: Boolean?,
     forcedMuteState: Boolean?,
-    metadata: RelevantMetadata?,
+    metadata: backend.Profile?,
     friendProvider: FriendProvider,
     itemSetProvider: ItemSetProvider,
 ): AdvancedProfileView {

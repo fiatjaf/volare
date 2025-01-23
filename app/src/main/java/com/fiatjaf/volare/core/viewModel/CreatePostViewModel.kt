@@ -11,14 +11,17 @@ import com.fiatjaf.volare.core.SendPoll
 import com.fiatjaf.volare.core.SendPost
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.interactor.PostSender
 import kotlinx.coroutines.delay
 
 
 class CreatePostViewModel(
+    accountManager: AccountManager,
     private val postSender: PostSender,
     private val snackbar: SnackbarHostState,
 ) : ViewModel() {
+    val ourPubkey = accountManager.pubkeyHexFlow
     val isSending = mutableStateOf(false)
 
     fun handle(action: CreatePostViewAction) {

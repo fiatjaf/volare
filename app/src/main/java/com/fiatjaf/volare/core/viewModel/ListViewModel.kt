@@ -13,9 +13,9 @@ import com.fiatjaf.volare.core.ListViewRefresh
 import com.fiatjaf.volare.core.model.Paginator
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.data.model.CustomPubkeys
-import com.fiatjaf.volare.data.model.ListFeedSetting
 import com.fiatjaf.volare.data.model.ListPubkeys
 import com.fiatjaf.volare.data.model.PostDetails
+import com.fiatjaf.volare.data.model.SetFeedSetting
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
@@ -48,13 +48,15 @@ class ListViewModel(
 
     fun openList(identifier: String) {
         isLoading.value = true
-        paginator.reinit(setting = ListFeedSetting(identifier = identifier))
+        paginator.reinit(setting = SetFeedSetting(identifier = identifier))
         viewModelScope.launchIO {
+            // TODO: call backend
+            /*
             lazyNostrSubscriber.lazySubNip65s(selection = ListPubkeys(identifier = identifier))
             itemSetProvider.loadList(identifier = identifier)
             lazyNostrSubscriber.lazySubUnknownProfiles(
                 selection = CustomPubkeys(itemSetProvider.profiles.value.map { it.pubkey })
-            )
+            ) */
         }.invokeOnCompletion {
             isLoading.value = false
         }

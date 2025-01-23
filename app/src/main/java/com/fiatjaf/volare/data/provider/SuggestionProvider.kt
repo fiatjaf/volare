@@ -11,7 +11,6 @@ import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.normalizeTopic
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.nostr.createNprofile
-import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,7 +20,7 @@ class SuggestionProvider(
     private val lazyNostrSubscriber: LazyNostrSubscriber,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
-    val profileSuggestions: MutableState<List<AdvancedProfileView>> = mutableStateOf(emptyList())
+    val profileSuggestions: MutableState<List<backend.Profile>> = mutableStateOf(emptyList())
     val topicSuggestions: MutableState<List<String>> = mutableStateOf(emptyList())
 
     fun handle(action: SuggestionAction) {

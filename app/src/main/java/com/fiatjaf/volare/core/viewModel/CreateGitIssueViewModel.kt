@@ -12,16 +12,19 @@ import com.fiatjaf.volare.core.SendGitIssue
 import com.fiatjaf.volare.core.SubRepoOwnerRelays
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
+import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.interactor.PostSender
 import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.nostr.createNprofile
 import kotlinx.coroutines.delay
 
 class CreateGitIssueViewModel(
+    accountManager: AccountManager,
     private val postSender: PostSender,
     private val snackbar: SnackbarHostState,
     private val lazyNostrSubscriber: LazyNostrSubscriber,
 ) : ViewModel() {
+    val ourPubkey = accountManager.pubkeyHexFlow
     val isSendingIssue = mutableStateOf(false)
 
     fun handle(action: CreateGitIssueViewAction) {

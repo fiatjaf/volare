@@ -192,13 +192,13 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
         },
         createPostVM = viewModel {
             CreatePostViewModel(
+                accountManager = appContainer.accountManager,
                 postSender = appContainer.postSender,
                 snackbar = appContainer.snackbar,
             )
         },
         createReplyVM = viewModel {
             CreateReplyViewModel(
-                lazyNostrSubscriber = appContainer.lazyNostrSubscriber,
                 postSender = appContainer.postSender,
                 snackbar = appContainer.snackbar,
                 eventRelayDao = appContainer.roomDb.eventRelayDao(),
@@ -207,8 +207,6 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
         },
         editProfileVM = viewModel {
             EditProfileViewModel(
-                fullProfileUpsertDao = appContainer.roomDb.fullProfileUpsertDao(),
-                nostrService = appContainer.nostrService,
                 snackbar = appContainer.snackbar,
                 relayProvider = appContainer.relayProvider,
                 fullProfileDao = appContainer.roomDb.fullProfileDao(),
@@ -270,10 +268,8 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
         bookmarksVM = viewModel {
             BookmarksViewModel(
                 feedProvider = appContainer.feedProvider,
-                muteProvider = appContainer.muteProvider,
                 feedState = bookmarksFeedState,
                 postDetails = appContainer.postDetailInspector.currentDetails,
-                lazyNostrSubscriber = appContainer.lazyNostrSubscriber,
             )
         },
         editListVM = viewModel {
@@ -281,20 +277,18 @@ private fun createVMContainer(appContainer: AppContainer): VMContainer {
                 itemSetEditor = appContainer.itemSetEditor,
                 snackbar = appContainer.snackbar,
                 itemSetProvider = appContainer.itemSetProvider,
-                lazyNostrSubscriber = appContainer.lazyNostrSubscriber
+                accountManager = appContainer.accountManager,
             )
         },
         listVM = viewModel {
             ListViewModel(
                 feedProvider = appContainer.feedProvider,
-                muteProvider = appContainer.muteProvider,
                 postDetails = appContainer.postDetailInspector.currentDetails,
                 feedState = listFeedState,
                 profileState = listProfileState,
                 topicState = listTopicState,
                 itemSetProvider = appContainer.itemSetProvider,
                 pagerState = listViewPagerState,
-                lazyNostrSubscriber = appContainer.lazyNostrSubscriber
             )
         },
         muteListVM = viewModel {

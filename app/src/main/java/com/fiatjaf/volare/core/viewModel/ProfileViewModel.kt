@@ -23,9 +23,6 @@ import com.fiatjaf.volare.data.model.ItemSetMeta
 import com.fiatjaf.volare.data.model.PostDetails
 import com.fiatjaf.volare.data.model.ProfileFeedSetting
 import com.fiatjaf.volare.data.model.ReplyFeedSetting
-import com.fiatjaf.volare.data.nostr.Nip65Relay
-import com.fiatjaf.volare.data.nostr.NostrSubscriber
-import com.fiatjaf.volare.data.nostr.createNprofile
 import com.fiatjaf.volare.data.provider.FeedProvider
 import com.fiatjaf.volare.data.provider.ItemSetProvider
 import com.fiatjaf.volare.data.provider.ProfileProvider
@@ -47,7 +44,6 @@ class ProfileViewModel(
     val profileAboutState: LazyListState,
     val profileRelayState: LazyListState,
     val pagerState: PagerState,
-    private val nostrSubscriber: NostrSubscriber,
     private val profileProvider: ProfileProvider,
     private val nip65Dao: Nip65Dao,
     private val eventRelayDao: EventRelayDao,
@@ -79,7 +75,7 @@ class ProfileViewModel(
 
     fun openProfile(profileNavView: ProfileNavView) {
         val pubkeyHex = profileNavView.nprofile.publicKey().toHex()
-        if (profile.value.value.inner.pubkey == pubkeyHex) return
+        if (profile.value.value.inner.pubkey() == pubkeyHex) return
 
         nostrSubscriber.subCreator.unsubAll()
         profile.value = profileProvider
@@ -93,8 +89,7 @@ class ProfileViewModel(
         viewModelScope.launch {
             pagerState.scrollToPage(0)
             trustedBy.value = if (pubkeyHex != accountManager.getPublicKeyHex()) {
-                profileProvider.getTrustedByFlow(pubkey = pubkeyHex)
-                    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+                profileProvider.getTrustedBy(pubkey = pubkeyHex)
             } else {
                 MutableStateFlow(null)
             }

@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -17,10 +18,10 @@ import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.EditListViewAddProfile
 import com.fiatjaf.volare.core.EditListViewAddTopic
 import com.fiatjaf.volare.core.MAX_KEYS_SQL
+import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.core.utils.getListTabHeaders
 import com.fiatjaf.volare.core.utils.getTransparentTextFieldColors
 import com.fiatjaf.volare.core.viewModel.EditListViewModel
-import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.ui.components.SimpleTabPager
 import com.fiatjaf.volare.ui.components.dialog.AddProfileDialog
 import com.fiatjaf.volare.ui.components.dialog.AddTopicDialog
@@ -28,17 +29,20 @@ import com.fiatjaf.volare.ui.components.indicator.ComingSoon
 import com.fiatjaf.volare.ui.components.list.ProfileList
 import com.fiatjaf.volare.ui.components.list.TopicList
 import com.fiatjaf.volare.ui.components.row.AddRow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun EditListView(
     vm: EditListViewModel,
-    profileSuggestions: State<List<AdvancedProfileView>>,
+    profileSuggestions: State<List<backend.Profile>>,
     topicSuggestions: State<List<String>>,
     snackbar: SnackbarHostState,
     onUpdate: (UIEvent) -> Unit
 ) {
+    val ourPubkey: String by vm.ourPubkey.collectAsState()
+
     EditListScaffold(
         title = vm.title,
         isSaving = vm.isSaving.value,
@@ -46,6 +50,7 @@ fun EditListView(
         onUpdate = onUpdate
     ) {
         ScreenContent(
+            ourPubkey = ourPubkey,
             profileSuggestions = profileSuggestions.value,
             topicSuggestions = topicSuggestions.value,
             vm = vm,
@@ -56,7 +61,8 @@ fun EditListView(
 
 @Composable
 private fun ScreenContent(
-    profileSuggestions: List<AdvancedProfileView>,
+    ourPubkey: String,
+    profileSuggestions: List<backend.Profile>,
     topicSuggestions: List<String>,
     vm: EditListViewModel,
     onUpdate: (UIEvent) -> Unit
@@ -68,6 +74,7 @@ private fun ScreenContent(
     val showTopicDialog = remember { mutableStateOf(false) }
     if (showProfileDialog.value) {
         AddProfileDialog(
+            ourPubkey = ourPubkey,
             profileSuggestions = profileSuggestions,
             onAdd = {
                 onUpdate(EditListViewAddProfile(profile = it))

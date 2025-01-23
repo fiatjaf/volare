@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.fiatjaf.volare.core.utils.getNormalizedName
 import com.fiatjaf.volare.data.event.ValidatedProfile
-import com.fiatjaf.volare.data.model.RelevantMetadata
 import com.fiatjaf.volare.data.nostr.getMetadata
 import com.fiatjaf.volare.data.nostr.secs
 import rust.nostr.sdk.Event
@@ -27,16 +26,6 @@ data class FullProfileEntity(
     val website: String,
     val banner: String,
 ) {
-    fun toRelevantMetadata(): RelevantMetadata {
-        return RelevantMetadata(
-            npub = PublicKey.fromHex(this.pubkey).toBech32(),
-            name = this.name,
-            about = this.about,
-            lightning = this.lud16.ifEmpty { this.lud06 },
-            createdAt = this.createdAt
-        )
-    }
-
     companion object {
         fun from(profile: ValidatedProfile): FullProfileEntity {
             return FullProfileEntity(

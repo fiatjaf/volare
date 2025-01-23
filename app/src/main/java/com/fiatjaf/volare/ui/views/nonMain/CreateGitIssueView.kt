@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -25,11 +26,11 @@ import com.fiatjaf.volare.core.GoBack
 import com.fiatjaf.volare.core.MAX_SUBJECT_LINES
 import com.fiatjaf.volare.core.SendGitIssue
 import com.fiatjaf.volare.core.SubRepoOwnerRelays
+import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.core.model.BugReport
 import com.fiatjaf.volare.core.model.EnhancementRequest
 import com.fiatjaf.volare.core.model.LabledGitIssue
 import com.fiatjaf.volare.core.viewModel.CreateGitIssueViewModel
-import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.ui.components.scaffold.ContentCreationScaffold
 import com.fiatjaf.volare.ui.components.selection.NamedRadio
 import com.fiatjaf.volare.ui.components.text.InputWithSuggestions
@@ -39,10 +40,11 @@ import com.fiatjaf.volare.ui.theme.spacing
 @Composable
 fun CreateGitIssueView(
     vm: CreateGitIssueViewModel,
-    searchSuggestions: State<List<AdvancedProfileView>>,
+    searchSuggestions: State<List<backend.Profile>>,
     snackbar: SnackbarHostState,
     onUpdate: (UIEvent) -> Unit
 ) {
+    val ourPubkey = vm.ourPubkey.collectAsState()
     val header = remember { mutableStateOf(TextFieldValue()) }
     val body = remember { mutableStateOf(TextFieldValue()) }
     val type: MutableState<LabledGitIssue> = remember { mutableStateOf(BugReport()) }
@@ -82,6 +84,7 @@ fun CreateGitIssueView(
         onUpdate = onUpdate,
     ) {
         CreateGitIssueContent(
+            ourPubkey = ourPubkey,
             header = header,
             body = body,
             type = type,
@@ -95,15 +98,17 @@ fun CreateGitIssueView(
 
 @Composable
 private fun CreateGitIssueContent(
+    ourPubkey: String,
     header: MutableState<TextFieldValue>,
     body: MutableState<TextFieldValue>,
     type: MutableState<LabledGitIssue>,
-    searchSuggestions: List<AdvancedProfileView>,
+    searchSuggestions: List<backend.Profile>,
     isAnon: MutableState<Boolean>,
     focusRequester: FocusRequester,
     onUpdate: (UIEvent) -> Unit,
 ) {
     InputWithSuggestions(
+        ourPubkey = ourPubkey,
         body = body,
         searchSuggestions = searchSuggestions,
         isAnon = isAnon,

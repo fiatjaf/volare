@@ -1,6 +1,8 @@
 package com.fiatjaf.volare.core
 
 import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import androidx.compose.ui.platform.UriHandler
 import com.fiatjaf.volare.core.model.ItemSetItem
@@ -91,12 +93,8 @@ data object ClickCreateGitIssue : PushNavEvent()
 
 sealed class AdvancedPushNavEvent : PushNavEvent()
 data class OpenThread(val note: backend.Note) : AdvancedPushNavEvent()
-data class OpenThreadRaw(
-    val nevent: String,
-    val parent: backend.Note? = null
-) : AdvancedPushNavEvent()
-
-data class OpenProfile(val nprofile: String) : AdvancedPushNavEvent()
+data class OpenThreadRaw(val pointer: backend.Pointer) : AdvancedPushNavEvent()
+data class OpenProfile(val pointer: backend.Pointer) : AdvancedPushNavEvent()
 data class OpenTopic(val topic: String) : AdvancedPushNavEvent()
 data class OpenReplyCreation(val parent: backend.Note) : AdvancedPushNavEvent()
 data class OpenCrossPostCreation(val id: String) : AdvancedPushNavEvent()

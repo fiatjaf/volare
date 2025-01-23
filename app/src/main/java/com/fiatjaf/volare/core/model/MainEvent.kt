@@ -301,10 +301,6 @@ data class Comment(
     isUpvoted = isUpvoted,
     isBookmarked = isBookmarked,
 ) {
-    fun parentIsSupported(): Boolean {
-        return parentId != null && commentableKinds.any { it.asU16().toInt() == parentKind }
-    }
-
     companion object {
         fun from(
             commentView: CommentView,

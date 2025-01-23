@@ -55,7 +55,7 @@ class ThreadViewModel(
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
-                parentUi?.let { ThreadRootCtx(threadableMainEvent = it) }
+                parentUi?.let { ThreadRootCtx(threadableNote = it) }
             )
         checkParentAvailability(replyId = id, parentUi = parentUi)
         loadReplies(

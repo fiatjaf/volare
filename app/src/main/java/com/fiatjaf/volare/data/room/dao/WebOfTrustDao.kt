@@ -21,11 +21,4 @@ interface WebOfTrustDao {
 
     @Query("SELECT MAX(createdAt) FROM weboftrust")
     suspend fun getNewestCreatedAt(): Long?
-
-    @Query(
-        "SELECT friendPubkey " +
-                "FROM weboftrust " +
-                "WHERE webOfTrustPubkey = :pubkey"
-    )
-    suspend fun getTrustedByPubkey(pubkey: String): String?
 }

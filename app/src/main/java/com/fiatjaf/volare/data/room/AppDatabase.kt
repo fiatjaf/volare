@@ -95,7 +95,6 @@ import com.fiatjaf.volare.data.room.view.SimplePostView
 
         // Lists
         FriendEntity::class,
-        WebOfTrustEntity::class,
         TopicEntity::class,
         Nip65Entity::class,
         BookmarkEntity::class,
@@ -106,10 +105,6 @@ import com.fiatjaf.volare.data.room.view.SimplePostView
         ProfileSetItemEntity::class,
         TopicSetEntity::class,
         TopicSetItemEntity::class,
-
-        // Other
-        ProfileEntity::class,
-        FullProfileEntity::class,
     ],
     views = [
         SimplePostView::class,
@@ -118,7 +113,6 @@ import com.fiatjaf.volare.data.room.view.SimplePostView
         LegacyReplyView::class,
         CommentView::class,
         CrossPostView::class,
-        AdvancedProfileView::class,
         PollView::class,
         PollOptionView::class,
     ]
@@ -134,7 +128,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun nip65Dao(): Nip65Dao
     abstract fun profileDao(): ProfileDao
     abstract fun eventRelayDao(): EventRelayDao
-    abstract fun rootPostDao(): RootPostDao
     abstract fun legacyReplyDao(): LegacyReplyDao
     abstract fun commentDao(): CommentDao
     abstract fun fullProfileDao(): FullProfileDao
@@ -152,7 +145,6 @@ abstract class AppDatabase : RoomDatabase() {
     // Util
     abstract fun deleteDao(): DeleteDao
     abstract fun countDao(): CountDao
-    abstract fun existsDao(): ExistsDao
 
     // Insert
     abstract fun mainEventInsertDao(): MainEventInsertDao
@@ -163,8 +155,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun topicUpsertDao(): TopicUpsertDao
     abstract fun bookmarkUpsertDao(): BookmarkUpsertDao
     abstract fun nip65UpsertDao(): Nip65UpsertDao
-    abstract fun profileUpsertDao(): ProfileUpsertDao
-    abstract fun fullProfileUpsertDao(): FullProfileUpsertDao
     abstract fun profileSetUpsertDao(): ProfileSetUpsertDao
     abstract fun topicSetUpsertDao(): TopicSetUpsertDao
     abstract fun muteUpsertDao(): MuteUpsertDao

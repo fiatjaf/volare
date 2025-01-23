@@ -7,35 +7,25 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fiatjaf.volare.core.DEBOUNCE
 import com.fiatjaf.volare.core.FollowListsViewAction
 import com.fiatjaf.volare.core.FollowListsViewInit
 import com.fiatjaf.volare.core.FollowListsViewRefresh
 import com.fiatjaf.volare.core.model.TopicFollowState
-import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
-import com.fiatjaf.volare.data.provider.ProfileProvider
-import com.fiatjaf.volare.data.provider.TopicProvider
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class FollowListsViewModel(
     val contactListState: LazyListState,
     val topicListState: LazyListState,
     val pagerState: PagerState,
-    private val lazyNostrSubscriber: LazyNostrSubscriber,
-    private val profileProvider: ProfileProvider,
-    private val topicProvider: TopicProvider,
 ) : ViewModel() {
     val tabIndex = mutableIntStateOf(0)
     val isRefreshing = mutableStateOf(false)
     val profiles: MutableState<StateFlow<List<AdvancedProfileView>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
-    val topics: MutableState<StateFlow<List<StringFollowState>>> =
+    val topics: MutableState<StateFlow<List<TopicFollowState>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
 
     fun handle(action: FollowListsViewAction) {
@@ -58,14 +48,9 @@ class FollowListsViewModel(
 
         viewModelScope.launch {
             if (!isInit) {
-                lazyNostrSubscriber.lazySubMyAccount()
-                delay(DEBOUNCE)
+                // TODO: call backend to refresh my account (metadata and lists)
             }
-            profiles.value = profileProvider.getMyFriendsFlow()
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), profiles.value.value)
-            topics.value = topicProvider.getMyTopicsFlow()
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), topics.value.value)
-            delay(DEBOUNCE)
+            // TODO: refresh all my friends' metadata
         }.invokeOnCompletion {
             isRefreshing.value = false
         }

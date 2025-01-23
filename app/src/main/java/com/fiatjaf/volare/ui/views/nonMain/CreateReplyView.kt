@@ -8,11 +8,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,13 +23,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextOverflow
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.GoBack
 import com.fiatjaf.volare.core.SendReply
+import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.core.model.MainEvent
 import com.fiatjaf.volare.core.viewModel.CreateReplyViewModel
-import com.fiatjaf.volare.data.room.view.AdvancedProfileView
 import com.fiatjaf.volare.ui.components.bottomSheet.FullPostBottomSheet
 import com.fiatjaf.volare.ui.components.scaffold.ContentCreationScaffold
 import com.fiatjaf.volare.ui.components.text.InputWithSuggestions
@@ -41,10 +40,11 @@ import com.fiatjaf.volare.ui.theme.spacing
 @Composable
 fun CreateReplyView(
     vm: CreateReplyViewModel,
-    searchSuggestions: State<List<AdvancedProfileView>>,
+    searchSuggestions: State<List<backend.Profile>>,
     snackbar: SnackbarHostState,
     onUpdate: (UIEvent) -> Unit
 ) {
+    val ourPubkey by vm.ourPubkey.collectAsState()
     val isSendingResponse by vm.isSendingReply
     val response = remember { mutableStateOf(TextFieldValue()) }
     val isAnon = remember { mutableStateOf(false) }
@@ -76,6 +76,7 @@ fun CreateReplyView(
         onUpdate = onUpdate,
     ) {
         CreateReplyViewContent(
+            ourPubkey = ourPubkey,
             parent = parent,
             response = response,
             searchSuggestions = suggestions,
@@ -88,14 +89,16 @@ fun CreateReplyView(
 
 @Composable
 private fun CreateReplyViewContent(
+    ourPubkey: String,
     parent: MainEvent?,
     response: MutableState<TextFieldValue>,
-    searchSuggestions: List<AdvancedProfileView>,
+    searchSuggestions: List<backend.Profile>,
     isAnon: MutableState<Boolean>,
     focusRequester: FocusRequester,
     onUpdate: (UIEvent) -> Unit,
 ) {
     InputWithSuggestions(
+        ourPubkey = ourPubkey,
         body = response,
         searchSuggestions = searchSuggestions,
         isAnon = isAnon,

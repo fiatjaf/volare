@@ -55,9 +55,6 @@ data class LegacyReplyView(
     fun mapToThreadReplyCtx(
         level: Int,
         isOp: Boolean,
-        forcedVotes: Map<String, Boolean>,
-        forcedFollows: Map<String, Boolean>,
-        forcedBookmarks: Map<String, Boolean>,
         collapsedIds: Set<String>,
         parentIds: Set<String>,
         ourPubKey: String,
@@ -65,9 +62,6 @@ data class LegacyReplyView(
     ): ThreadReplyCtx {
         return ThreadReplyCtx(
             reply = this.mapToLegacyReplyUI(
-                forcedVotes = forcedVotes,
-                forcedFollows = forcedFollows,
-                forcedBookmarks = forcedBookmarks,
                 ourPubKey = ourPubKey,
                 annotatedStringProvider = annotatedStringProvider
             ),
@@ -79,24 +73,13 @@ data class LegacyReplyView(
     }
 
     fun mapToLegacyReplyUI(
-        forcedVotes: Map<String, Boolean>,
-        forcedFollows: Map<String, Boolean>,
-        forcedBookmarks: Map<String, Boolean>,
         ourPubKey: String,
         annotatedStringProvider: AnnotatedStringProvider
     ): LegacyReply {
-        val reply = LegacyReply.from(
+        return LegacyReply.from(
             legacyReplyView = this,
             ourPubKey = ourPubKey,
             annotatedStringProvider = annotatedStringProvider
         )
-        val vote = forcedVotes.getOrDefault(this.id, null)
-        val follow = forcedFollows.getOrDefault(this.pubkey, null)
-        val bookmark = forcedBookmarks.getOrDefault(this.id, null)
-        return if (vote != null || follow != null || bookmark != null) reply.copy(
-            isUpvoted = vote ?: reply.isUpvoted,
-            trustType = TrustType.from(legacyReplyView = this, ourPubKey = ourPubKey, isFriend = follow),
-            isBookmarked = bookmark ?: reply.isBookmarked
-        ) else reply
     }
 }
