@@ -1,14 +1,15 @@
 package backend
 
 import (
-	"cmp"
 	"context"
 	"fmt"
 	"time"
 
 	"github.com/mailru/easyjson"
 	"github.com/nbd-wtf/go-nostr"
+	"github.com/nbd-wtf/go-nostr/nip10"
 	"github.com/nbd-wtf/go-nostr/nip14"
+	"github.com/nbd-wtf/go-nostr/nip19"
 	"github.com/nbd-wtf/go-nostr/nip92"
 	"github.com/nbd-wtf/go-nostr/sdk"
 )
@@ -35,7 +36,7 @@ func (b blurhashDef) Blurhash() string { return b.IMetaEntry.Blurhash }
 type Note interface {
 	Is() int
 	ID() string
-	PubKey() string
+	Pubkey() string
 	CreatedAt() int64
 	Subject() string
 	Content() string
@@ -50,6 +51,9 @@ type Note interface {
 	LikeCount() int
 	ReplyCount() int
 	Repost() Note
+	RelevantID() string
+	Parent() string
+	Nevent() string
 }
 
 type note struct {
@@ -59,7 +63,7 @@ type note struct {
 }
 
 func (n note) ID() string       { return n.Event.ID }
-func (n note) PubKey() string   { return n.Event.PubKey }
+func (n note) Pubkey() string   { return n.Event.PubKey }
 func (n note) CreatedAt() int64 { return int64(n.Event.CreatedAt) }
 func (n note) Content() string  { return n.Event.Content }
 func (n note) Subject() string  { return nip14.GetSubject(n.Event.Tags) }
@@ -231,6 +235,27 @@ func (n note) Repost() Note {
 	return note{Event: evt}
 }
 
+func (n note) RelevantID() string {
+	if n.Is() == IsRepost {
+		return n.Repost().ID()
+	}
+	return n.Event.ID
+}
+
+func (n note) Parent() string {
+	tag := nip10.GetImmediateParent(n.Event.Tags)
+	if tag == nil {
+		return ""
+	}
+	return (*tag)[1]
+}
+
+func (n note) Nevent() string {
+	relays, _ := sys.GetEventRelays(n.Event.ID)
+	nevent, _ := nip19.EncodeEvent(n.Event.ID, relays, n.Event.PubKey)
+	return nevent
+}
+
 func (dbi DBInterface) GetNote(idOrCode string) (Note, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
@@ -244,8 +269,4 @@ func (dbi DBInterface) GetNote(idOrCode string) (Note, error) {
 	_ = relays
 
 	return note{Event: event}, nil
-}
-
-func compareNotesMostRecentFirst(a, b note) int {
-	return -cmp.Compare(a.Event.CreatedAt, b.Event.CreatedAt)
 }

@@ -39,8 +39,13 @@ class BackendDatabase {
         }
     }
 
-    fun getRootPost(id: String): backend.Note {
-        return dbi.getNote(id)
+    fun getNote(id: String): backend.Note? {
+        try {
+            return dbi.getNote(id)
+        } catch (err: Exception) {
+            Log.d(TAG, "failed to getNote($id): $err")
+            return null
+        }
     }
 
     fun getHomeFeedFlow(pubkey: String, setting: HomeFeedSetting, until: Long = 9999999999L, limit: Int): Flow<backend.NoteFeed> {

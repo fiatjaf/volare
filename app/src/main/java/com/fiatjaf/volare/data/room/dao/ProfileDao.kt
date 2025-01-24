@@ -16,9 +16,6 @@ interface ProfileDao {
     @Query("SELECT * FROM AdvancedProfileView WHERE pubkey IN (SELECT friendPubkey FROM friend)")
     suspend fun getAdvancedProfilesOfFriends(): List<AdvancedProfileView>
 
-    @Query("SELECT * FROM AdvancedProfileView WHERE pubkey IN (SELECT mutedItem FROM mute WHERE tag = 'p')")
-    suspend fun getAdvancedProfilesOfMutes(): List<AdvancedProfileView>
-
     @Query(
         "SELECT * " +
                 "FROM AdvancedProfileView " +

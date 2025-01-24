@@ -58,7 +58,7 @@ class ProfileProvider(
         return getKnownProfilesFlow(pubkeys = unfollowedPubkeys)
     }
 
-    suspend fun getMutedProfiles(): Flow<List<AdvancedProfileView>> {
+    suspend fun getMutedProfiles(): Flow<List<backend.Profile>> {
         // We want to be able to unmute on the same list
         val mutedProfiles = profileDao.getAdvancedProfilesOfMutes()
         val mutesWithoutProfile = profileDao.getUnknownMutes()

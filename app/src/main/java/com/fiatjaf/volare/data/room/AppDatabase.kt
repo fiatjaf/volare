@@ -85,7 +85,6 @@ import com.fiatjaf.volare.data.room.view.SimplePostView
         MainEventEntity::class,
         RootPostEntity::class,
         LegacyReplyEntity::class,
-        CommentEntity::class,
         CrossPostEntity::class,
         HashtagEntity::class,
         VoteEntity::class,
@@ -129,7 +128,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun profileDao(): ProfileDao
     abstract fun eventRelayDao(): EventRelayDao
     abstract fun legacyReplyDao(): LegacyReplyDao
-    abstract fun commentDao(): CommentDao
     abstract fun fullProfileDao(): FullProfileDao
     abstract fun mainEventDao(): MainEventDao
     abstract fun inboxDao(): InboxDao

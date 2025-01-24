@@ -13,7 +13,6 @@ import com.fiatjaf.volare.core.MuteListViewAction
 import com.fiatjaf.volare.core.MuteListViewOpen
 import com.fiatjaf.volare.core.MuteListViewRefresh
 import com.fiatjaf.volare.core.model.TopicMuteState
-import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
 import com.fiatjaf.volare.data.provider.ProfileProvider
 import com.fiatjaf.volare.data.provider.TopicProvider
 import com.fiatjaf.volare.data.room.view.AdvancedProfileView
@@ -29,7 +28,6 @@ class MuteListViewModel(
     val mutedTopicState: LazyListState,
     val mutedWordState: LazyListState,
     val pagerState: PagerState,
-    private val lazyNostrSubscriber: LazyNostrSubscriber,
     private val profileProvider: ProfileProvider,
     private val topicProvider: TopicProvider,
 ) : ViewModel() {
@@ -38,7 +36,7 @@ class MuteListViewModel(
     private val isLoading = mutableStateOf(false)
     val mutedProfiles: MutableState<StateFlow<List<AdvancedProfileView>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
-    val mutedTopics: MutableState<StateFlow<List<StringMuteState>>> =
+    val mutedTopics: MutableState<StateFlow<List<TopicMuteState>>> =
         mutableStateOf(MutableStateFlow(emptyList()))
     val mutedWords: MutableState<List<String>> = mutableStateOf(emptyList())
 

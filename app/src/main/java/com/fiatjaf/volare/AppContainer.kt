@@ -10,22 +10,14 @@ import com.fiatjaf.volare.data.BackendDatabase
 import com.fiatjaf.volare.data.account.AccountManager
 import com.fiatjaf.volare.data.account.AccountSwitcher
 import com.fiatjaf.volare.data.account.ExternalSignerHandler
-import com.fiatjaf.volare.data.event.EventDeletor
-import com.fiatjaf.volare.data.event.EventMaker
-import com.fiatjaf.volare.data.event.EventRebroadcaster
 import com.fiatjaf.volare.data.interactor.Bookmarker
 import com.fiatjaf.volare.data.interactor.ItemSetEditor
 import com.fiatjaf.volare.data.interactor.Muter
-import com.fiatjaf.volare.data.interactor.PollVoter
 import com.fiatjaf.volare.data.interactor.PostDetailInspector
 import com.fiatjaf.volare.data.interactor.PostSender
-import com.fiatjaf.volare.data.interactor.PostVoter
 import com.fiatjaf.volare.data.interactor.ProfileFollower
 import com.fiatjaf.volare.data.interactor.ThreadCollapser
 import com.fiatjaf.volare.data.interactor.TopicFollower
-import com.fiatjaf.volare.data.nostr.FilterCreator
-import com.fiatjaf.volare.data.nostr.NostrClient
-import com.fiatjaf.volare.data.nostr.NostrService
 import com.fiatjaf.volare.data.preferences.DatabasePreferences
 import com.fiatjaf.volare.data.preferences.EventPreferences
 import com.fiatjaf.volare.data.preferences.HomePreferences
@@ -143,26 +135,6 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         hashtagDao = roomDb.hashtagDao(),
     )
 
-    val postVoter = PostVoter(
-        nostrService = nostrService,
-        relayProvider = relayProvider,
-        snackbar = snackbar,
-        context = context,
-        voteDao = roomDb.voteDao(),
-        eventDeletor = eventDeletor,
-        accountManager = accountManager,
-        eventPreferences = eventPreferences,
-    )
-
-    val pollVoter = PollVoter(
-        nostrService = nostrService,
-        relayProvider = relayProvider,
-        snackbar = snackbar,
-        context = context,
-        pollResponseDao = roomDb.pollResponseDao(),
-        pollDao = roomDb.pollDao(),
-    )
-
     val threadCollapser = ThreadCollapser()
     val topicFollower = TopicFollower()
     val bookmarker = Bookmarker()
@@ -205,19 +177,9 @@ class AppContainer(val context: Context, storageHelper: SimpleStorageHelper) {
         searchProvider = searchProvider,
     )
 
-    val postSender = PostSender(
-        nostrService = nostrService,
-        relayProvider = relayProvider,
-        mainEventInsertDao = roomDb.mainEventInsertDao(),
-        mainEventDao = roomDb.mainEventDao(),
-        eventPreferences = eventPreferences,
-        accountManager = accountManager,
-    )
-
     val relayProfileProvider = RelayProfileProvider()
 
     val itemSetEditor = ItemSetEditor(
-        nostrService = nostrService,
         relayProvider = relayProvider,
         profileSetUpsertDao = roomDb.profileSetUpsertDao(),
         topicSetUpsertDao = roomDb.topicSetUpsertDao(),

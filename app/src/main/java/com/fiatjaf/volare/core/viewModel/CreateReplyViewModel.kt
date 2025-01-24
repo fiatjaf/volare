@@ -17,10 +17,8 @@ import com.fiatjaf.volare.core.model.Poll
 import com.fiatjaf.volare.core.model.RootPost
 import com.fiatjaf.volare.core.utils.launchIO
 import com.fiatjaf.volare.core.utils.showToast
+import com.fiatjaf.volare.data.BackendDatabase
 import com.fiatjaf.volare.data.account.AccountManager
-import com.fiatjaf.volare.data.interactor.PostSender
-import com.fiatjaf.volare.data.nostr.LazyNostrSubscriber
-import com.fiatjaf.volare.data.nostr.createNprofile
 import com.fiatjaf.volare.data.room.dao.EventRelayDao
 import com.fiatjaf.volare.data.room.dao.MainEventDao
 import kotlinx.coroutines.delay
@@ -28,17 +26,16 @@ import rust.nostr.sdk.Event
 
 class CreateReplyViewModel(
     accountManager: AccountManager,
-    private val lazyNostrSubscriber: LazyNostrSubscriber,
-    private val postSender: PostSender,
+    private val backendDB: BackendDatabase,
     private val snackbar: SnackbarHostState,
     private val eventRelayDao: EventRelayDao,
     private val mainEventDao: MainEventDao,
 ) : ViewModel() {
     val ourPubkey = accountManager.pubkeyHexFlow
     val isSendingReply = mutableStateOf(false)
-    val parent: MutableState<MainEvent?> = mutableStateOf(null)
+    val parent: MutableState<backend.Note?> = mutableStateOf(null)
 
-    fun openParent(newParent: MainEvent) {
+    fun openParent(newParent: backend.Note) {
         val relevantId = newParent.getRelevantId()
         if (relevantId == this.parent.value?.id) return
 
@@ -75,6 +72,8 @@ class CreateReplyViewModel(
 
         isSendingReply.value = true
         viewModelScope.launchIO {
+
+
             val json = mainEventDao.getJson(id = action.parent.id)
 
             val result = if (json != null) {

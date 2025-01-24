@@ -5,7 +5,6 @@ import com.fiatjaf.volare.VMContainer
 import com.fiatjaf.volare.core.NavEvent
 import com.fiatjaf.volare.core.PopNavEvent
 import com.fiatjaf.volare.core.PushNavEvent
-import com.fiatjaf.volare.data.nostr.createNevent
 
 class Navigator(private val vmContainer: VMContainer, private val closeApp: () -> Unit) {
     val stack = mutableStateOf<List<NavView>>(listOf(HomeNavView))
@@ -43,15 +42,13 @@ class Navigator(private val vmContainer: VMContainer, private val closeApp: () -
             is AdvancedNonMainNavView -> {
                 when (navView) {
                     is ThreadNavView -> vmContainer.threadVM.openThread(
-                        nevent = createNevent(hex = navView.mainEvent.id),
-                        parentUi = navView.mainEvent
+                        pointer = backend.Backend.eventPointerFromID(navView.note.id()),
+                        parentUi = navView.note
                     )
-
                     is ThreadRawNavView -> vmContainer.threadVM.openThread(
-                        nevent = navView.nevent,
+                        pointer = backend.Backend.neventParse(navView.nevent),
                         parentUi = navView.parent
                     )
-
                     is ProfileNavView -> vmContainer.profileVM.openProfile(profileNavView = navView)
                     is TopicNavView -> vmContainer.topicVM.openTopic(topicNavView = navView)
                     is ReplyCreationNavView -> vmContainer.createReplyVM.openParent(newParent = navView.parent)

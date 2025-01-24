@@ -211,17 +211,27 @@ class Core(
             uriHandler?.openUri("https://njump.me/$nostrStr")
         }
 
-        if (str.startsWith("nprofile1")) {
-            onUpdate(OpenProfile(Backend.parseBech32(str)))
-        } else if (str.startsWith("npub1")) {
-            onUpdate(OpenProfile(Backend.parseBech32(str)))
-        } else if (str.startsWith("nevent1")) {
-            onUpdate(OpenThreadRaw(Backend.parseBech32(str)))
+        if (str.startsWith("nprofile1") || str.startsWith("npub1")) {
+            runCatching { Backend.parseBech32(str) }
+                .onSuccess {
+                    onUpdate(OpenProfile(it))
+                    return
+                }
+        } else if (str.startsWith("nevent1") || str.startsWith("note1")) {
+            runCatching { Backend.parseBech32(str) }
+                .onSuccess {
+                    onUpdate(OpenThreadRaw(it))
+                    return
+                }
         } else if (str.startsWith("naddr1")) {
-            onHandleUri(str)
-        } else {
-            Log.w(TAG, "Unknown clickable string '$str'")
+            runCatching { Backend.parseBech32(str) }
+                .onSuccess {
+                    onHandleUri(str)
+                    return
+                }
         }
+
+        Log.w(TAG, "Unknown clickable string '$str'")
     }
 
     override fun onCleared() {

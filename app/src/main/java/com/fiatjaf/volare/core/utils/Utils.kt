@@ -315,35 +315,6 @@ fun mergeToMainEventUIList(
     return result.sortedByDescending { it.createdAt }.take(size)
 }
 
-fun mergeToSomeReplyUIList(
-    legacyReplies: Collection<LegacyReplyView>,
-    comments: Collection<CommentView>,
-    votes: Map<String, Boolean>,
-    follows: Map<String, Boolean>,
-    bookmarks: Map<String, Boolean>,
-    size: Int,
-    ourPubKey: String,
-    annotatedStringProvider: AnnotatedStringProvider,
-): List<SomeReply> {
-    val result = mutableListOf<SomeReply>()
-
-    mergeToMainEventUIList(
-        roots = emptyList(),
-        crossPosts = emptyList(),
-        polls = emptyList(),
-        pollOptions = emptyList(),
-        legacyReplies = legacyReplies,
-        comments = comments,
-        votes = votes,
-        follows = follows,
-        bookmarks = bookmarks,
-        size = size,
-        ourPubKey = ourPubKey,
-        annotatedStringProvider = annotatedStringProvider
-    ).forEach { if (it is SomeReply) result.add(it) }
-
-    return result
-}
 
 fun createAdvancedProfile(
     pubkey: String,
@@ -371,13 +342,7 @@ fun String.containsNoneIgnoreCase(strs: Collection<String>): Boolean {
     return strs.none { this.contains(other = it, ignoreCase = true) }
 }
 
-fun String.containsAnyIgnoreCase(strs: Collection<String>): Boolean {
-    return strs.any { this.contains(other = it, ignoreCase = true) }
-}
-
 fun String.toTextFieldValue() = TextFieldValue(text = this, selection = TextRange(this.length))
-
-fun createVolareClientTag() = Tag.parse(listOf("client", VOLARE))
 
 fun getFullDateTime(ctx: Context, createdAt: Long): String {
     return DateUtils.formatDateTime(

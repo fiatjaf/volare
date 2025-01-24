@@ -27,13 +27,8 @@ import androidx.compose.ui.res.stringResource
 import com.fiatjaf.volare.R
 import com.fiatjaf.volare.core.OpenThreadRaw
 import com.fiatjaf.volare.core.ThreadViewRefresh
-import com.fiatjaf.volare.core.model.Comment
-import com.fiatjaf.volare.core.model.LegacyReply
-import com.fiatjaf.volare.core.model.Poll
-import com.fiatjaf.volare.core.model.RootPost
-import com.fiatjaf.volare.core.model.SomeReply
+import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.core.viewModel.ThreadViewModel
-import com.fiatjaf.volare.data.nostr.createNevent
 import com.fiatjaf.volare.ui.components.FullHorizontalDivider
 import com.fiatjaf.volare.ui.components.bottomSheet.PostDetailsBottomSheet
 import com.fiatjaf.volare.ui.components.indicator.BaseHint
@@ -84,15 +79,15 @@ private fun ThreadViewContent(
     onUpdate: (UIEvent) -> Unit
 ) {
     val adjustedReplies = remember(localRoot, replies) {
-        when (localRoot.threadableMainEvent) {
-            is RootPost, is Poll -> replies
-            is LegacyReply, is Comment -> replies.map { it.copy(level = it.level + 2) }
+        when (localRoot.threadableNote.`is`()) {
+            backend.Backend.IsReply -> replies.map { it.copy(level = it.level + 2) }
+            else -> replies
         }
     }
     PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = { onUpdate(ThreadViewRefresh) }) {
-        val replyCountDif = remember(localRoot.mainEvent.replyCount, adjustedReplies) {
+        val replyCountDif = remember(localRoot.threadableNote.replyCount(), adjustedReplies) {
             val minLvl = adjustedReplies.minByOrNull { it.level }?.level
-            localRoot.mainEvent.replyCount - adjustedReplies.filter { it.level == minLvl }.size
+            localRoot.threadableNote.replyCount() - adjustedReplies.filter { it.level == minLvl }.size
         }
 
         LazyColumn(
@@ -100,24 +95,15 @@ private fun ThreadViewContent(
             contentPadding = PaddingValues(bottom = spacing.xxl),
             state = state
         ) {
-            if (parentIsAvailable && localRoot.threadableMainEvent is SomeReply) {
-                val parentId = when (localRoot.threadableMainEvent) {
-                    is LegacyReply -> localRoot.threadableMainEvent.parentId
-                    is Comment -> localRoot.threadableMainEvent.parentId
-                }
-                if (parentId != null) item {
+            if (parentIsAvailable) {
+                val parentId = localRoot.threadableNote.parent()
+                if (parentId != "") item {
                     OpenParentButton(
                         modifier = Modifier.padding(start = spacing.medium),
                         parentId = parentId,
                         onUpdate = onUpdate
                     )
                 }
-            } else if (
-                !parentIsAvailable &&
-                localRoot.threadableMainEvent is Comment &&
-                !localRoot.threadableMainEvent.parentIsSupported()
-            ) item {
-                HintText(text = stringResource(id = R.string.parent_event_is_not_supported))
             }
             item {
                 MainEventRow(
@@ -125,11 +111,11 @@ private fun ThreadViewContent(
                     onUpdate = onUpdate
                 )
             }
-            when (localRoot.threadableMainEvent) {
-                is RootPost, is Poll -> item { FullHorizontalDivider() }
-                is Comment, is LegacyReply -> {}
+            when (localRoot.threadableNote.`is`()) {
+                backend.Backend.IsRoot, backend.Backend.IsPoll -> item { FullHorizontalDivider() }
+                else -> {}
             }
-            if (localRoot.mainEvent.replyCount > totalReplyCount) item {
+            if (localRoot.threadableNote.replyCount() > totalReplyCount) item {
                 FullLinearProgressIndicator()
             }
             itemsIndexed(adjustedReplies) { i, reply ->
@@ -149,7 +135,7 @@ private fun ThreadViewContent(
                 )
             }
 
-            if (localRoot.mainEvent.replyCount == 0 && adjustedReplies.isEmpty()) item {
+            if (localRoot.threadableNote.replyCount() == 0L && adjustedReplies.isEmpty()) item {
                 Column(modifier = Modifier.fillParentMaxHeight(0.5f)) {
                     BaseHint(text = stringResource(id = R.string.no_comments_found))
                 }
@@ -188,7 +174,7 @@ private fun OpenParentButton(
 ) {
     TextButton(
         modifier = modifier,
-        onClick = { onUpdate(OpenThreadRaw(nevent = createNevent(hex = parentId))) }
+        onClick = { onUpdate(OpenThreadRaw(pointer = backend.Backend.eventPointerFromID(parentId))) }
     ) {
         Text(text = stringResource(id = R.string.open_parent))
     }

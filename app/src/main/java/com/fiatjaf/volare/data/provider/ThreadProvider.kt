@@ -23,21 +23,10 @@ private const val TAG = "ThreadProvider"
 
 class ThreadProvider(
     private val accountManager: AccountManager,
-    private val nostrSubscriber: NostrSubscriber,
     private val room: AppDatabase,
     private val collapsedIds: Flow<Set<String>>,
     private val annotatedStringProvider: AnnotatedStringProvider,
 ) {
-    fun getLocalRoot(
-        scope: CoroutineScope,
-        nevent: String,
-        isInit: Boolean
-    ): Flow<backend.Note?> {
-        scope.launchIO {
-            // TODO: call backend
-        }
-    }
-
     fun getParentIsAvailableFlow(scope: CoroutineScope, replyId: String): Flow<Boolean> {
         scope.launchIO {
             // TODO: call backend
@@ -49,16 +38,10 @@ class ThreadProvider(
         // TODO: call backend
     }
 
-    // don't update oldestCreatedAt in replies. They are always younger than root
-    fun getReplyCtxs(
-        rootId: String,
-        parentIds: Set<String>,
-    ): Flow<List<ThreadReplyCtx>> {
+    fun getReplyCtxs(root: backend.Note): Flow<List<ThreadReplyCtx>> {
         // TODO: Only comments when opening poll
         val allIds = parentIds + rootId
         val legacyFlow = room.legacyReplyDao().getRepliesFlow(parentIds = allIds)
-            .firstThenDistinctDebounce(DEBOUNCE)
-        val commentFlow = room.commentDao().getCommentsFlow(parentIds = allIds)
             .firstThenDistinctDebounce(DEBOUNCE)
         val opPubkeyFlow = room.mainEventDao().getAuthorFlow(id = rootId)
             .firstThenDistinctDebounce(DEBOUNCE)
@@ -97,29 +80,6 @@ class ThreadProvider(
                 result.add(result.indexOf(parent) + 1, leveledReply)
             }
 
-            // Comments after replies because they can reference replies, not the other way around
-            for (comment in comments) {
-                if (comment.pubkey != accountManager.getPublicKeyHex() && hasMutedWords(comment.content)) continue
-                val parent = result.find { it.reply.id == comment.parentId }
-
-                if (parent?.isCollapsed == true) continue
-                if (parent == null && comment.parentId != rootId) continue
-
-                val leveledComment = comment.mapToThreadReplyCtx(
-                    level = parent?.level?.plus(1) ?: 0,
-                    isOp = opPubkey == comment.pubkey,
-                    collapsedIds = collapsed,
-                    parentIds = parentIds,
-                    ourPubKey = accountManager.getPublicKeyHex(),
-                    annotatedStringProvider = annotatedStringProvider
-                )
-
-                if (comment.parentId == rootId) {
-                    result.add(leveledComment)
-                    continue
-                }
-                result.add(result.indexOf(parent) + 1, leveledComment)
-            }
 
             val firstTopLevelCommentIndex =
                 result.indexOfFirst { it.level == 0 && it.reply is Comment }

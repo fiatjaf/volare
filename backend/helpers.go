@@ -1,6 +1,10 @@
 package backend
 
-import "github.com/nbd-wtf/go-nostr/sdk"
+import (
+	"cmp"
+
+	"github.com/nbd-wtf/go-nostr/sdk"
+)
 
 func flattenProfileList(pl []sdk.ProfileRef) []string {
 	pubkeys := make([]string, len(pl))
@@ -13,4 +17,8 @@ func flattenProfileList(pl []sdk.ProfileRef) []string {
 func swapDelete[A any](slice []A, idx int) []A {
 	slice[idx] = slice[len(slice)-1] // move last element to target position
 	return slice[0 : len(slice)-1]   // forget last element
+}
+
+func compareNotesMostRecentFirst(a, b note) int {
+	return -cmp.Compare(a.Event.CreatedAt, b.Event.CreatedAt)
 }

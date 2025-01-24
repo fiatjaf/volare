@@ -16,10 +16,10 @@ fun ClickableProfileRow(
             isOneself = profile.pubkey() == ourPubkey,
             isFriend = profile.isFollowedBy(ourPubkey),
             isWebOfTrust = profile.isInNetworkOf(ourPubkey),
-            isMuted = profile.IsMutedBy(ourPubkey),
-            isInList = profile.IsInListOf(ourPubkey),
+            isMuted = profile.isMutedBy(ourPubkey),
+            isInList = profile.isInFollowSetOf(ourPubkey),
         ),
-        header = profile.name,
+        header = profile.name(),
         trailingContent = trailingContent,
         onClick = onClick,
     )

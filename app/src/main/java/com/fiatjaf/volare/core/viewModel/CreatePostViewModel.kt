@@ -18,7 +18,6 @@ import kotlinx.coroutines.delay
 
 class CreatePostViewModel(
     accountManager: AccountManager,
-    private val postSender: PostSender,
     private val snackbar: SnackbarHostState,
 ) : ViewModel() {
     val ourPubkey = accountManager.pubkeyHexFlow

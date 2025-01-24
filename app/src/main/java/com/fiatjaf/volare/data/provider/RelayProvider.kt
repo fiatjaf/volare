@@ -21,9 +21,6 @@ import com.fiatjaf.volare.data.model.NoPubkeys
 import com.fiatjaf.volare.data.model.PubkeySelection
 import com.fiatjaf.volare.data.model.SingularPubkey
 import com.fiatjaf.volare.data.model.WebOfTrustPubkeys
-import com.fiatjaf.volare.data.nostr.Nip65Relay
-import com.fiatjaf.volare.data.nostr.NostrClient
-import com.fiatjaf.volare.data.nostr.removeTrailingSlashes
 import com.fiatjaf.volare.data.preferences.RelayPreferences
 import com.fiatjaf.volare.data.room.dao.EventRelayDao
 import com.fiatjaf.volare.data.room.dao.Nip65Dao

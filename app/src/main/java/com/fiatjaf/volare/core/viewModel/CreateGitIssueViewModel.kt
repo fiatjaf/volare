@@ -20,9 +20,7 @@ import kotlinx.coroutines.delay
 
 class CreateGitIssueViewModel(
     accountManager: AccountManager,
-    private val postSender: PostSender,
     private val snackbar: SnackbarHostState,
-    private val lazyNostrSubscriber: LazyNostrSubscriber,
 ) : ViewModel() {
     val ourPubkey = accountManager.pubkeyHexFlow
     val isSendingIssue = mutableStateOf(false)

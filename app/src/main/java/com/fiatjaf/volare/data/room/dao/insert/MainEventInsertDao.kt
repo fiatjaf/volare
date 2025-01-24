@@ -61,14 +61,6 @@ interface MainEventInsertDao {
         internalInsertLegacyReplyEntities(legacyReplies = entities)
     }
 
-    @Transaction
-    suspend fun insertComments(comments: Collection<ValidatedComment>) {
-        if (comments.isEmpty()) return
-
-        internalInsertMainEvents(mainEvents = comments)
-        internalInsertCommentEntities(comments = comments.map { CommentEntity.from(comment = it) })
-    }
-
     suspend fun internalInsertMainEvents(mainEvents: Collection<ValidatedMainEvent>) {
         val mainEntities = mainEvents.map { MainEventEntity.from(mainEvent = it) }
         internalInsertMainEventEntities(mainEvents = mainEntities)

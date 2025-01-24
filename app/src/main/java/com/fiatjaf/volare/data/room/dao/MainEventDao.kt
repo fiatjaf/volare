@@ -15,12 +15,6 @@ interface MainEventDao {
     @Query("SELECT * FROM mainEvent WHERE id = :id")
     suspend fun getPost(id: String): MainEventEntity?
 
-    @Query("SELECT pubkey FROM mainEvent WHERE id = :id")
-    suspend fun getAuthor(id: String): String?
-
-    @Query("SELECT pubkey FROM mainEvent WHERE id = :id")
-    fun getAuthorFlow(id: String): Flow<String?>
-
     @Query(
         "SELECT pubkey " +
                 "FROM mainEvent " +

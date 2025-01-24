@@ -18,7 +18,6 @@ import kotlinx.coroutines.delay
 private const val TAG = "CreateCrossPostViewModel"
 
 class CreateCrossPostViewModel(
-    private val postSender: PostSender,
     private val snackbar: SnackbarHostState,
 ) : ViewModel() {
     val isSending = mutableStateOf(false)

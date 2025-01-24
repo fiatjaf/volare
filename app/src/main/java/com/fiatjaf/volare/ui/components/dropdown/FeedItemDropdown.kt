@@ -1,6 +1,5 @@
 package com.fiatjaf.volare.ui.components.dropdown
 
-
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,31 +15,17 @@ import com.fiatjaf.volare.core.FollowProfile
 import com.fiatjaf.volare.core.OpenPostInfo
 import com.fiatjaf.volare.core.OpenThreadRaw
 import com.fiatjaf.volare.core.RebroadcastPost
+import com.fiatjaf.volare.core.UIEvent
 import com.fiatjaf.volare.core.UnfollowProfile
-import com.fiatjaf.volare.core.model.Comment
-import com.fiatjaf.volare.core.model.CrossPost
-import com.fiatjaf.volare.core.model.FriendTrust
-import com.fiatjaf.volare.core.model.IsInListTrust
-import com.fiatjaf.volare.core.model.LegacyReply
-import com.fiatjaf.volare.core.model.MainEvent
-import com.fiatjaf.volare.core.model.Muted
-import com.fiatjaf.volare.core.model.NoTrust
-import com.fiatjaf.volare.core.model.Oneself
-import com.fiatjaf.volare.core.model.Poll
-import com.fiatjaf.volare.core.model.RootPost
-import com.fiatjaf.volare.core.model.WebTrust
 import com.fiatjaf.volare.core.utils.copyAndToast
 import com.fiatjaf.volare.core.utils.createProcessTextIntent
 import com.fiatjaf.volare.core.utils.getTranslators
-import com.fiatjaf.volare.data.nostr.createNevent
-import com.fiatjaf.volare.data.nostr.createNeventUri
-import com.fiatjaf.volare.data.nostr.NOSTR_URI
-import com.fiatjaf.volare.data.provider.TextItem
 
 @Composable
 fun FeedItemDropdown(
+    ourPubkey: String,
     isOpen: Boolean,
-    mainEvent: MainEvent,
+    mainEvent: backend.Note,
     onDismiss: () -> Unit,
     onUpdate: (UIEvent) -> Unit
 ) {
@@ -49,39 +34,35 @@ fun FeedItemDropdown(
         onDismissRequest = onDismiss
     ) {
         FollowItem(
+            ourPubkey = ourPubkey,
             mainEvent = mainEvent,
             onDismiss = onDismiss,
             onUpdate = onUpdate
         )
         FollowCrossPostedItem(
+            ourPubkey = ourPubkey,
             mainEvent = mainEvent,
             onDismiss = onDismiss,
             onUpdate = onUpdate
         )
 
-        when (mainEvent) {
-            is RootPost, is CrossPost, is Poll -> {}
-            is LegacyReply, is Comment -> SimpleDropdownItem(
+        when (mainEvent.`is`()) {
+            backend.Backend.IsReply -> SimpleDropdownItem(
                 text = stringResource(id = R.string.open_as_root),
                 onClick = {
-                    onUpdate(OpenThreadRaw(nevent = createNevent(hex = mainEvent.id)))
+                    onUpdate(OpenThreadRaw(backend.Backend.eventPointerFromID(mainEvent.id())))
                     onDismiss()
                 })
         }
 
         val context = LocalContext.current
-        val nevent = createNeventUri(
-            hex = mainEvent.getRelevantId(),
-            author = mainEvent.getRelevantPubkey(),
-            relays = listOf(mainEvent.relayUrl).filter { it.isNotEmpty() },
-            kind = mainEvent.getRelevantKind()
-        )
+        val nevent = mainEvent.nevent()
         SimpleDropdownItem(
             text = stringResource(id = R.string.share_web),
             onClick = {
                 context.startActivity(Intent.createChooser(Intent().apply {
                     action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, "https://njump.me/${nevent.drop(NOSTR_URI.length)}")
+                    putExtra(Intent.EXTRA_TEXT, "https://njump.me/$nevent")
                     type = "text/plain"
                 }, null))
                 onDismiss()
@@ -108,7 +89,7 @@ fun FeedItemDropdown(
             text = stringResource(id = R.string.copy_content),
             onClick = {
                 copyAndToast(
-                    text = mainEvent.content.map { when (it) { is TextItem.AString -> it.value.text; else -> "" } }.joinToString(""),
+                    text = mainEvent.content(),
                     toast = contentCopiedToast,
                     context = context,
                     clip = clip
@@ -116,11 +97,11 @@ fun FeedItemDropdown(
                 onDismiss()
             }
         )
-        if (!mainEvent.isBookmarked) {
+        if (!mainEvent.isBookmarkedBy(ourPubkey)) {
             SimpleDropdownItem(
                 text = stringResource(id = R.string.bookmark),
                 onClick = {
-                    onUpdate(BookmarkPost(id = mainEvent.getRelevantId()))
+                    onUpdate(BookmarkPost(id = mainEvent.relevantID()))
                     onDismiss()
                 }
             )
@@ -128,22 +109,22 @@ fun FeedItemDropdown(
         SimpleDropdownItem(
             text = stringResource(id = R.string.rebroadcast),
             onClick = {
-                // RelevantId bc repost json is not saved in db
-                onUpdate(RebroadcastPost(postId = mainEvent.getRelevantId(), context = context))
+                // relevantId bc repost json is not saved in db
+                onUpdate(RebroadcastPost(postId = mainEvent.relevantID(), context = context))
                 onDismiss()
             }
         )
-        if (mainEvent.trustType is Oneself) {
+        if (mainEvent.pubkey() == ourPubkey) {
             SimpleDropdownItem(
                 text = stringResource(id = R.string.attempt_deletion),
                 onClick = {
-                    onUpdate(DeletePost(id = mainEvent.id))
+                    onUpdate(DeletePost(id = mainEvent.id()))
                     onDismiss()
                 }
             )
         }
 
-        if (mainEvent.trustType !is Oneself) {
+        if (mainEvent.pubkey() != ourPubkey) {
             val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
             ) { _ -> }
@@ -154,7 +135,7 @@ fun FeedItemDropdown(
                     onClick = {
                         launcher.launch(
                             createProcessTextIntent(
-                                text = mainEvent.content.map { when (it) { is TextItem.AString -> it.value.text; else -> "" } }.joinToString(""),
+                                text = mainEvent.content(),
                                 info = translator
                             )
                         )
@@ -166,7 +147,7 @@ fun FeedItemDropdown(
         SimpleDropdownItem(
             text = stringResource(id = R.string.more),
             onClick = {
-                onUpdate(OpenPostInfo(postId = mainEvent.getRelevantId()))
+                onUpdate(OpenPostInfo(postId = mainEvent.relevantID()))
                 onDismiss()
             }
         )
@@ -175,62 +156,56 @@ fun FeedItemDropdown(
 
 @Composable
 private fun FollowItem(
-    mainEvent: MainEvent,
+    ourPubkey: String,
+    mainEvent: backend.Note,
     onDismiss: () -> Unit,
     onUpdate: (UIEvent) -> Unit
 ) {
-    when (mainEvent.trustType) {
-        Oneself, Muted -> {}
-        FriendTrust -> {
-            SimpleDropdownItem(
-                text = stringResource(id = R.string.unfollow),
-                onClick = {
-                    onUpdate(UnfollowProfile(pubkey = mainEvent.pubkey))
-                    onDismiss()
-                }
-            )
-        }
-
-        NoTrust, WebTrust, IsInListTrust -> {
-            SimpleDropdownItem(
-                text = stringResource(id = R.string.follow),
-                onClick = {
-                    onUpdate(FollowProfile(pubkey = mainEvent.pubkey))
-                    onDismiss()
-                }
-            )
-        }
+    if (mainEvent.authorIsFollowedBy(ourPubkey)) {
+        SimpleDropdownItem(
+            text = stringResource(id = R.string.unfollow),
+            onClick = {
+                onUpdate(UnfollowProfile(pubkey = mainEvent.pubkey()))
+                onDismiss()
+            }
+        )
+    } else if (mainEvent.pubkey() != ourPubkey) {
+        SimpleDropdownItem(
+            text = stringResource(id = R.string.follow),
+            onClick = {
+                onUpdate(FollowProfile(pubkey = mainEvent.pubkey()))
+                onDismiss()
+            }
+        )
     }
 }
 
 @Composable
 private fun FollowCrossPostedItem(
-    mainEvent: MainEvent,
+    ourPubkey: String,
+    mainEvent: backend.Note,
     onDismiss: () -> Unit,
     onUpdate: (UIEvent) -> Unit
 ) {
-    if (mainEvent is CrossPost) {
-        when (mainEvent.crossPostedTrustType) {
-            Oneself, Muted -> {}
-            FriendTrust -> {
-                SimpleDropdownItem(
-                    text = stringResource(id = R.string.unfollow_cross_posted_author),
-                    onClick = {
-                        onUpdate(UnfollowProfile(pubkey = mainEvent.crossPostedPubkey))
-                        onDismiss()
-                    }
-                )
-            }
+    if (mainEvent.`is`() == backend.Backend.IsRepost) {
+        val repost = mainEvent.repost()
 
-            NoTrust, WebTrust, IsInListTrust -> {
-                SimpleDropdownItem(
-                    text = stringResource(id = R.string.follow_cross_posted_author),
-                    onClick = {
-                        onUpdate(FollowProfile(pubkey = mainEvent.crossPostedPubkey))
-                        onDismiss()
-                    }
-                )
-            }
+        if (repost.authorIsFollowedBy(ourPubkey)) {
+            SimpleDropdownItem(
+                text = stringResource(id = R.string.unfollow_cross_posted_author),
+                onClick = {
+                    onUpdate(UnfollowProfile(pubkey = repost.pubkey()))
+                    onDismiss()
+                }
+            )
+        } else if (repost.pubkey() != ourPubkey) {
+            SimpleDropdownItem(
+                text = stringResource(id = R.string.follow_cross_posted_author),
+                onClick = {
+                    onUpdate(FollowProfile(pubkey = repost.pubkey()))
+                    onDismiss()
+                }
+            )
         }
     }
 }
