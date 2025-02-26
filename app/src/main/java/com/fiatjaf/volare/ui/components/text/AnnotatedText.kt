@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import coil3.compose.asPainter
 import coil3.imageLoader
 import coil3.request.CachePolicy
@@ -62,15 +63,17 @@ fun AnnotatedText(
     val addedHeight = remember { mutableStateOf(0) }
     var lastWasSpacer = remember { mutableStateOf(true) } // Start with true, so if a media is the first item, skip the spacer
     var realHeight by remember { mutableStateOf(0) }
+    var maxHeight = (addedHeight.value + (maxLines * style.lineHeight.value)).dp
+    val maxHeightPx = with(LocalDensity.current) { maxHeight.toPx() }
 
     Box(modifier = modifier) {
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier
             .onGloballyPositioned { layoutCoordinates ->
-                realHeight = layoutCoordinates.size.height
+                realHeight = layoutCoordinates.size.height // Warning: height is calculated after the cropping done by the following command
             }
-            .heightIn(max = (addedHeight.value + (maxLines * style.lineHeight.value)).dp)
+            .heightIn(max = maxHeight)
             .padding(top = 0.dp, bottom = 0.dp)
         ) {
             items.forEach { item ->
@@ -115,16 +118,21 @@ fun AnnotatedText(
             lastWasSpacer.value = true
         }
 
-        val maxHeight = addedHeight.value + maxLines * style.lineHeight.value
-        if (realHeight > maxHeight) {
+        // Ugly hack: since realHeight is the eventually cropped height,
+        // compare it with max height to check if the box have been cropped
+        if (realHeight.toFloat() == maxHeightPx) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)
+                    .height(60.dp)
                     .align(Alignment.BottomCenter)
                     .background(
                         brush = Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background),
+                            colorStops = arrayOf(
+                                0.0f to Color.Transparent,
+                                0.3f to MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
+                                1.0f to MaterialTheme.colorScheme.background
+                            ),
                             startY = 0f,
                             endY = 100f
                         )
