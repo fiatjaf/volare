@@ -1,5 +1,6 @@
 package com.fiatjaf.volare.ui.components.text
 
+import kotlin.math.abs
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.clickable
@@ -120,7 +121,8 @@ fun AnnotatedText(
 
         // Ugly hack: since realHeight is the eventually cropped height,
         // compare it with max height to check if the box have been cropped
-        if (realHeight.toFloat() == maxHeightPx) {
+        // and add a +/-30px rounding, since the truncation is not px precise
+        if (abs(realHeight.toFloat() - maxHeightPx) < 30) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

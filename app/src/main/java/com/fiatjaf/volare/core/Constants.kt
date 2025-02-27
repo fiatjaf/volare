@@ -16,7 +16,7 @@ const val MAX_POLL_OPTIONS = 12
 const val MAX_POLL_OPTION_LEN = 128
 
 const val MAX_SUBJECT_LINES = 3
-const val MAX_CONTENT_LINES = 16
+const val MAX_CONTENT_LINES = 20
 
 const val DELAY_1SEC = 1000L
 const val DELAY_10SEC = 10 * DELAY_1SEC
